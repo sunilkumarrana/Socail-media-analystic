@@ -289,6 +289,24 @@ export function generateMockStats(
     postsCountFormatted: formatNumber(postsCount),
     postsDelta,
     postsDeltaPositive: true,
+    trajectoryStatus: vDeltaNum >= 0 ? "growing" : "decreasing",
+    trajectoryPercent: Number((vDeltaNum * 3.8).toFixed(1)),
+    trajectoryFormatted: `${vDeltaNum >= 0 ? "+" : ""}${(vDeltaNum * 3.8).toFixed(1)}%`,
+    likesHealth: {
+      status: eDeltaNum >= 0 ? "good" : "bad",
+      rate: engagementRate,
+      deltaPercent: Number((eDeltaNum * 12).toFixed(1)),
+      deltaFormatted: `${eDeltaNum >= 0 ? "+" : ""}${(eDeltaNum * 12).toFixed(1)}%`,
+      isPositive: eDeltaNum >= 0,
+    },
+    viewsHealth: {
+      status: vDeltaNum >= 0 ? "good" : "bad",
+      deltaPercent: Number(vDeltaNum.toFixed(1)),
+      deltaFormatted: viewsDelta,
+      isPositive: vDeltaNum >= 0,
+      recentAvg: Math.round(totalViews / Math.max(1, postsCount)),
+      channelAvg: Math.round(totalViews / Math.max(1, postsCount)),
+    },
   };
 
   // Generate 90-day historical points
@@ -395,6 +413,15 @@ export function generateMockStats(
         { title: "Special Guest Interviews", views: formatNumber(Math.round(totalViews * 0.18)) },
         { title: "Weekly Compilations", views: formatNumber(Math.round(totalViews * 0.12)) },
       ],
+      interactionRates: {
+        overallRate: Number((rng.range(5.8, 8.4)).toFixed(1)),
+        likesPerKViews: Number((rng.range(46.0, 68.0)).toFixed(1)),
+        commentsPerKViews: Number((rng.range(4.5, 8.2)).toFixed(1)),
+        sharesPerKViews: Number((rng.range(8.0, 16.5)).toFixed(1)),
+        cardClickRate: Number((rng.range(1.5, 3.2)).toFixed(1)),
+        endScreenRate: 4.8,
+        saveToPlaylistRate: Number((rng.range(2.4, 4.8)).toFixed(1)),
+      },
     },
     audience: {
       returningViewers: Math.round(followers * 0.58),
@@ -562,9 +589,32 @@ function generateTopContent(
 
     let type: "video" | "reel" | "post" | "thread" = "post";
     let durationOrLength = undefined;
+    let videoUrl = "";
+    let thumbnailUrl = "";
+
+    const sampleYoutubeIds = [
+      "kJQP7kiw5Fk",
+      "dQw4w9WgXcQ",
+      "fJ9rUzIMcZQ",
+      "L_LUpnjgPso",
+      "9bZkp7q19f0",
+    ];
+
+    const sampleThumbnails = [
+      "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80",
+    ];
+
+    const cleanHandle = displayName.replace(/[^a-zA-Z0-9_]/g, "").toLowerCase() || "creator";
 
     if (platform === "youtube") {
       type = "video";
+      const ytId = sampleYoutubeIds[i % sampleYoutubeIds.length];
+      videoUrl = `https://www.youtube.com/watch?v=${ytId}`;
+      thumbnailUrl = `https://i.ytimg.com/vi/${ytId}/mqdefault.jpg`;
       durationOrLength = `${rng.intRange(8, 24)}:${rng
         .intRange(10, 59)
         .toString()
@@ -572,9 +622,13 @@ function generateTopContent(
     } else if (platform === "instagram") {
       type = i % 2 === 0 ? "reel" : "post";
       durationOrLength = type === "reel" ? "0:45 Reel" : "Carousel";
+      videoUrl = `https://instagram.com/p/C${i + 1}xY${rng.intRange(100, 999)}/`;
+      thumbnailUrl = sampleThumbnails[i % sampleThumbnails.length];
     } else {
       type = i === 1 ? "thread" : "post";
       durationOrLength = type === "thread" ? "6 tweets" : undefined;
+      videoUrl = `https://x.com/${cleanHandle}/status/182000000000000000${i + 1}`;
+      thumbnailUrl = sampleThumbnails[i % sampleThumbnails.length];
     }
 
     items.push({
@@ -595,6 +649,8 @@ function generateTopContent(
       engagementRate: er,
       type,
       durationOrLength,
+      videoUrl,
+      thumbnailUrl,
     });
   }
 

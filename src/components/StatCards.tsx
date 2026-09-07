@@ -108,8 +108,26 @@ export const StatCards: React.FC<StatCardsProps> = ({ stats, platform }) => {
               </div>
             </div>
 
-            <div className="mt-2 text-[11px] text-slate-400">
-              {card.period}
+            <div className="mt-2 flex items-center justify-between text-[11px] text-slate-400">
+              <span>{card.period}</span>
+              {card.id === "stat-views" && stats.viewsHealth && (
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+                  stats.viewsHealth.isPositive 
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+                    : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                }`}>
+                  {stats.viewsHealth.status.toUpperCase()} ({stats.viewsHealth.deltaFormatted})
+                </span>
+              )}
+              {card.id === "stat-engagement" && stats.likesHealth && (
+                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium border ${
+                  stats.likesHealth.isPositive 
+                    ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+                    : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                }`}>
+                  LIKES: {stats.likesHealth.status.toUpperCase()} ({stats.likesHealth.deltaFormatted})
+                </span>
+              )}
             </div>
           </div>
         );

@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from "react";
 import { DashboardDataset, StudioAnalytics } from "../types";
 import { formatNumber } from "../utils/mockGenerator";
+import { ReachTab } from "./ReachTab";
+import { EngagementTab } from "./EngagementTab";
+import { AudienceTab } from "./AudienceTab";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -32,6 +35,7 @@ import {
   Calendar,
   Sparkles,
   TrendingUp,
+  TrendingDown,
   Radio,
   CheckCircle2,
   Video,
@@ -461,9 +465,11 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
               <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 {periodWatchTimeFormatted}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>{studioData.engagement.watchTimeDelta} vs benchmark</span>
+              <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
+                stats.viewsDeltaPositive ? "text-emerald-400" : "text-rose-400"
+              }`}>
+                {stats.viewsDeltaPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                <span>{stats.viewsDeltaPositive ? studioData.engagement.watchTimeDelta : `-${studioData.engagement.watchTimeDelta.replace("+", "")}`} vs benchmark</span>
               </div>
             </div>
 
@@ -478,7 +484,9 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
               <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 {stats.followersFormatted}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
+              <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
+                stats.followersDeltaPositive ? "text-emerald-400" : "text-rose-400"
+              }`}>
                 <UserPlus className="h-3.5 w-3.5" />
                 <span>{stats.followersDelta} recent net growth</span>
               </div>
@@ -495,9 +503,11 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
               <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
                 {stats.engagementRate}%
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-400 font-medium">
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>{stats.engagementDelta} above creator benchmark</span>
+              <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
+                stats.engagementDeltaPositive ? "text-emerald-400" : "text-rose-400"
+              }`}>
+                {stats.engagementDeltaPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+                <span>{stats.engagementDelta} {stats.engagementDeltaPositive ? "above" : "below"} creator benchmark</span>
               </div>
             </div>
           </div>
@@ -634,445 +644,32 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
 
       {/* ================= REACH TAB ================= */}
       {activeTab === "reach" && (
-        <div className="space-y-6">
-          {/* Reach Headline Cards */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span>Impressions</span>
-                <span className="inline-flex rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                  📊 Modeled
-                </span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {periodImpressionsFormatted}
-              </div>
-              <div className="mt-2 text-xs text-indigo-300 font-medium">
-                {studioData.reach.impressionsDelta} in {studioPeriod} ({dateRangeString})
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span>Impressions Click-Through Rate (CTR)</span>
-                <span className="inline-flex rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                  📊 Modeled
-                </span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {studioData.reach.ctr}%
-              </div>
-              <div className="mt-2 text-xs text-slate-400">
-                Above creator benchmark (4.0% – 7.0%)
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span>Views from Impressions</span>
-                <span className="inline-flex rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                  📊 Modeled
-                </span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {periodViewsFromImpressionsFormatted}
-              </div>
-              <div className="mt-2 text-xs text-slate-400">
-                74% of total channel traffic
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span>Unique Viewers</span>
-                <span className="inline-flex rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                  📊 Modeled
-                </span>
-              </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {periodUniqueViewersFormatted}
-              </div>
-              <div className="mt-2 text-xs text-slate-400">
-                Estimated distinct viewers in {studioPeriod}
-              </div>
-            </div>
-          </div>
-
-          {/* Traffic Sources Breakdown & Funnel */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Traffic Source Types */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Compass className="h-4 w-4 text-red-400" />
-                  <span>Traffic Source Types</span>
-                </h3>
-                <span className="text-xs text-slate-400">% of Views</span>
-              </div>
-
-              <div className="space-y-4">
-                {studioData.reach.trafficSources.map((source, i) => (
-                  <div key={i} className="space-y-1.5">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-slate-300 font-medium">{source.source}</span>
-                      <div className="flex items-center gap-2 font-mono">
-                        <span className="text-slate-400">{source.viewsFormatted}</span>
-                        <span className="text-white font-semibold">{source.percentage}%</span>
-                      </div>
-                    </div>
-                    <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
-                      <div
-                        style={{ width: `${source.percentage}%` }}
-                        className={`h-full rounded-full ${
-                          i === 0 ? "bg-red-500" : i === 1 ? "bg-rose-500" : i === 2 ? "bg-amber-500" : "bg-slate-500"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Top Search Terms & External Sources */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md space-y-6">
-              {/* YouTube Search */}
-              <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                  <Search className="h-4 w-4 text-amber-400" />
-                  <span>Top YouTube Search Terms</span>
-                </h3>
-                <div className="space-y-2">
-                  {studioData.reach.topSearchTerms.map((term, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-slate-800/60 last:border-0">
-                      <span className="text-slate-300">"{term.term}"</span>
-                      <span className="text-slate-400 font-mono font-medium">{term.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* External Sites */}
-              <div className="pt-2">
-                <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                  <ExternalLink className="h-4 w-4 text-sky-400" />
-                  <span>Top External Apps & Sites</span>
-                </h3>
-                <div className="space-y-2">
-                  {studioData.reach.externalSites.map((site, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-slate-800/60 last:border-0">
-                      <span className="text-slate-300">{site.site}</span>
-                      <span className="text-slate-400 font-mono font-medium">{site.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ReachTab
+          studio={studioData}
+          platform={dataset.profile.platform}
+          period={studioPeriod}
+          onPeriodChange={setStudioPeriod}
+        />
       )}
 
       {/* ================= ENGAGEMENT TAB ================= */}
       {activeTab === "engagement" && (
-        <div className="space-y-6">
-          {/* Key Engagement Metrics */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="text-xs text-slate-400 mb-2">Watch Time (Hours)</div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {studioData.engagement.watchTimeFormatted}
-              </div>
-              <div className="mt-2 text-xs text-emerald-400 font-medium">
-                {studioData.engagement.watchTimeDelta} in {studioPeriod}
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="text-xs text-slate-400 mb-2">Average View Duration (AVD)</div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {studioData.engagement.avgViewDuration}
-              </div>
-              <div className="mt-2 text-xs text-slate-400">
-                Avg time spent per view
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="text-xs text-slate-400 mb-2">Average Percentage Viewed</div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {studioData.engagement.avgPercentageViewed}%
-              </div>
-              <div className="mt-2 text-xs text-slate-400">
-                Above average completion rate
-              </div>
-            </div>
-          </div>
-
-          {/* Retention Curve Chart */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-              <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Activity className="h-4 w-4 text-emerald-400" />
-                  <span>Key Moments for Audience Retention</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Second-by-second viewer attention drop-off from video start (0%) to conclusion (100%)
-                </p>
-              </div>
-              <span className="inline-flex rounded bg-indigo-500/10 px-2.5 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20 self-start sm:self-auto">
-                📊 Modeled Retention Curve
-              </span>
-            </div>
-
-            <div className="h-[260px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={studioData.engagement.retentionCurve} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="retentionGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis
-                    dataKey="percentOfVideo"
-                    stroke="#64748b"
-                    fontSize={11}
-                    tickFormatter={(v) => `${v}%`}
-                  />
-                  <YAxis
-                    stroke="#64748b"
-                    fontSize={11}
-                    domain={[0, 100]}
-                    tickFormatter={(v) => `${v}%`}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#0f172a",
-                      border: "1px solid #334155",
-                      borderRadius: "0.75rem",
-                      fontSize: "0.75rem",
-                    }}
-                    formatter={(val: any) => [`${val}%`, "Audience Still Watching"]}
-                    labelFormatter={(lbl) => `Video Timestamp: ${lbl}%`}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="retentionPercent"
-                    stroke="#10b981"
-                    strokeWidth={2.5}
-                    fillOpacity={1}
-                    fill="url(#retentionGrad)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-800 text-xs">
-              <div className="rounded-xl bg-slate-950/40 p-3 border border-slate-800/80">
-                <span className="text-slate-400">Intro Hook (0:30)</span>
-                <div className="text-white font-semibold mt-0.5">79% retention</div>
-                <div className="text-[11px] text-slate-500">Hook effectively kept viewers engaged</div>
-              </div>
-              <div className="rounded-xl bg-slate-950/40 p-3 border border-slate-800/80">
-                <span className="text-slate-400">Continuous Segments</span>
-                <div className="text-white font-semibold mt-0.5">54% through midpoint</div>
-                <div className="text-[11px] text-slate-500">Minimal mid-episode dip</div>
-              </div>
-              <div className="rounded-xl bg-slate-950/40 p-3 border border-slate-800/80">
-                <span className="text-slate-400">End Screen CTR</span>
-                <div className="text-white font-semibold mt-0.5">{studioData.engagement.endScreenCtaRate}% click rate</div>
-                <div className="text-[11px] text-slate-500">Above YouTube average (2.5%)</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <EngagementTab
+          studio={studioData}
+          platform={dataset.profile.platform}
+          period={studioPeriod}
+          onPeriodChange={setStudioPeriod}
+        />
       )}
 
       {/* ================= AUDIENCE TAB ================= */}
       {activeTab === "audience" && (
-        <div className="space-y-6">
-          {/* Top Audience KPIs */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="text-xs text-slate-400 mb-2">Returning Viewers</div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {periodReturningViewersFormatted}
-              </div>
-              <div className="mt-2 text-xs text-indigo-300 font-medium">
-                Loyal core fan base in {studioPeriod} ({dateRangeString})
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="text-xs text-slate-400 mb-2">New Viewers</div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {periodNewViewersFormatted}
-              </div>
-              <div className="mt-2 text-xs text-emerald-400 font-medium">
-                Discovered via browse &amp; suggestions
-              </div>
-            </div>
-
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg">
-              <div className="text-xs text-slate-400 mb-2">Subscribed vs Not Subscribed</div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-                {periodSubRatio}% / {(100 - periodSubRatio).toFixed(1)}%
-              </div>
-              <div className="mt-2 text-xs text-slate-400">
-                High viral discovery opportunity
-              </div>
-            </div>
-          </div>
-
-          {/* When Viewers Are on YouTube (Studio Heatmap Matrix) */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-              <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-purple-400" />
-                  <span>When Your Viewers Are on YouTube</span>
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Peak viewing window is between 6:00 PM and 11:00 PM local time
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <span>Few Viewers</span>
-                <div className="flex items-center gap-1">
-                  <div className="h-3 w-3 rounded bg-slate-800" />
-                  <div className="h-3 w-3 rounded bg-purple-900/60" />
-                  <div className="h-3 w-3 rounded bg-purple-600/80" />
-                  <div className="h-3 w-3 rounded bg-purple-400" />
-                </div>
-                <span>Many Viewers</span>
-              </div>
-            </div>
-
-            {/* Matrix Grid */}
-            <div className="overflow-x-auto">
-              <div className="min-w-[500px]">
-                {/* Hours Header */}
-                <div className="grid grid-cols-25 gap-1 text-[10px] text-slate-500 pb-1.5 border-b border-slate-800">
-                  <div className="col-span-1">Day</div>
-                  {Array.from({ length: 24 }).map((_, h) => (
-                    <div key={h} className="text-center font-mono">
-                      {h % 3 === 0 ? (h === 0 ? "12a" : h === 12 ? "12p" : `${h > 12 ? h - 12 : h}${h >= 12 ? "p" : "a"}`) : ""}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Day Rows */}
-                <div className="space-y-1.5 pt-2">
-                  {daysOfWeek.map((day, dIdx) => (
-                    <div key={day} className="grid grid-cols-25 gap-1 items-center">
-                      <div className="col-span-1 text-[11px] text-slate-400 font-medium">
-                        {day}
-                      </div>
-                      {Array.from({ length: 24 }).map((_, h) => {
-                        const intensity = studioData.audience.activeHoursHeatmap[dIdx]?.[h] ?? 1;
-                        const bgClass =
-                          intensity === 0
-                            ? "bg-slate-900 border border-slate-800"
-                            : intensity === 1
-                            ? "bg-purple-950/70 border border-purple-900/40"
-                            : intensity === 2
-                            ? "bg-purple-700/80 border border-purple-600/50"
-                            : "bg-purple-400 border border-purple-300 shadow-sm";
-                        return (
-                          <div
-                            key={h}
-                            title={`${day} at ${h}:00 - Level ${intensity}`}
-                            className={`h-5 rounded-[4px] transition-all hover:scale-110 cursor-pointer ${bgClass}`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Age & Gender + Top Geographies */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            {/* Age & Gender Demographics */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                <Users className="h-4 w-4 text-sky-400" />
-                <span>Age &amp; Gender Distribution</span>
-              </h3>
-
-              {/* Gender bar */}
-              <div className="mb-5">
-                <div className="flex justify-between text-xs text-slate-400 mb-1.5">
-                  <span>Gender</span>
-                  <span className="font-mono">
-                    Male: <strong className="text-white">{studioData.audience.ageGender.gender.male}%</strong> • Female: <strong className="text-white">{studioData.audience.ageGender.gender.female}%</strong>
-                  </span>
-                </div>
-                <div className="h-2.5 w-full rounded-full bg-slate-800 flex overflow-hidden">
-                  <div style={{ width: `${studioData.audience.ageGender.gender.male}%` }} className="bg-sky-500 h-full" />
-                  <div style={{ width: `${studioData.audience.ageGender.gender.female}%` }} className="bg-pink-500 h-full" />
-                </div>
-              </div>
-
-              {/* Age Brackets */}
-              <div className="space-y-3">
-                <span className="text-xs text-slate-400 font-medium">Age Groups</span>
-                {studioData.audience.ageGender.ageGroups.map((group, i) => (
-                  <div key={i} className="space-y-1">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-slate-300">{group.bracket}</span>
-                      <span className="text-white font-semibold font-mono">{group.percentage}%</span>
-                    </div>
-                    <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                      <div
-                        style={{ width: `${group.percentage * 2}%` }}
-                        className="h-full rounded-full bg-sky-500"
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Top Geographies & Subtitles */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md space-y-5">
-              <div>
-                <h3 className="text-sm font-bold text-white flex items-center gap-2 mb-3">
-                  <Compass className="h-4 w-4 text-emerald-400" />
-                  <span>Top Geographies</span>
-                </h3>
-                <div className="space-y-2.5">
-                  {studioData.audience.topGeographies.map((geo, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs py-1 border-b border-slate-800/60 last:border-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] text-slate-400 px-1.5 py-0.5 rounded bg-slate-800">
-                          {geo.code}
-                        </span>
-                        <span className="text-slate-200 font-medium">{geo.country}</span>
-                      </div>
-                      <span className="text-white font-mono font-semibold">{geo.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-2 border-t border-slate-800">
-                <h3 className="text-sm font-bold text-white mb-2">Top Subtitle / CC Languages</h3>
-                <div className="space-y-1.5">
-                  {studioData.audience.topSubtitles.map((sub, i) => (
-                    <div key={i} className="flex items-center justify-between text-xs text-slate-300">
-                      <span>{sub.language}</span>
-                      <span className="font-mono text-slate-400">{sub.percentage}%</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <AudienceTab
+          studio={studioData}
+          platform={dataset.profile.platform}
+          period={studioPeriod}
+          onPeriodChange={setStudioPeriod}
+        />
       )}
     </div>
   );

@@ -49,6 +49,27 @@ export interface HeadlineStats {
   postsCountFormatted: string;
   postsDelta: string;
   postsDeltaPositive: boolean;
+
+  // Dynamic Performance Health Metrics
+  trajectoryStatus?: "growing" | "decreasing" | "neutral";
+  trajectoryPercent?: number;
+  trajectoryFormatted?: string;
+  trajectorySummary?: string;
+  likesHealth?: {
+    status: "good" | "bad";
+    rate: number;
+    deltaPercent: number;
+    deltaFormatted: string;
+    isPositive: boolean;
+  };
+  viewsHealth?: {
+    status: "good" | "bad";
+    deltaPercent: number;
+    deltaFormatted: string;
+    isPositive: boolean;
+    recentAvg: number;
+    channelAvg: number;
+  };
 }
 
 export interface HistoryPoint {
@@ -115,6 +136,15 @@ export interface StudioAnalytics {
     retentionCurve: Array<{ percentOfVideo: number; retentionPercent: number }>;
     endScreenCtaRate: number;
     topPlaylists: Array<{ title: string; views: string }>;
+    interactionRates?: {
+      overallRate: number;
+      likesPerKViews: number;
+      commentsPerKViews: number;
+      sharesPerKViews: number;
+      cardClickRate: number;
+      endScreenRate: number;
+      saveToPlaylistRate: number;
+    };
   };
   audience: {
     returningViewers: number;
@@ -139,6 +169,54 @@ export interface StudioAnalytics {
   };
 }
 
+export interface VideoAnalyticsData {
+  videoId: string;
+  title: string;
+  videoUrl: string;
+  embedUrl: string;
+  thumbnailUrl: string;
+  publishedDate: string;
+  duration: string;
+  durationSeconds?: number;
+  descriptionSnippet?: string;
+  tags?: string[];
+  
+  // Real-time video performance stats
+  views: number;
+  viewsFormatted: string;
+  viewsPerHour: number;
+  viewsPerHourFormatted: string;
+  likes: number;
+  likesFormatted: string;
+  likeRatio: number; // e.g. 98.2
+  comments: number;
+  commentsFormatted: string;
+  shares: number;
+  sharesFormatted: string;
+  
+  // Video-specific rates & retention
+  engagementRate: number; // e.g. 4.2%
+  viralScore: number; // 0-100 scale
+  avgViewDuration: string;
+  avgPercentageViewed: number;
+  retentionCurve: Array<{ percentOfVideo: number; retentionPercent: number; timeLabel: string }>;
+
+  // Video-specific traffic source breakdown
+  trafficSources: Array<{ source: string; percentage: number; viewsFormatted: string }>;
+
+  // Video search terms
+  topSearchTerms: Array<{ term: string; percentage: number }>;
+
+  // Comparative benchmarks vs channel average
+  vsChannelAverage: {
+    viewsDeltaPercent: string;
+    viewsMultiplier: string;
+    engagementDeltaPercent: string;
+    isViewsHigher: boolean;
+    isEngagementHigher: boolean;
+  };
+}
+
 export interface DashboardDataset {
   profile: ProfileData;
   stats: HeadlineStats;
@@ -146,6 +224,7 @@ export interface DashboardDataset {
   topContent: TopContentItem[];
   engagement: EngagementBreakdown;
   studio?: StudioAnalytics;
+  videoAnalytics?: VideoAnalyticsData;
   isRealtimeVerified?: boolean;
   lastUpdated: string;
 }
@@ -153,5 +232,89 @@ export interface DashboardDataset {
 export interface AiInsightResponse {
   insight: string;
   source: string;
+  timestamp: string;
+}
+
+export interface CompareMetricAnalysis {
+  leader: "Account A" | "Account B" | "Tie";
+  differential: string;
+  analysis: string;
+}
+
+export interface BeatCompetitorTactic {
+  id: string;
+  priority: "Critical Priority" | "High Leverage" | "Quick Win" | "Strategic Moat";
+  category: "Packaging & CTR" | "Retention & Watch Time" | "Topic Gaps" | "Upload Timing" | "Community Moat";
+  title: string;
+  tacticalAction: string;
+  whyItBeatsCompetitor: string;
+  expectedAdvantage: string;
+}
+
+export interface CompareRecommendation {
+  priority: "High" | "Medium";
+  category: string;
+  title: string;
+  action: string;
+}
+
+export interface CompareInsightData {
+  executiveSummary: string;
+  metricsComparison: {
+    subscribers: CompareMetricAnalysis;
+    totalViews: CompareMetricAnalysis;
+    engagementRate: CompareMetricAnalysis;
+    growthVelocity: CompareMetricAnalysis;
+  };
+  actionableRecommendations: CompareRecommendation[];
+  waysToBeatCompetitor?: BeatCompetitorTactic[];
+}
+
+export interface CompareInsightResponse {
+  data: CompareInsightData;
+  source: string;
+  modelName: string;
+  timestamp: string;
+}
+
+export interface HighDemandOpportunity {
+  id: string;
+  topic: string;
+  nicheCategory: string;
+  demandScore: number; // e.g. 97/100
+  demandLevel: "Extreme Demand" | "High Demand" | "Rising Trend" | "High Search Volume";
+  userRatingLevel: string; // e.g. "98% Positive Viewer Rating"
+  whyDemandIsHigh: string; // Detail why audience is actively rating and searching for this
+  recommendedFormat: string; // e.g. "30-min Step-by-Step Project Masterclass"
+  suggestedTitles: string[]; // 2-3 copy-ready high-CTR titles
+  thumbnailConcept: string; // Visual advice and 3-word trigger hook
+  targetKeywords: string[];
+  productionDifficulty: "Quick Win (Low Effort)" | "Medium (Standard Build)" | "High Leverage (Deep Dive)";
+  projectedViewerImpact: string; // Expected watch time and CTR impact
+}
+
+export interface HighestRatedFormat {
+  formatName: string;
+  userRatingPercent: number; // e.g. 96
+  avgViewerRetention: string; // e.g. "62%"
+  whyItPerforms: string;
+}
+
+export interface HighDemandContentData {
+  detectedNiche: string;
+  nicheDescription: string;
+  overallDemandScore: number; // 0 - 100
+  demandVelocity: "Accelerating Exponentially" | "Surging High Appetite" | "Consistent Peak Demand";
+  viewerSatisfactionBenchmark: string; // e.g. "96.4% Viewer Approval in this Category"
+  highestRatedFormats: HighestRatedFormat[];
+  trendingViewerQueries: string[]; // High-demand questions viewers search for
+  opportunities: HighDemandOpportunity[];
+  productionActionPlan: string[];
+}
+
+export interface HighDemandContentResponse {
+  data: HighDemandContentData;
+  source: string;
+  modelName: string;
   timestamp: string;
 }
