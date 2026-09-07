@@ -1,0 +1,6 @@
+{
+  "name": "SocialPulse",
+  "description": "Social media analytics dashboard prototype for YouTube, Instagram, and X with simulated performance data, growth trends, top content metrics, and AI-powered analyst insights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
