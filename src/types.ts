@@ -243,8 +243,8 @@ export interface CompareMetricAnalysis {
 
 export interface BeatCompetitorTactic {
   id: string;
-  priority: "Critical Priority" | "High Leverage" | "Quick Win" | "Strategic Moat";
-  category: "Packaging & CTR" | "Retention & Watch Time" | "Topic Gaps" | "Upload Timing" | "Community Moat";
+  priority: "Critical Priority" | "High Leverage" | "Quick Win" | "Strategic Moat" | string;
+  category: "Packaging & CTR" | "Retention & Watch Time" | "Topic Gaps" | "Upload Timing" | "Community Moat" | "Audience Scaling" | "Upload Cadence" | "Strategic Dominance" | string;
   title: string;
   tacticalAction: string;
   whyItBeatsCompetitor: string;

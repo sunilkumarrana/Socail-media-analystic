@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Platform,
   DashboardDataset,
   CompareInsightData,
   BeatCompetitorTactic,
+  HistoryPoint,
 } from "../types";
 import {
   generateMockStats,
@@ -42,6 +43,8 @@ import {
   CheckSquare,
   Square,
   Filter,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 
 interface CompareViewProps {
@@ -90,6 +93,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
   const [copiedRecs, setCopiedRecs] = useState(false);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>("All");
   const [completedTactics, setCompletedTactics] = useState<Record<string, boolean>>({});
+  const [expandedTactics, setExpandedTactics] = useState<Record<string, boolean>>({});
 
   // Duplicate link detection
   const normalizedA = normalizeAccountInput(handleA);
@@ -144,7 +148,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
     }
   }, [initialHandleA, initialPlatformA]);
 
-  // Generate dynamic client-side tactics to beat the competitor
+  // Generate dynamic client-side tactics strictly based on real performance gaps
   const generateTacticsToBeatCompetitor = (a: DashboardDataset, b: DashboardDataset): BeatCompetitorTactic[] => {
     const nameA = a.profile.displayName;
     const nameB = b.profile.displayName;
@@ -161,63 +165,224 @@ export const CompareView: React.FC<CompareViewProps> = ({
     const avgViewsA = Math.round(viewsA / postsA);
     const avgViewsB = Math.round(viewsB / postsB);
 
-    const userHasHigherER = erA > erB;
-    const competitorHasMoreViewsPerVideo = avgViewsB > avgViewsA;
-    const competitorHasMoreSubs = subB > subA;
+    const userHasBetterThumbnails = avgViewsA >= avgViewsB;
+    const userNeedsSubscribers = subA < subB;
+    const userNeedsViews = viewsA < viewsB;
+    const userNeedsER = erA < erB;
+    const competitorHasHugeCatalog = postsB > postsA * 1.25;
 
-    return [
-      {
-        id: "tactic-packaging",
+    const tactics: BeatCompetitorTactic[] = [];
+
+    // 1. Thumbnail / Packaging: ONLY suggest fixing/upgrading thumbnails if competitor gets more views per video
+    if (!userHasBetterThumbnails) {
+      tactics.push({
+        id: "tactic-packaging-deficit",
         priority: "Critical Priority",
         category: "Packaging & CTR",
-        title: `Counter-Package Thumbnails to Steal ${nameB}'s Suggested Video Clicks`,
-        tacticalAction: `Perform a packaging audit on ${nameB}'s last 10 uploads. If they use dark, text-heavy designs, deploy high-contrast vibrant visuals with emotive focal points. Strict rule: maximum 3 curiosity-inducing words on the thumbnail (e.g., "NEVER Do This" instead of repeating the topic title). YouTube automatically presents your videos in ${nameB}'s "Up Next" sidebar—high-contrast packaging ensures you win the impression click.`,
-        whyItBeatsCompetitor: competitorHasMoreViewsPerVideo
-          ? `${nameB} commands ~${formatNumber(avgViewsB)} views per video largely from browse feeds. Capturing even 15% of their suggested sidebar impressions diverts substantial view volume directly to your channel.`
-          : `Your view efficiency (~${formatNumber(avgViewsA)}/video) is strong; contrast-packaging prevents browse leakage and converts searchers browsing ${nameB}'s catalog.`,
+        title: `Upgrade Thumbnail CTR to Match ${nameB}'s ~${formatNumber(avgViewsB)} Views/Video`,
+        tacticalAction: `Audit ${nameB}'s recent 10 uploads for color palette and thumbnail layout. Because ${nameB} averages higher views per upload (~${formatNumber(avgViewsB)} vs ~${formatNumber(avgViewsA)}), deploy high-contrast vibrant visuals and maximum 3 curiosity-inducing words on the thumbnail (e.g. "NEVER Do This" instead of repeating title text). Winning impression clicks in suggested sidebars will bridge the view-pull gap.`,
+        whyItBeatsCompetitor: `Capturing impressions directly adjacent to ${nameB}'s videos diverts their browse traffic into your channel.`,
         expectedAdvantage: "+18% to +32% higher Click-Through-Rate (CTR) on competitor-related suggested sidebars",
-      },
-      {
-        id: "tactic-retention",
+      });
+    }
+
+    // 2. Subscriber Gap: ONLY suggest if competitor has more subscribers
+    if (userNeedsSubscribers) {
+      tactics.push({
+        id: "tactic-subscriber-gap",
+        priority: "Critical Priority",
+        category: "Audience Scaling",
+        title: `Bridge the ${formatNumber(subB - subA)} Subscriber Deficit via Mid-Video Retention Triggers`,
+        tacticalAction: `${nameB} commands ${b.stats.followersFormatted} subscribers versus your ${a.stats.followersFormatted}. Rather than waiting for the end-screen, insert a seamless value-first call-to-subscribe at minute 3:30 (your highest retention window), promising a specific upcoming deep-dive.`,
+        whyItBeatsCompetitor: `Elevates viewer-to-subscriber conversion from 1.5% to 3.5%+, closing the ${formatNumber(subB - subA)} audience gap at accelerated velocity.`,
+        expectedAdvantage: "Pushes subscriber conversion velocity up by +28%",
+      });
+    }
+
+    // 3. Catalog Volume Disparity: ONLY if competitor has significantly more uploads
+    if (competitorHasHugeCatalog) {
+      const postDeficit = postsB - postsA;
+      tactics.push({
+        id: "tactic-catalog-disparity",
+        priority: "High Leverage",
+        category: "Upload Cadence",
+        title: `Overcome ${nameB}'s ${postDeficit}-Upload Library Advantage with Modular Repurposing`,
+        tacticalAction: `${nameB} has published ${b.stats.postsCountFormatted} videos against your ${a.stats.postsCountFormatted} videos (+${postDeficit} library advantage), driving continuous passive long-tail views. Counter this by extracting 3-4 modular short-form clips from every long-form video to multiply your discovery touchpoints without production burnout.`,
+        whyItBeatsCompetitor: `Compensates for competitor catalog volume by multiplying algorithmic entry points across YouTube search and Shorts shelves.`,
+        expectedAdvantage: "Recovers +35% search impression market share against competitor's back-catalog",
+      });
+    }
+
+    // 4. Total Views Gap: ONLY if user trails in total views and not already covered by catalog disparity
+    if (userNeedsViews && !competitorHasHugeCatalog) {
+      tactics.push({
+        id: "tactic-views-gap",
         priority: "High Leverage",
         category: "Retention & Watch Time",
-        title: `Cut Intros Under 5 Seconds to Beat ${nameB}'s Audience Retention Curve`,
-        tacticalAction: `Eliminate animated channel logos, generic greetings ("welcome back guys"), and slow introductory agendas. Start at second 0 directly with the highest-stakes payoff, problem demo, or core curiosity hook. Deploy pattern interrupts (camera punches, on-screen callouts, audio cues) every 45 seconds to keep your 3-minute audience retention above 60%.`,
-        whyItBeatsCompetitor: `The YouTube algorithm compares Relative Audience Retention between videos covering the same topic. When your retention at minute 2 exceeds ${nameB}'s curve, YouTube progressively swaps their video with yours in search and homepage feeds.`,
-        expectedAdvantage: "Pushes average watch-time past 55%, prioritizing your uploads in recommendation carousels",
-      },
-      {
-        id: "tactic-topic",
-        priority: "High Leverage",
-        category: "Topic Gaps",
-        title: `Cannibalize ${nameB}'s Aging Evergreen Videos with 2026 Modernized Guides`,
-        tacticalAction: `Inspect ${nameB}'s top 10 most-viewed videos published 12 to 24 months ago. Spot deprecated libraries, changed APIs, or frequent unanswered questions in their comments. Produce updated 2026 definitive masterclasses with downloadable cheat-sheets, modern code repositories, and zero-fluff explanations that make competitor videos obsolete.`,
-        whyItBeatsCompetitor: `Viewers searching for tutorials actively avoid outdated videos. Intercepting high-volume keywords with fresh, comprehensive uploads captures search dominance away from ${nameB}'s legacy catalog.`,
-        expectedAdvantage: `Captures search rank #1 for high-intent queries currently held by ${nameB}`,
-      },
-      {
-        id: "tactic-timing",
-        priority: "Quick Win",
-        category: "Upload Timing",
-        title: `Pre-Empt ${nameB}'s Prime Upload Window by 2 Hours`,
-        tacticalAction: `Identify the days and hours ${nameB} routinely drops new uploads. Schedule your release 90-120 minutes prior. This allows YouTube's notification delivery and initial seed audience loops to warm up your video right as your shared audience opens the app, absorbing viewer attention before ${nameB}'s notification arrives.`,
-        whyItBeatsCompetitor: `Viewers have finite daily watch time. Securing their initial 15-minute viewing session pre-empts them from starting competitor uploads during peak consumption windows.`,
-        expectedAdvantage: "Maximizes Day-1 subscriber velocity and notification click-through velocity",
-      },
-      {
-        id: "tactic-community",
+        title: `Close the ${formatNumber(viewsB - viewsA)} Total View Gap with Bingeable Series Playlists`,
+        tacticalAction: `Group your top-performing videos into tightly focused thematic playlists with sequential numbering. Insert end-screen cards linking directly to Part 2 during the final 15 seconds to initiate consecutive session viewing chains.`,
+        whyItBeatsCompetitor: `Signals extended viewer session watch time to YouTube's recommendation engine, unlocking wider homepage distribution.`,
+        expectedAdvantage: "+25% increase in consecutive session views per viewer",
+      });
+    }
+
+    // 5. Engagement Rate Gap: ONLY if competitor has higher ER
+    if (userNeedsER) {
+      tactics.push({
+        id: "tactic-engagement-gap",
         priority: "Strategic Moat",
         category: "Community Moat",
-        title: userHasHigherER
-          ? `Leverage Your ${erA}% Engagement Lead to Convert Viewers into Vocal Advocates`
-          : `Close the Engagement Gap with Pinned Discussion Loops & Direct Utility`,
-        tacticalAction: userHasHigherER
-          ? `Your ${erA}% engagement rate leads ${nameB}'s ${erB}%. Capitalize on this loyalty moat by pinning interactive challenge prompts, responding to early commenters within 30 minutes, and featuring community solutions on-screen. This turns casual viewers into brand advocates who recommend your channel over ${nameB}.`
-          : `${nameB} currently achieves ${erB}% ER vs your ${erA}%. Bridge this gap immediately: pin a dedicated resource link (cheat-sheet, GitHub repo) and an open-ended debate question in your top comment within 5 minutes of uploading, and reply to the first 30 comments within 1 hour.`,
-        whyItBeatsCompetitor: `Early comment velocity signals strong viewer satisfaction to the YouTube algorithm, boosting homepage distribution speed and community lock-in.`,
-        expectedAdvantage: "Elevates viewer-to-subscriber conversion rate to 3.8%+",
-      },
-    ];
+        title: `Bridge the ${(erB - erA).toFixed(1)}% Engagement Gap with Pinned Discussion Loops`,
+        tacticalAction: `${nameB} achieves ${erB}% engagement rate compared to your ${erA}%. Within 5 minutes of uploading, pin a provocative open-ended question in the comments and personally reply to the first 30 responses to spark community debate.`,
+        whyItBeatsCompetitor: `High early comment velocity triggers immediate algorithmic distribution velocity on the YouTube browse feed.`,
+        expectedAdvantage: "Boosts comment density and Day-1 algorithmic velocity by +35%",
+      });
+    }
+
+    // 6. If user ALREADY has superior thumbnails / views-per-video:
+    if (userHasBetterThumbnails) {
+      tactics.push({
+        id: "tactic-weaponize-thumbnail-advantage",
+        priority: "High Leverage",
+        category: "Strategic Dominance",
+        title: `Weaponize Your ~${formatNumber(avgViewsA)} Views/Video Magnetism Against ${nameB}`,
+        tacticalAction: `Your packaging efficiency (~${formatNumber(avgViewsA)} views/upload) outperforms ${nameB}'s (~${formatNumber(avgViewsB)} views/upload), confirming your thumbnail click magnetism is superior. Target ${nameB}'s highest-ranking video keywords with your superior packaging style to consistently win the side-by-side click in search results.`,
+        whyItBeatsCompetitor: `When your video appears next to ${nameB}'s in search results or suggested video columns, your proven CTR advantage pulls the viewer directly to your channel.`,
+        expectedAdvantage: "Captures 25-35% of competitor's sidebar recommendation traffic directly",
+      });
+    }
+
+    // 7. Retention & Watch Time (Always actionable and core to outranking)
+    tactics.push({
+      id: "tactic-retention",
+      priority: "High Leverage",
+      category: "Retention & Watch Time",
+      title: `Cut Intros Under 5 Seconds to Beat ${nameB}'s Relative Retention Curve`,
+      tacticalAction: `Eliminate animated channel logos, generic greetings ("welcome back guys"), and slow introductory agendas. Start at second 0 directly with the highest-stakes payoff, problem demo, or core curiosity hook. Deploy pattern interrupts (camera punches, on-screen callouts, audio cues) every 45 seconds to keep your 3-minute audience retention above 60%.`,
+      whyItBeatsCompetitor: `The YouTube algorithm compares Relative Audience Retention between videos covering the same topic. When your retention at minute 2 exceeds ${nameB}'s curve, YouTube progressively swaps their video with yours in search and homepage feeds.`,
+      expectedAdvantage: "Pushes average watch-time past 55%, prioritizing your uploads in recommendation carousels",
+    });
+
+    // 8. Topic Gaps
+    tactics.push({
+      id: "tactic-topic",
+      priority: "High Leverage",
+      category: "Topic Gaps",
+      title: `Cannibalize ${nameB}'s Aging Evergreen Videos with 2026 Modernized Guides`,
+      tacticalAction: `Inspect ${nameB}'s top 10 most-viewed videos published 12 to 24 months ago. Spot deprecated libraries, changed APIs, or frequent unanswered questions in their comments. Produce updated 2026 definitive masterclasses with downloadable cheat-sheets, modern code repositories, and zero-fluff explanations that make competitor videos obsolete.`,
+      whyItBeatsCompetitor: `Viewers searching for tutorials actively avoid outdated videos. Intercepting high-volume keywords with fresh, comprehensive uploads captures search dominance away from ${nameB}'s legacy catalog.`,
+      expectedAdvantage: `Captures search rank #1 for high-intent queries currently held by ${nameB}`,
+    });
+
+    // 9. Upload Timing
+    tactics.push({
+      id: "tactic-timing",
+      priority: "Quick Win",
+      category: "Upload Timing",
+      title: `Pre-Empt ${nameB}'s Prime Upload Window by 2 Hours`,
+      tacticalAction: `Identify the days and hours ${nameB} routinely drops new uploads. Schedule your release 90-120 minutes prior. This allows YouTube's notification delivery and initial seed audience loops to warm up your video right as your shared audience opens the app, absorbing viewer attention before ${nameB}'s notification arrives.`,
+      whyItBeatsCompetitor: `Viewers have finite daily watch time. Securing their initial 15-minute viewing session pre-empts them from starting competitor uploads during peak consumption windows.`,
+      expectedAdvantage: "Maximizes Day-1 subscriber velocity and notification click-through velocity",
+    });
+
+    return tactics.slice(0, 5);
+  };
+
+  // Enforces user intent: filter out any tactic for metrics where user already leads!
+  const sanitizeAndFilterTactics = (
+    tactics: BeatCompetitorTactic[],
+    a: DashboardDataset,
+    b: DashboardDataset
+  ): BeatCompetitorTactic[] => {
+    const subA = a.stats.followers;
+    const subB = b.stats.followers;
+    const viewsA = a.stats.totalViews;
+    const viewsB = b.stats.totalViews;
+    const erA = a.stats.engagementRate;
+    const erB = b.stats.engagementRate;
+    const postsA = Math.max(1, a.stats.postsCount);
+    const postsB = Math.max(1, b.stats.postsCount);
+    const avgViewsA = Math.round(viewsA / postsA);
+    const avgViewsB = Math.round(viewsB / postsB);
+
+    const userHasBetterThumbnails = avgViewsA >= avgViewsB;
+    const userHasMoreSubs = subA >= subB;
+    const userHasMoreViews = viewsA >= viewsB;
+    const userHasHigherER = erA >= erB;
+
+    const filtered = (tactics || []).filter((t) => {
+      const text = `${t.title} ${t.category} ${t.tacticalAction}`.toLowerCase();
+
+      // Rule 1: If user already has more or equal subscribers, do NOT mention subscriber growth/acquisition
+      if (userHasMoreSubs) {
+        if (
+          t.category.toLowerCase().includes("audience scaling") ||
+          text.includes("subscriber deficit") ||
+          text.includes("subscriber gap") ||
+          text.includes("gain more subscriber") ||
+          text.includes("increase subscriber") ||
+          text.includes("grow subscriber") ||
+          text.includes("grow your subscriber") ||
+          t.id.includes("subscriber")
+        ) {
+          return false;
+        }
+      }
+
+      // Rule 2: If user already has more or equal total views, do NOT mention total views gap
+      if (userHasMoreViews) {
+        if (
+          text.includes("total view gap") ||
+          text.includes("increase total view") ||
+          text.includes("view deficit")
+        ) {
+          return false;
+        }
+      }
+
+      // Rule 3: If user already has higher views/post (better thumbnails), do NOT mention fixing/upgrading thumbnails
+      if (userHasBetterThumbnails) {
+        if (
+          text.includes("thumbnail architecture") ||
+          text.includes("thumbnail audit") ||
+          text.includes("thumbnail ctr") ||
+          text.includes("re-package thumbnail") ||
+          text.includes("counter-package thumbnail") ||
+          text.includes("thumbnail packaging") ||
+          text.includes("upgrade thumbnail") ||
+          t.id.includes("packaging-deficit") ||
+          t.id.includes("packaging")
+        ) {
+          return false;
+        }
+      }
+
+      // Rule 4: If user has higher engagement, do NOT suggest engagement rate gap fixes
+      if (userHasHigherER) {
+        if (
+          text.includes("engagement gap") ||
+          text.includes("engagement deficit") ||
+          text.includes("bridge the engagement") ||
+          text.includes("close the engagement")
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    if (filtered.length < 4) {
+      const backfill = generateTacticsToBeatCompetitor(a, b);
+      for (const t of backfill) {
+        if (filtered.length >= 5) break;
+        if (!filtered.some((existing) => existing.id === t.id || existing.title === t.title)) {
+          filtered.push(t);
+        }
+      }
+    }
+
+    return filtered.slice(0, 5);
   };
 
   const fetchComparativeInsight = async (a: DashboardDataset, b: DashboardDataset) => {
@@ -371,27 +536,106 @@ export const CompareView: React.FC<CompareViewProps> = ({
   const avgVPerPostA = Math.round(viewsA / postsA);
   const avgVPerPostB = dataB ? Math.round(viewsB / postsB) : 0;
 
-  // Chart Data Synthesis
-  const chartPoints = (dataA.growthHistory || []).map((pt, idx) => {
-    const ptB = dataB?.growthHistory ? dataB.growthHistory[idx] : null;
+  // Helper to ensure valid history points
+  const getDatasetHistory = (dataset: DashboardDataset | null, count: number): HistoryPoint[] => {
+    if (!dataset) return [];
+    if (Array.isArray(dataset.history) && dataset.history.length > 0) {
+      return dataset.history.slice(-count);
+    }
+    // Fallback synthesis if history array is somehow not populated
+    const points: HistoryPoint[] = [];
+    const now = new Date();
+    const followers = dataset.stats?.followers || 1000000;
+    const views = dataset.stats?.totalViews || 50000000;
+    const er = dataset.stats?.engagementRate || 3.0;
+
+    for (let i = count - 1; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const progress = (count - 1 - i) / Math.max(1, count - 1);
+      const fVal = Math.round(followers * (0.95 + 0.05 * progress));
+      const vVal = Math.round(views * (0.94 + 0.06 * progress));
+      points.push({
+        date: d.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+        fullDate: d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+        followers: fVal,
+        views: vVal,
+        engagementRate: er,
+      });
+    }
+    return points;
+  };
+
+  // Chart Data Synthesis with trailing timeframe support (7d, 30d, 90d)
+  const sliceCount = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90;
+  const historyA = getDatasetHistory(dataA, sliceCount);
+  const historyB = getDatasetHistory(dataB, sliceCount);
+
+  const maxLen = Math.max(historyA.length, historyB.length);
+  const chartPoints = Array.from({ length: maxLen }, (_, idx) => {
+    const ptA = historyA[idx] || null;
+    const ptB = historyB[idx] || null;
+    const dateLabel = ptA?.date || ptB?.date || `Day ${idx + 1}`;
+    const fullDateLabel = ptA?.fullDate || ptB?.fullDate || dateLabel;
+
     return {
-      date: pt.date,
-      aValue: compareMetric === "followers" ? pt.followers : pt.views,
-      bValue: ptB ? (compareMetric === "followers" ? ptB.followers : ptB.views) : null,
+      date: dateLabel,
+      fullDate: fullDateLabel,
+      aValue: ptA
+        ? compareMetric === "followers"
+          ? Number(ptA.followers) || 0
+          : Number(ptA.views) || 0
+        : null,
+      bValue: ptB
+        ? compareMetric === "followers"
+          ? Number(ptB.followers) || 0
+          : Number(ptB.views) || 0
+        : null,
     };
   });
 
-  // Current battle tactics list
-  const currentTactics = dataB
-    ? (compareInsight?.waysToBeatCompetitor || generateTacticsToBeatCompetitor(dataA, dataB))
-    : [];
+  // Current battle tactics list strictly gap-filtered
+  const currentTactics = useMemo(() => {
+    if (!dataB) return [];
+    const raw = compareInsight?.waysToBeatCompetitor || generateTacticsToBeatCompetitor(dataA, dataB);
+    return sanitizeAndFilterTactics(raw, dataA, dataB);
+  }, [dataA, dataB, compareInsight]);
 
-  const categories = ["All", "Packaging & CTR", "Retention & Watch Time", "Topic Gaps", "Upload Timing", "Community Moat"];
-  const filteredTactics = activeCategoryFilter === "All"
+  const categories = useMemo(() => {
+    const list = ["All"];
+    currentTactics.forEach((t) => {
+      if (t.category && !list.includes(t.category)) {
+        list.push(t.category);
+      }
+    });
+    return list;
+  }, [currentTactics]);
+
+  const filteredTactics = activeCategoryFilter === "All" || !categories.includes(activeCategoryFilter)
     ? currentTactics
     : currentTactics.filter((t) => t.category === activeCategoryFilter);
 
   const completedCount = Object.values(completedTactics).filter(Boolean).length;
+
+  // Toggle step expansion to reveal full tactical playbook
+  const toggleTacticExpand = (tacticId: string) => {
+    setExpandedTactics((prev) => ({
+      ...prev,
+      [tacticId]: !prev[tacticId],
+    }));
+  };
+
+  const expandAllTactics = () => {
+    const all: Record<string, boolean> = {};
+    filteredTactics.forEach((t) => {
+      all[t.id] = true;
+    });
+    setExpandedTactics(all);
+  };
+
+  const collapseAllTactics = () => {
+    setExpandedTactics({});
+  };
 
   return (
     <div className="space-y-6">
@@ -413,15 +657,15 @@ export const CompareView: React.FC<CompareViewProps> = ({
           </div>
         </div>
 
-        {/* Input Form: Target (Account A) vs Competitor (Account B) */}
-        <form onSubmit={handleRunCompare} className="grid grid-cols-1 gap-3 sm:grid-cols-11">
+        {/* Input Form: Target (Account A) vs Competitor (Account B) with Button Beside Account B */}
+        <form onSubmit={handleRunCompare} className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:items-end">
           {/* Account 1 Input (Target) */}
-          <div className="sm:col-span-5">
-            <label className="block text-[11px] font-semibold text-indigo-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+          <div className="lg:col-span-5">
+            <label className="block text-[11px] font-semibold text-indigo-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
               <Target className="h-3 w-3 text-indigo-400" />
               Account A (Your Channel)
             </label>
-            <div className="flex rounded-xl border border-slate-700 bg-slate-950 px-3 py-2 text-xs text-slate-100 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition">
+            <div className="flex h-[42px] items-center rounded-xl border border-slate-700 bg-slate-950 px-3 text-xs text-slate-100 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition">
               <input
                 type="text"
                 value={handleA}
@@ -432,15 +676,15 @@ export const CompareView: React.FC<CompareViewProps> = ({
             </div>
           </div>
 
-          <div className="hidden sm:flex sm:col-span-1 items-end justify-center pb-2.5 text-slate-500">
+          <div className="hidden lg:flex lg:col-span-1 items-center justify-center h-[42px] text-slate-500">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-800/80 px-2 py-1 rounded-md">
               VS
             </span>
           </div>
 
-          {/* Account 2 Input (Competitor - NO PRE-POPULATED LINK, USER ENTERS OWN LINK) */}
-          <div className="sm:col-span-5">
-            <div className="flex items-center justify-between mb-1">
+          {/* Account 2 Input (Competitor) and Compare & Beat Competitor Button Beside It */}
+          <div className="lg:col-span-6">
+            <div className="flex items-center justify-between mb-1.5">
               <label className="block text-[11px] font-semibold text-violet-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Crosshair className="h-3 w-3 text-violet-400" />
                 Account B (Competitor to Beat)
@@ -451,57 +695,57 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </span>
               )}
             </div>
-            <div
-              className={`flex rounded-xl border px-3 py-2 text-xs transition ${
-                isDuplicateInput
-                  ? "border-rose-500 bg-rose-950/20 ring-1 ring-rose-500/40 text-rose-100"
-                  : "border-slate-700 bg-slate-950 text-slate-100 focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500"
-              }`}
-            >
-              <input
-                type="text"
-                value={handleB}
-                onChange={(e) => setHandleB(e.target.value)}
-                placeholder="Paste competitor YouTube link or @handle..."
-                className="w-full bg-transparent placeholder-slate-500 focus:outline-none"
-              />
-            </div>
-          </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div
+                className={`flex h-[42px] items-center flex-1 min-w-0 rounded-xl border px-3 text-xs transition ${
+                  isDuplicateInput
+                    ? "border-rose-500 bg-rose-950/20 ring-1 ring-rose-500/40 text-rose-100"
+                    : "border-slate-700 bg-slate-950 text-slate-100 focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500"
+                }`}
+              >
+                <input
+                  type="text"
+                  value={handleB}
+                  onChange={(e) => setHandleB(e.target.value)}
+                  placeholder="Paste competitor YouTube link or @handle..."
+                  className="w-full bg-transparent placeholder-slate-500 focus:outline-none"
+                />
+              </div>
 
-          {/* Submit Button */}
-          <div className="sm:col-span-11 mt-1 flex justify-end">
-            <button
-              type="submit"
-              disabled={isComparing || isDuplicateInput || !handleA.trim() || !handleB.trim()}
-              title={
-                isDuplicateInput
-                  ? "Cannot compare duplicate account links"
-                  : !handleB.trim()
-                  ? "Enter competitor link to benchmark"
-                  : "Compare and unlock ways to beat competitor"
-              }
-              className={`rounded-xl px-5 py-2.5 text-xs font-bold shadow-md transition flex items-center justify-center gap-2 ${
-                isDuplicateInput
-                  ? "bg-rose-950/60 border border-rose-500/40 text-rose-300/80 cursor-not-allowed"
-                  : !handleB.trim()
-                  ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                  : "bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99]"
-              }`}
-            >
-              {isComparing ? (
-                <>
-                  <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  <span>Analyzing Competitor...</span>
-                </>
-              ) : isDuplicateInput ? (
-                <span>Duplicate Link Conflict</span>
-              ) : (
-                <>
-                  <Swords className="h-3.5 w-3.5" />
-                  <span>Compare &amp; Beat Competitor</span>
-                </>
-              )}
-            </button>
+              {/* Compare & Beat Competitor Button placed directly beside Account B */}
+              <button
+                type="submit"
+                disabled={isComparing || isDuplicateInput || !handleA.trim() || !handleB.trim()}
+                title={
+                  isDuplicateInput
+                    ? "Cannot compare duplicate account links"
+                    : !handleB.trim()
+                    ? "Enter competitor link to benchmark"
+                    : "Compare and unlock ways to beat competitor"
+                }
+                className={`h-[42px] shrink-0 whitespace-nowrap rounded-xl px-4 text-xs font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer ${
+                  isDuplicateInput
+                    ? "bg-rose-950/60 border border-rose-500/40 text-rose-300/80 cursor-not-allowed"
+                    : !handleB.trim()
+                    ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
+                    : "bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99]"
+                }`}
+              >
+                {isComparing ? (
+                  <>
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    <span>Analyzing...</span>
+                  </>
+                ) : isDuplicateInput ? (
+                  <span>Duplicate Link</span>
+                ) : (
+                  <>
+                    <Swords className="h-3.5 w-3.5" />
+                    <span>Compare &amp; Beat Competitor</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </form>
 
@@ -584,34 +828,118 @@ export const CompareView: React.FC<CompareViewProps> = ({
               <span className="text-slate-400 block text-[11px]">
                 {PLATFORM_CONFIGS[dataA.profile.platform].followerLabel}
               </span>
-              <span className="text-lg font-bold text-white block mt-0.5 font-mono">
+              <span
+                className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
+                  !dataB
+                    ? "text-white"
+                    : subA > subB
+                    ? "text-emerald-400"
+                    : subA < subB
+                    ? "text-rose-400"
+                    : "text-white"
+                }`}
+              >
                 {dataA.stats.followersFormatted}
               </span>
-              <span className="text-[10px] text-emerald-400 font-medium">
-                {dataA.stats.followersDelta} pace
-              </span>
+              {dataB ? (
+                <span
+                  className={`text-[10px] font-semibold flex items-center gap-0.5 ${
+                    subA > subB
+                      ? "text-emerald-400"
+                      : subA < subB
+                      ? "text-rose-400"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {subA > subB
+                    ? `▲ +${formatNumber(subDiff)} ahead`
+                    : subA < subB
+                    ? `▼ -${formatNumber(subDiff)} deficit`
+                    : "Equal parity"}
+                </span>
+              ) : (
+                <span className="text-[10px] text-emerald-400 font-medium">
+                  {dataA.stats.followersDelta} pace
+                </span>
+              )}
             </div>
 
             <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
               <span className="text-slate-400 block text-[11px]">
                 {PLATFORM_CONFIGS[dataA.profile.platform].viewsLabel}
               </span>
-              <span className="text-lg font-bold text-white block mt-0.5 font-mono">
+              <span
+                className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
+                  !dataB
+                    ? "text-white"
+                    : viewsA > viewsB
+                    ? "text-emerald-400"
+                    : viewsA < viewsB
+                    ? "text-rose-400"
+                    : "text-white"
+                }`}
+              >
                 {dataA.stats.totalViewsFormatted}
               </span>
-              <span className="text-[10px] text-emerald-400 font-medium">
-                {dataA.stats.viewsDelta}
-              </span>
+              {dataB ? (
+                <span
+                  className={`text-[10px] font-semibold flex items-center gap-0.5 ${
+                    viewsA > viewsB
+                      ? "text-emerald-400"
+                      : viewsA < viewsB
+                      ? "text-rose-400"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {viewsA > viewsB
+                    ? `▲ +${formatNumber(viewsDiff)} lead`
+                    : viewsA < viewsB
+                    ? `▼ -${formatNumber(viewsDiff)} deficit`
+                    : "Equal parity"}
+                </span>
+              ) : (
+                <span className="text-[10px] text-emerald-400 font-medium">
+                  {dataA.stats.viewsDelta}
+                </span>
+              )}
             </div>
 
             <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
               <span className="text-slate-400 block text-[11px]">Engagement Rate</span>
-              <span className="text-lg font-bold text-amber-300 block mt-0.5 font-mono">
+              <span
+                className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
+                  !dataB
+                    ? "text-amber-300"
+                    : erA > erB
+                    ? "text-emerald-400"
+                    : erA < erB
+                    ? "text-rose-400"
+                    : "text-amber-300"
+                }`}
+              >
                 {dataA.stats.engagementRate}%
               </span>
-              <span className="text-[10px] text-slate-400">
-                {dataA.stats.engagementDelta}
-              </span>
+              {dataB ? (
+                <span
+                  className={`text-[10px] font-semibold flex items-center gap-0.5 ${
+                    erA > erB
+                      ? "text-emerald-400"
+                      : erA < erB
+                      ? "text-rose-400"
+                      : "text-amber-300"
+                  }`}
+                >
+                  {erA > erB
+                    ? `▲ +${erDiff}% higher`
+                    : erA < erB
+                    ? `▼ -${erDiff}% lower`
+                    : `Parity (${erA}%)`}
+                </span>
+              ) : (
+                <span className="text-[10px] text-slate-400">
+                  {dataA.stats.engagementDelta}
+                </span>
+              )}
             </div>
 
             <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
@@ -621,6 +949,11 @@ export const CompareView: React.FC<CompareViewProps> = ({
               </span>
               <span className="text-[10px] text-slate-400">
                 ~{formatNumber(avgVPerPostA)} / video
+                {dataB && avgVPerPostA > avgVPerPostB && (
+                  <span className="text-emerald-400 font-semibold ml-1">
+                    (▲ {(avgVPerPostA / Math.max(1, avgVPerPostB)).toFixed(1)}x pull)
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -675,11 +1008,31 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span className="text-slate-400 block text-[11px]">
                   {PLATFORM_CONFIGS[dataB.profile.platform].followerLabel}
                 </span>
-                <span className="text-lg font-bold text-white block mt-0.5 font-mono">
+                <span
+                  className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
+                    subB > subA
+                      ? "text-emerald-400"
+                      : subB < subA
+                      ? "text-rose-400"
+                      : "text-white"
+                  }`}
+                >
                   {dataB.stats.followersFormatted}
                 </span>
-                <span className="text-[10px] text-emerald-400 font-medium">
-                  {dataB.stats.followersDelta} pace
+                <span
+                  className={`text-[10px] font-semibold flex items-center gap-0.5 ${
+                    subB > subA
+                      ? "text-emerald-400"
+                      : subB < subA
+                      ? "text-rose-400"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {subB > subA
+                    ? `▲ +${formatNumber(subDiff)} lead`
+                    : subB < subA
+                    ? `▼ -${formatNumber(subDiff)} deficit`
+                    : "Equal parity"}
                 </span>
               </div>
 
@@ -687,21 +1040,61 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span className="text-slate-400 block text-[11px]">
                   {PLATFORM_CONFIGS[dataB.profile.platform].viewsLabel}
                 </span>
-                <span className="text-lg font-bold text-white block mt-0.5 font-mono">
+                <span
+                  className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
+                    viewsB > viewsA
+                      ? "text-emerald-400"
+                      : viewsB < viewsA
+                      ? "text-rose-400"
+                      : "text-white"
+                  }`}
+                >
                   {dataB.stats.totalViewsFormatted}
                 </span>
-                <span className="text-[10px] text-emerald-400 font-medium">
-                  {dataB.stats.viewsDelta}
+                <span
+                  className={`text-[10px] font-semibold flex items-center gap-0.5 ${
+                    viewsB > viewsA
+                      ? "text-emerald-400"
+                      : viewsB < viewsA
+                      ? "text-rose-400"
+                      : "text-slate-400"
+                  }`}
+                >
+                  {viewsB > viewsA
+                    ? `▲ +${formatNumber(viewsDiff)} lead`
+                    : viewsB < viewsA
+                    ? `▼ -${formatNumber(viewsDiff)} deficit`
+                    : "Equal parity"}
                 </span>
               </div>
 
               <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
                 <span className="text-slate-400 block text-[11px]">Engagement Rate</span>
-                <span className="text-lg font-bold text-amber-300 block mt-0.5 font-mono">
+                <span
+                  className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
+                    erB > erA
+                      ? "text-emerald-400"
+                      : erB < erA
+                      ? "text-rose-400"
+                      : "text-amber-300"
+                  }`}
+                >
                   {dataB.stats.engagementRate}%
                 </span>
-                <span className="text-[10px] text-slate-400">
-                  {dataB.stats.engagementDelta}
+                <span
+                  className={`text-[10px] font-semibold flex items-center gap-0.5 ${
+                    erB > erA
+                      ? "text-emerald-400"
+                      : erB < erA
+                      ? "text-rose-400"
+                      : "text-amber-300"
+                  }`}
+                >
+                  {erB > erA
+                    ? `▲ +${erDiff}% higher`
+                    : erB < erA
+                    ? `▼ -${erDiff}% lower`
+                    : `Parity (${erB}%)`}
                 </span>
               </div>
 
@@ -712,6 +1105,11 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </span>
                 <span className="text-[10px] text-slate-400">
                   ~{formatNumber(avgVPerPostB)} / video
+                  {avgVPerPostB > avgVPerPostA && (
+                    <span className="text-emerald-400 font-semibold ml-1">
+                      (▲ {(avgVPerPostB / Math.max(1, avgVPerPostA)).toFixed(1)}x pull)
+                    </span>
+                  )}
                 </span>
               </div>
             </div>
@@ -1003,13 +1401,21 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartPoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <LineChart data={chartPoints} margin={{ top: 12, right: 16, left: 6, bottom: 4 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                  <XAxis dataKey="date" stroke="#64748b" tick={{ fontSize: 11 }} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="#64748b"
+                    tick={{ fontSize: 11, fill: "#94a3b8" }}
+                    tickLine={false}
+                  />
                   <YAxis
                     stroke="#64748b"
-                    tick={{ fontSize: 11 }}
+                    tick={{ fontSize: 11, fill: "#94a3b8" }}
+                    tickLine={false}
                     tickFormatter={(val) => formatNumber(val)}
+                    domain={["auto", "auto"]}
+                    width={48}
                   />
                   <Tooltip
                     contentStyle={{
@@ -1021,15 +1427,16 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     }}
                     formatter={(value: any, name: string) => [
                       formatNumber(Number(value) || 0),
-                      name === "aValue" ? dataA.profile.displayName : dataB.profile.displayName,
+                      name === "aValue" ? dataA.profile.displayName : dataB?.profile.displayName || "Competitor",
                     ]}
+                    labelFormatter={(lbl, payload) => payload?.[0]?.payload?.fullDate || lbl}
                   />
                   <Legend
                     verticalAlign="top"
                     height={36}
                     formatter={(val) => (
-                      <span className="text-xs text-slate-300">
-                        {val === "aValue" ? dataA.profile.displayName : dataB.profile.displayName}
+                      <span className="text-xs font-medium text-slate-300">
+                        {val === "aValue" ? dataA.profile.displayName : dataB?.profile.displayName || "Competitor"}
                       </span>
                     )}
                   />
@@ -1039,7 +1446,9 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     name="aValue"
                     stroke="#6366f1"
                     strokeWidth={2.5}
-                    dot={false}
+                    dot={timeRange === "7d" ? { r: 3.5, fill: "#6366f1", strokeWidth: 1 } : false}
+                    activeDot={{ r: 5 }}
+                    connectNulls
                   />
                   <Line
                     type="monotone"
@@ -1047,7 +1456,9 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     name="bValue"
                     stroke="#a855f7"
                     strokeWidth={2.5}
-                    dot={false}
+                    dot={timeRange === "7d" ? { r: 3.5, fill: "#a855f7", strokeWidth: 1 } : false}
+                    activeDot={{ r: 5 }}
+                    connectNulls
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -1068,7 +1479,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   </h3>
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  High-leverage tactical battle moves calculated to outperform <span className="text-violet-300 font-semibold">{dataB.profile.displayName}</span> across packaging, retention, topic gaps, and release timing
+                  High-leverage tactical battle moves calculated to outperform <span className="text-violet-300 font-semibold">{dataB.profile.displayName}</span>. Click on any step to reveal its tactical playbook, competitive edge, and execution details.
                 </p>
               </div>
 
@@ -1129,36 +1540,59 @@ export const CompareView: React.FC<CompareViewProps> = ({
               </div>
             </div>
 
-            {/* Category Filter Pills */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-1">
-              <span className="text-xs text-slate-400 mr-1 flex items-center gap-1">
-                <Filter className="h-3 w-3" /> Filter:
-              </span>
-              {categories.map((cat) => (
+            {/* Category Filter Pills & Bulk Step Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs text-slate-400 mr-1 flex items-center gap-1">
+                  <Filter className="h-3 w-3" /> Filter:
+                </span>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategoryFilter(cat)}
+                    className={`rounded-lg px-3 py-1 text-xs font-medium transition cursor-pointer ${
+                      activeCategoryFilter === cat
+                        ? "bg-indigo-600 text-white font-semibold shadow-xs"
+                        : "bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 text-xs self-start sm:self-auto">
                 <button
-                  key={cat}
-                  onClick={() => setActiveCategoryFilter(cat)}
-                  className={`rounded-lg px-3 py-1 text-xs font-medium transition ${
-                    activeCategoryFilter === cat
-                      ? "bg-indigo-600 text-white font-semibold shadow"
-                      : "bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800"
-                  }`}
+                  type="button"
+                  onClick={expandAllTactics}
+                  className="text-[11px] font-medium text-indigo-300 hover:text-indigo-100 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 transition cursor-pointer"
                 >
-                  {cat}
+                  Expand All
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={collapseAllTactics}
+                  className="text-[11px] font-medium text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 transition cursor-pointer"
+                >
+                  Collapse All
+                </button>
+              </div>
             </div>
 
             {/* Tactical Battle Moves Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredTactics.map((tactic, idx) => {
                 const isDone = Boolean(completedTactics[tactic.id]);
+                const isExpanded = Boolean(expandedTactics[tactic.id]);
+
                 return (
                   <div
                     key={tactic.id || idx}
-                    className={`rounded-2xl border p-5 transition flex flex-col justify-between ${
+                    className={`rounded-2xl border p-5 transition-all flex flex-col justify-between ${
                       isDone
                         ? "border-emerald-500/40 bg-slate-950/90 shadow-md"
+                        : isExpanded
+                        ? "border-indigo-500/40 bg-slate-950/95 shadow-lg shadow-indigo-950/30"
                         : "border-slate-800 bg-slate-950/70 hover:border-slate-700"
                     }`}
                   >
@@ -1184,61 +1618,124 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                           <button
                             type="button"
-                            onClick={() => toggleTactic(tactic.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleTactic(tactic.id);
+                            }}
                             title={isDone ? "Mark as in progress" : "Mark as applied"}
-                            className="text-slate-400 hover:text-white transition"
+                            className="text-slate-400 hover:text-white transition cursor-pointer p-0.5"
                           >
                             {isDone ? (
                               <CheckSquare className="h-4 w-4 text-emerald-400" />
                             ) : (
-                              <Square className="h-4 w-4 text-slate-500" />
+                              <Square className="h-4 w-4 text-slate-500 hover:text-slate-300" />
                             )}
                           </button>
                         </div>
                       </div>
 
-                      {/* Tactic Title */}
-                      <h4 className={`text-sm font-bold mb-2 flex items-start gap-2 ${isDone ? "text-emerald-300" : "text-white"}`}>
-                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-mono font-bold mt-0.5">
-                          {idx + 1}
-                        </span>
-                        <span>{tactic.title}</span>
-                      </h4>
-
-                      {/* Tactical Action */}
-                      <p className="text-xs text-slate-300 leading-relaxed pl-7 font-normal">
-                        {tactic.tacticalAction}
-                      </p>
-
-                      {/* Why it beats competitor box */}
-                      <div className="mt-3.5 ml-7 rounded-xl bg-slate-900/90 border border-slate-800 p-3 text-xs">
-                        <span className="text-[11px] font-bold text-violet-300 flex items-center gap-1 mb-1">
-                          <Crosshair className="h-3 w-3 text-violet-400" />
-                          Why this beats {dataB.profile.displayName}:
-                        </span>
-                        <p className="text-slate-400 text-[11px] leading-relaxed">
-                          {tactic.whyItBeatsCompetitor}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Bottom Expected Advantage */}
-                    <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                      <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                        <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                        <span>Advantage: {tactic.expectedAdvantage}</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => toggleTactic(tactic.id)}
-                        className={`text-[10px] font-semibold px-2 py-0.5 rounded transition ${
-                          isDone
-                            ? "bg-emerald-500/20 text-emerald-300"
-                            : "bg-slate-800 text-slate-400 hover:text-slate-200"
-                        }`}
+                      {/* Clickable Step Title Header */}
+                      <div
+                        onClick={() => toggleTacticExpand(tactic.id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            toggleTacticExpand(tactic.id);
+                          }
+                        }}
+                        title={isExpanded ? "Click to collapse step" : "Click to view full step breakdown"}
+                        className="group flex items-start justify-between gap-2.5 cursor-pointer select-none rounded-xl p-1.5 -m-1.5 hover:bg-slate-900/70 transition"
                       >
-                        {isDone ? "Applied" : "Mark Done"}
-                      </button>
+                        <div className="flex items-start gap-2.5 flex-1 min-w-0">
+                          <span
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-mono font-bold mt-0.5 transition ${
+                              isDone
+                                ? "bg-emerald-500/20 text-emerald-300"
+                                : isExpanded
+                                ? "bg-indigo-600 text-white shadow-xs"
+                                : "bg-indigo-500/20 text-indigo-300 group-hover:bg-indigo-500/30"
+                            }`}
+                          >
+                            {idx + 1}
+                          </span>
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <h4
+                              className={`text-sm font-bold leading-snug transition ${
+                                isDone
+                                  ? "text-emerald-300"
+                                  : isExpanded
+                                  ? "text-indigo-200"
+                                  : "text-white group-hover:text-indigo-300"
+                              }`}
+                            >
+                              {tactic.title}
+                            </h4>
+                            {!isExpanded && (
+                              <span className="text-[11px] text-slate-500 mt-1 line-clamp-1 group-hover:text-slate-400">
+                                Click step to reveal full tactical playbook & edge analysis
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 shrink-0 ml-1 mt-0.5">
+                          <span className="text-[11px] font-medium text-slate-400 group-hover:text-indigo-300 transition hidden sm:inline">
+                            {isExpanded ? "Hide" : "Expand"}
+                          </span>
+                          <div className="p-0.5 rounded-md text-slate-400 group-hover:text-indigo-300 transition">
+                            {isExpanded ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Remaining Part - Revealed only when user clicks on this step */}
+                      {isExpanded && (
+                        <div className="mt-4 space-y-3.5 pt-1 border-t border-slate-800/60">
+                          {/* Tactical Action */}
+                          <p className="text-xs text-slate-300 leading-relaxed pl-7 font-normal">
+                            {tactic.tacticalAction}
+                          </p>
+
+                          {/* Why it beats competitor box */}
+                          <div className="ml-7 rounded-xl bg-slate-900/90 border border-slate-800 p-3.5 text-xs">
+                            <span className="text-[11px] font-bold text-violet-300 flex items-center gap-1.5 mb-1.5">
+                              <Crosshair className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+                              Why this beats {dataB.profile.displayName}:
+                            </span>
+                            <p className="text-slate-400 text-[11px] leading-relaxed">
+                              {tactic.whyItBeatsCompetitor}
+                            </p>
+                          </div>
+
+                          {/* Bottom Expected Advantage & Mark Done */}
+                          <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px]">
+                            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                              <span>Advantage: {tactic.expectedAdvantage}</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleTactic(tactic.id);
+                              }}
+                              className={`text-[10px] font-semibold px-2.5 py-1 rounded transition cursor-pointer self-end sm:self-auto ${
+                                isDone
+                                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                  : "bg-slate-800 text-slate-400 hover:text-slate-200"
+                              }`}
+                            >
+                              {isDone ? "Applied" : "Mark Done"}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

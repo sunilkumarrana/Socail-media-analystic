@@ -465,27 +465,23 @@ export default function App() {
                       <button
                         id="dashboard-subtab-video"
                         onClick={() => setDashboardTab("video-analytics")}
-                        className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+                        className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg transition whitespace-nowrap ${
                           dashboardTab === "video-analytics"
-                            ? "bg-red-600 text-white shadow-md shadow-red-600/30"
-                            : "text-red-400 hover:text-red-300 hover:bg-red-950/40 border border-red-500/20"
+                            ? "bg-indigo-600 text-white shadow-sm"
+                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
                         }`}
                       >
                         <Tv className="h-3.5 w-3.5" />
-                        <span>Video &amp; Channel (Side-by-Side)</span>
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-                        </span>
+                        <span>Video &amp; Channel Comparison</span>
                       </button>
                     )}
 
                     <button
                       id="dashboard-subtab-overview"
                       onClick={() => setDashboardTab("overview")}
-                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg transition whitespace-nowrap ${
                         dashboardTab === "overview"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
+                          ? "bg-indigo-600 text-white shadow-sm"
                           : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
                       }`}
                     >
@@ -590,31 +586,31 @@ export default function App() {
 
                 {dashboardTab === "overview" && (
                   <div className="space-y-6">
-                    {/* Live Video Banner if analyzed */}
+                    {/* Video Analysis Active Banner */}
                     {dataset.videoAnalytics && (
-                      <div className="rounded-2xl border border-red-500/20 bg-gradient-to-r from-red-950/30 via-slate-900 to-slate-900 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+                      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
                         <div className="flex items-center gap-3">
-                          <div className="h-9 w-9 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center shrink-0">
-                            <Radio className="h-4 w-4 animate-pulse" />
+                          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center shrink-0">
+                            <Tv className="h-4 w-4 text-indigo-400" />
                           </div>
                           <div>
-                            <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                              <span>Live Video Analytics Active:</span>
-                              <span className="text-red-400 font-normal truncate max-w-[280px] sm:max-w-md">
+                            <div className="text-xs font-medium text-white flex items-center gap-1.5">
+                              <span>Video Diagnostics:</span>
+                              <span className="text-slate-300 font-normal truncate max-w-[280px] sm:max-w-md">
                                 {dataset.videoAnalytics.title}
                               </span>
                             </div>
                             <p className="text-[11px] text-slate-400">
-                              {dataset.videoAnalytics.viewsFormatted} live views • {dataset.videoAnalytics.viewsPerHourFormatted} • {dataset.videoAnalytics.likeRatio}% positive
+                              {dataset.videoAnalytics.viewsFormatted} views • {dataset.videoAnalytics.viewsPerHourFormatted} • {dataset.videoAnalytics.likeRatio}% positive
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => setDashboardTab("video-analytics")}
-                          className="shrink-0 text-xs font-semibold text-red-400 hover:text-white bg-red-500/10 hover:bg-red-600 px-3 py-1.5 rounded-lg border border-red-500/20 transition flex items-center gap-1.5"
+                          className="shrink-0 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
                         >
-                          <span>View Side-by-Side Comparison</span>
-                          <Tv className="h-3.5 w-3.5" />
+                          <span>Open Side-by-Side View</span>
+                          <Tv className="h-3.5 w-3.5 text-slate-400" />
                         </button>
                       </div>
                     )}

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { DashboardDataset, VideoAnalyticsData, TopContentItem } from "../types";
+import { HighDemandContentSection } from "./HighDemandContentSection";
 import {
   Play,
   TrendingUp,
@@ -23,6 +24,7 @@ import {
   BarChart3,
   Flame,
   Tag,
+  Activity,
 } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -59,12 +61,12 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
     percent: item.retentionPercent,
   }));
 
-  // Video traffic data
+  // Video traffic data - cohesive neutral / indigo shades
   const trafficData = videoAnalytics.trafficSources.map((item, idx) => ({
     name: item.source.split(" (")[0],
     percentage: item.percentage,
     views: item.viewsFormatted,
-    fill: ["#ef4444", "#f97316", "#3b82f6", "#10b981", "#8b5cf6"][idx % 5],
+    fill: ["#6366f1", "#818cf8", "#94a3b8", "#64748b", "#475569"][idx % 5],
   }));
 
   // Channel history sparkline data
@@ -81,23 +83,22 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & View Switcher */}
-      <div className="rounded-2xl border border-red-500/30 bg-gradient-to-r from-red-950/40 via-slate-900 to-indigo-950/40 p-4 sm:p-5 shadow-xl backdrop-blur-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Top Banner & View Switcher - Rule 2: Neutral tones with one indigo accent for active toggle */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5 shadow-sm backdrop-blur-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-600/20 border border-red-500/40 text-red-400">
-            <Radio className="h-5 w-5 animate-pulse" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-800 text-slate-300 border border-slate-700/60">
+            <Tv className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-red-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-red-400 border border-red-500/20">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
-                Live Video Link Analyzed
+              <span className="text-xs font-semibold text-slate-300">
+                Video Intelligence
               </span>
-              <span className="text-xs text-slate-400 hidden sm:inline">
-                • Synchronized side-by-side with channel intelligence
+              <span className="text-xs text-slate-500 hidden sm:inline">
+                • Synchronized side-by-side with channel metrics
               </span>
             </div>
-            <h2 className="text-base font-bold text-white mt-1 line-clamp-1">
+            <h2 className="text-sm sm:text-base font-semibold text-white mt-0.5 line-clamp-1">
               {videoAnalytics.title}
             </h2>
           </div>
@@ -109,7 +110,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
             onClick={() => setActiveViewMode("side-by-side")}
             className={`flex-1 md:flex-initial px-3 py-1.5 rounded-lg transition ${
               activeViewMode === "side-by-side"
-                ? "bg-red-600 text-white font-semibold shadow-md shadow-red-600/30"
+                ? "bg-indigo-600 text-white font-medium shadow-sm"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -119,7 +120,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
             onClick={() => setActiveViewMode("video-only")}
             className={`flex-1 md:flex-initial px-3 py-1.5 rounded-lg transition ${
               activeViewMode === "video-only"
-                ? "bg-red-600 text-white font-semibold shadow-md shadow-red-600/30"
+                ? "bg-indigo-600 text-white font-medium shadow-sm"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -129,7 +130,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
             onClick={() => setActiveViewMode("channel-only")}
             className={`flex-1 md:flex-initial px-3 py-1.5 rounded-lg transition ${
               activeViewMode === "channel-only"
-                ? "bg-red-600 text-white font-semibold shadow-md shadow-red-600/30"
+                ? "bg-indigo-600 text-white font-medium shadow-sm"
                 : "text-slate-400 hover:text-white"
             }`}
           >
@@ -152,21 +153,18 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
         {(activeViewMode === "side-by-side" || activeViewMode === "video-only") && (
           <div className="space-y-6">
             {/* Video Card Container */}
-            <div className="rounded-2xl border border-red-500/20 bg-slate-900/90 p-5 sm:p-6 shadow-xl backdrop-blur-md">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 shadow-sm backdrop-blur-sm">
               {/* Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-800/80">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center font-bold">
-                    <Tv className="h-4 w-4" />
+                <div className="flex items-center gap-2.5">
+                  <div className="h-7 w-7 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold">
+                    <Tv className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                      Video Analytics
-                      <span className="text-[10px] font-normal normal-case text-red-400 bg-red-500/10 px-2 py-0.5 rounded-full border border-red-500/20">
-                        Target Media
-                      </span>
+                    <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                      Video Performance
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       ID: {videoAnalytics.videoId} • Published {videoAnalytics.publishedDate}
                     </p>
                   </div>
@@ -176,10 +174,10 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                   href={videoAnalytics.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-red-400 hover:text-red-300 font-medium transition group"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1 text-xs font-medium transition"
                 >
                   <span>Open Video</span>
-                  <ExternalLink className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
+                  <ExternalLink className="h-3 w-3 text-slate-400" />
                 </a>
               </div>
 
@@ -204,23 +202,20 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                     <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-between p-4">
                       <div className="flex items-center justify-between">
                         <span className="rounded-md bg-black/70 px-2 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
-                          Duration: {videoAnalytics.duration}
-                        </span>
-                        <span className="rounded-md bg-red-600/90 px-2 py-0.5 text-[11px] font-bold text-white uppercase tracking-wider shadow">
-                          YouTube HD
+                          {videoAnalytics.duration}
                         </span>
                       </div>
 
                       {/* Play Button Overlay */}
                       <button
                         onClick={() => setIsPlayingEmbed(true)}
-                        className="self-center flex items-center justify-center h-14 w-14 rounded-full bg-red-600/90 text-white shadow-2xl hover:scale-110 hover:bg-red-500 transition cursor-pointer"
+                        className="self-center flex items-center justify-center h-12 w-12 rounded-full bg-slate-900/90 text-white border border-slate-700 shadow-xl hover:scale-105 transition cursor-pointer"
                         title="Play preview"
                       >
-                        <Play className="h-6 w-6 fill-white ml-0.5" />
+                        <Play className="h-5 w-5 fill-white ml-0.5" />
                       </button>
 
-                      <p className="text-xs font-semibold text-white line-clamp-1 bg-black/60 px-2 py-1 rounded backdrop-blur-sm">
+                      <p className="text-xs font-medium text-white line-clamp-1 bg-black/60 px-2 py-1 rounded backdrop-blur-sm">
                         {videoAnalytics.title}
                       </p>
                     </div>
@@ -233,10 +228,10 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 {/* Metric 1: Views */}
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                    <span>Live Views</span>
-                    <Eye className="h-3.5 w-3.5 text-blue-400" />
+                    <span>Views</span>
+                    <Eye className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {videoAnalytics.viewsFormatted}
                   </div>
                   <div className="flex items-center gap-1 text-[10px] text-emerald-400 mt-0.5 font-medium">
@@ -249,9 +244,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Likes</span>
-                    <ThumbsUp className="h-3.5 w-3.5 text-red-400" />
+                    <ThumbsUp className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {videoAnalytics.likesFormatted}
                   </div>
                   <div className="text-[10px] text-slate-400 mt-0.5">
@@ -263,9 +258,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Comments</span>
-                    <MessageSquare className="h-3.5 w-3.5 text-amber-400" />
+                    <MessageSquare className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {videoAnalytics.commentsFormatted}
                   </div>
                   <div className="text-[10px] text-slate-400 mt-0.5">
@@ -277,21 +272,21 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Engagement</span>
-                    <Flame className="h-3.5 w-3.5 text-purple-400" />
+                    <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {videoAnalytics.engagementRate}%
                   </div>
-                  <div className="text-[10px] text-purple-400 mt-0.5 font-medium">
+                  <div className="text-[10px] text-slate-400 mt-0.5 font-medium">
                     Viral Score: {videoAnalytics.viralScore}/100
                   </div>
                 </div>
               </div>
 
               {/* Video vs Channel Baseline Benchmark */}
-              <div className="mt-4 rounded-xl border border-indigo-500/20 bg-gradient-to-r from-indigo-950/30 via-slate-950 to-slate-950 p-4">
+              <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-indigo-300 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
                     Performance vs Channel Baseline
                   </span>
@@ -303,12 +298,12 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                  <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-900/80 border border-slate-800">
+                  <div className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
                     <div
                       className={`h-7 w-7 rounded-md flex items-center justify-center ${
                         videoAnalytics.vsChannelAverage.isViewsHigher
-                          ? "bg-emerald-500/20 text-emerald-400"
-                          : "bg-amber-500/20 text-amber-400"
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : "bg-amber-500/10 text-amber-400"
                       }`}
                     >
                       {videoAnalytics.vsChannelAverage.isViewsHigher ? (
@@ -318,7 +313,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                       )}
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white">
+                      <div className="text-xs font-bold text-white font-mono">
                         {videoAnalytics.vsChannelAverage.viewsMultiplier} Views
                       </div>
                       <div className="text-[10px] text-slate-400">
@@ -327,18 +322,18 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 p-2 rounded-lg bg-slate-900/80 border border-slate-800">
+                  <div className="flex items-center gap-3 p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
                     <div
                       className={`h-7 w-7 rounded-md flex items-center justify-center ${
                         videoAnalytics.vsChannelAverage.isEngagementHigher
-                          ? "bg-emerald-500/20 text-emerald-400"
-                          : "bg-slate-700/50 text-slate-300"
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : "bg-slate-800 text-slate-400"
                       }`}
                     >
                       <ThumbsUp className="h-4 w-4" />
                     </div>
                     <div>
-                      <div className="text-xs font-bold text-white">
+                      <div className="text-xs font-bold text-white font-mono">
                         {videoAnalytics.vsChannelAverage.engagementDeltaPercent} Engagement
                       </div>
                       <div className="text-[10px] text-slate-400">
@@ -354,7 +349,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-red-400" />
+                      <Clock className="h-3.5 w-3.5 text-slate-400" />
                       Audience Retention Curve
                     </h4>
                     <p className="text-[11px] text-slate-400">
@@ -362,7 +357,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                     </p>
                   </div>
                   <div className="text-right">
-                    <div className="text-xs font-bold text-white">
+                    <div className="text-xs font-bold text-white font-mono">
                       {videoAnalytics.avgViewDuration}
                     </div>
                     <div className="text-[10px] text-slate-400">
@@ -376,8 +371,8 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                     <AreaChart data={retentionData}>
                       <defs>
                         <linearGradient id="vidRetentionGrad" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4} />
-                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0.0} />
+                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
@@ -408,7 +403,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                       <Area
                         type="monotone"
                         dataKey="percent"
-                        stroke="#ef4444"
+                        stroke="#6366f1"
                         strokeWidth={2}
                         fill="url(#vidRetentionGrad)"
                       />
@@ -420,7 +415,7 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
               {/* Video Traffic Sources Breakdown */}
               <div className="mt-5 pt-4 border-t border-slate-800">
                 <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-3 flex items-center gap-1.5">
-                  <Compass className="h-3.5 w-3.5 text-red-400" />
+                  <Compass className="h-3.5 w-3.5 text-slate-400" />
                   Traffic Sources for this Video
                 </h4>
                 <div className="space-y-2.5">
@@ -431,8 +426,8 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                           {item.name}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-slate-400 text-[11px]">{item.views} views</span>
-                          <span className="font-semibold text-white">{item.percentage}%</span>
+                          <span className="text-slate-400 text-[11px] font-mono">{item.views} views</span>
+                          <span className="font-semibold text-white font-mono">{item.percentage}%</span>
                         </div>
                       </div>
                       <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
@@ -478,21 +473,18 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
         {(activeViewMode === "side-by-side" || activeViewMode === "channel-only") && (
           <div className="space-y-6">
             {/* Channel Card Container */}
-            <div className="rounded-2xl border border-indigo-500/20 bg-slate-900/90 p-5 sm:p-6 shadow-xl backdrop-blur-md">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 sm:p-6 shadow-sm backdrop-blur-sm">
               {/* Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-800/80">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-lg bg-indigo-600/20 text-indigo-400 flex items-center justify-center font-bold">
-                    <Users className="h-4 w-4" />
+                <div className="flex items-center gap-2.5">
+                  <div className="h-7 w-7 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold">
+                    <Users className="h-3.5 w-3.5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                    <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
                       Channel Analytics
-                      <span className="text-[10px] font-normal normal-case text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
-                        Host Channel
-                      </span>
                     </h3>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       {profile.handle} • Joined {profile.joinedYear}
                     </p>
                   </div>
@@ -502,10 +494,10 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                   href={profile.profileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 font-medium transition group"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white px-2.5 py-1 text-xs font-medium transition"
                 >
                   <span>Visit Channel</span>
-                  <ExternalLink className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition" />
+                  <ExternalLink className="h-3 w-3 text-slate-400" />
                 </a>
               </div>
 
@@ -516,13 +508,16 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                     <img
                       src={profile.bannerUrl}
                       alt={profile.displayName}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover opacity-85"
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
                   </div>
                 ) : (
-                  <div className="h-16 w-full bg-gradient-to-r from-red-900/50 via-indigo-900/50 to-slate-900" />
+                  <div className="h-16 w-full bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900" />
                 )}
 
                 <div className="p-4 pt-2 flex items-center gap-3.5">
@@ -531,28 +526,33 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                       <img
                         src={profile.avatarUrl}
                         alt={profile.displayName}
-                        className="h-14 w-14 rounded-full border-2 border-slate-900 object-cover shadow-lg"
+                        className="h-14 w-14 rounded-xl border-2 border-slate-900 object-cover shadow-lg"
                         referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          (e.target as HTMLElement).style.display = "none";
+                        }}
                       />
                     ) : (
-                      <div className="h-14 w-14 rounded-full bg-red-600 border-2 border-slate-900 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                      <div className="h-14 w-14 rounded-xl bg-slate-800 border-2 border-slate-900 flex items-center justify-center text-white font-bold text-lg shadow-lg">
                         {profile.initials}
                       </div>
-                    )}
-                    {profile.verified && (
-                      <CheckCircle2 className="absolute bottom-0 right-0 h-4 w-4 fill-blue-500 text-slate-900" />
                     )}
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-base font-bold text-white truncate">
+                      <h4 className="text-base font-bold text-white tracking-tight truncate">
                         {profile.displayName}
                       </h4>
+                      {profile.verified && (
+                        <CheckCircle2 className="h-4 w-4 text-sky-400 shrink-0" />
+                      )}
                     </div>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">
-                      {profile.bio}
-                    </p>
+                    {profile.bio && (
+                      <p className="text-xs text-slate-400 truncate mt-0.5">
+                        {profile.bio.replace(/subscribe for a cookie\s*:\s*\)/gi, "").trim()}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -563,9 +563,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Subscribers</span>
-                    <Users className="h-3.5 w-3.5 text-indigo-400" />
+                    <Users className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {stats.followersFormatted}
                   </div>
                   <div className="text-[10px] text-emerald-400 mt-0.5 font-medium">
@@ -577,9 +577,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Channel Views</span>
-                    <Eye className="h-3.5 w-3.5 text-blue-400" />
+                    <Eye className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {stats.totalViewsFormatted}
                   </div>
                   <div className="text-[10px] text-emerald-400 mt-0.5 font-medium">
@@ -591,9 +591,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Uploads</span>
-                    <Tv className="h-3.5 w-3.5 text-purple-400" />
+                    <Tv className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {stats.postsCountFormatted}
                   </div>
                   <div className="text-[10px] text-slate-400 mt-0.5">
@@ -605,9 +605,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                     <span>Channel Eng</span>
-                    <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                    <TrendingUp className="h-3.5 w-3.5 text-slate-400" />
                   </div>
-                  <div className="text-lg font-bold text-white">
+                  <div className="text-lg font-bold text-white font-mono">
                     {stats.engagementRate}%
                   </div>
                   <div className="text-[10px] text-emerald-400 mt-0.5 font-medium">
@@ -621,22 +621,22 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                 <div className="mt-4 rounded-xl border border-slate-800 bg-slate-950/60 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                      <Radio className="h-3.5 w-3.5 text-emerald-400 animate-pulse" />
-                      Channel Real-Time Activity
+                      <Activity className="h-3.5 w-3.5 text-slate-400" />
+                      Channel Realtime Velocity
                     </span>
-                    <span className="text-[10px] text-emerald-400 font-medium">Updating Live</span>
+                    <span className="text-[11px] text-slate-400 font-medium">Continuous</span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800">
                       <div className="text-[11px] text-slate-400">Views in Last 48 Hours</div>
-                      <div className="text-base font-bold text-white mt-0.5">
+                      <div className="text-base font-bold text-white font-mono mt-0.5">
                         {studio.realtime.viewsLast48hFormatted}
                       </div>
                     </div>
                     <div className="p-2.5 rounded-lg bg-slate-900/90 border border-slate-800">
                       <div className="text-[11px] text-slate-400">Views in Last 60 Mins</div>
-                      <div className="text-base font-bold text-white mt-0.5">
+                      <div className="text-base font-bold text-white font-mono mt-0.5">
                         {studio.realtime.viewsLast60mFormatted}
                       </div>
                     </div>
@@ -791,6 +791,9 @@ export const VideoAndChannelAnalytics: React.FC<VideoAndChannelAnalyticsProps> =
                   </div>
                 </div>
               )}
+
+              {/* High-Demand Content & Viewer Rating Intelligence at the bottom of Channel Analytics */}
+              <HighDemandContentSection dataset={dataset} />
             </div>
           </div>
         )}

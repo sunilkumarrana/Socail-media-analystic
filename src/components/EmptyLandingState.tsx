@@ -98,68 +98,69 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
   };
 
   return (
-    <div id="overview-channel-entry-landing" className="py-6 sm:py-10">
+    <div id="overview-channel-entry-landing" className="py-8 sm:py-12">
       {/* Hero Container */}
-      <div className="max-w-3xl mx-auto text-center mb-8">
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-medium text-indigo-300 mb-4">
-          <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-          <span>Real-Time Creator Analytics Engine</span>
+      <div className="max-w-4xl mx-auto text-center mb-8 px-4">
+        <div className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-xs font-medium text-slate-400 mb-4 shadow-xs">
+          <Youtube className="h-3.5 w-3.5 text-red-500" />
+          <span>YouTube Channel &amp; Video Intelligence</span>
         </div>
 
-        <h1 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-tight">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-white whitespace-nowrap text-center">
           Enter Channel URL or Account Name
         </h1>
-        <p className="mt-3 text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl mx-auto">
-          Enter any YouTube channel URL, handle (e.g. <span className="text-indigo-300 font-mono">@mkbhd</span>), or creator name to unlock real-time subscriber counts, YouTube Studio-style performance curves, and AI intelligence.
+        <p className="mt-2.5 text-sm sm:text-base text-slate-400 leading-relaxed max-w-xl mx-auto">
+          Search any YouTube channel by handle, URL, or creator name to inspect live studio analytics, audience retention, and growth curves.
         </p>
       </div>
 
       {/* Prominent URL / Account Name Input Box */}
-      <div className="max-w-3xl mx-auto mb-8">
+      <div className="max-w-2xl mx-auto mb-8 px-4">
         <form
           onSubmit={handleFormSubmit}
-          className="relative rounded-2xl border-2 border-indigo-500/50 bg-slate-900/95 p-2 sm:p-2.5 shadow-2xl shadow-indigo-950/40 backdrop-blur-xl transition-all focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-500/20"
+          className="relative rounded-xl border border-slate-750 bg-slate-900/90 p-1.5 sm:p-2 shadow-lg shadow-black/20 backdrop-blur-sm transition-all focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500"
         >
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <div className="flex items-center flex-1 pl-3 pr-2">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-600/20 text-red-500 border border-red-500/30 mr-2.5">
-                <Youtube className="h-5 w-5" />
+            <div className="flex items-center flex-1 pl-2.5 pr-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-slate-400 mr-2.5">
+                <Search className="h-4 w-4 text-slate-400" />
               </div>
               <input
                 id="landing-channel-input"
                 type="text"
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
-                placeholder="Paste channel URL or name: e.g. https://youtube.com/@mkbhd, @mrbeast, Apna College..."
-                className="w-full bg-transparent py-2.5 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
+                placeholder="e.g. youtube.com/@mkbhd, @mrbeast, or Veritasium..."
+                className="w-full bg-transparent py-2 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
                 autoComplete="off"
                 spellCheck={false}
               />
-              {inputVal && (
+              {inputVal ? (
                 <button
                   type="button"
                   onClick={() => setInputVal("")}
-                  className="px-2 py-1 text-xs text-slate-400 hover:text-white"
+                  className="px-2 py-1 text-xs text-slate-400 hover:text-white transition cursor-pointer"
                 >
                   Clear
                 </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handlePaste}
+                  title="Paste from clipboard"
+                  className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-800 transition cursor-pointer"
+                >
+                  <ClipboardPaste className="h-3.5 w-3.5" />
+                  <span>Paste</span>
+                </button>
               )}
-              <button
-                type="button"
-                onClick={handlePaste}
-                title="Paste from clipboard"
-                className="hidden sm:flex items-center gap-1 text-xs text-slate-400 hover:text-indigo-300 px-2 py-1 rounded hover:bg-slate-800 transition"
-              >
-                <ClipboardPaste className="h-3.5 w-3.5" />
-                <span>Paste</span>
-              </button>
             </div>
 
             <button
               id="landing-analyze-btn"
               type="submit"
               disabled={isLoading || !inputVal.trim()}
-              className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white px-5 py-3 text-sm font-semibold shadow-lg shadow-indigo-600/30 transition"
+              className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm transition active:scale-[0.98] cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -169,7 +170,7 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
               ) : (
                 <>
                   <span>Analyze Channel</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </>
               )}
             </button>
@@ -178,13 +179,12 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
       </div>
 
       {/* Instant Quick-Select Featured Channels */}
-      <div className="max-w-3xl mx-auto mb-12">
-        <div className="flex items-center justify-center gap-2 text-xs text-slate-400 mb-3">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Or click an instant channel to load data:</span>
-        </div>
+      <div className="max-w-3xl mx-auto mb-12 px-4">
+        <p className="text-xs font-medium text-slate-400 mb-3 text-center">
+          Suggested creator channels:
+        </p>
 
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+        <div className="flex flex-wrap items-center justify-center gap-2">
           {FEATURED_PRESETS.map((preset) => (
             <button
               key={preset.handle}
@@ -196,17 +196,17 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
                   onSelectSample(preset.handle, preset.platform);
                 }
               }}
-              className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/90 hover:border-indigo-500/60 hover:bg-slate-800/90 px-3.5 py-2 text-xs font-medium text-slate-200 transition group shadow-sm"
+              className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 hover:border-slate-700 hover:bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors group cursor-pointer shadow-xs"
             >
               <div
-                className={`h-5 w-5 rounded-full bg-gradient-to-br ${preset.avatarBg} text-white flex items-center justify-center text-[9px] font-bold`}
+                className="h-5 w-5 rounded-full bg-slate-800 text-slate-300 group-hover:text-white flex items-center justify-center text-[10px] font-semibold"
               >
                 {preset.initials}
               </div>
-              <span className="font-semibold text-white group-hover:text-indigo-300 transition">
+              <span className="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">
                 {preset.name}
               </span>
-              <span className="text-[10px] text-slate-400 font-mono">
+              <span className="text-[11px] text-slate-400 font-mono">
                 {preset.subscribers}
               </span>
             </button>
@@ -215,34 +215,40 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
       </div>
 
       {/* Feature Capabilities Preview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto">
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 p-5 backdrop-blur-sm">
-          <div className="h-10 w-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-3 border border-indigo-500/20">
-            <TrendingUp className="h-5 w-5" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto px-4">
+        <div className="rounded-xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-xs transition hover:border-slate-750">
+          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
+            <TrendingUp className="h-4 w-4 text-indigo-400" />
           </div>
-          <h2 className="text-sm font-bold text-white mb-1">YouTube Studio Growth Curves</h2>
+          <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-1.5">
+            Live Channel Growth
+          </h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Tracks performance against typical channels: curves grow up sharply when performance is good and decrease down when traffic slows.
+            Tracks live subscriber delta, view velocities, and video upload cadence verified directly from YouTube.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 p-5 backdrop-blur-sm">
-          <div className="h-10 w-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-500/20">
-            <ShieldCheck className="h-5 w-5" />
+        <div className="rounded-xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-xs transition hover:border-slate-750">
+          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
+            <BarChart2 className="h-4 w-4 text-indigo-400" />
           </div>
-          <h2 className="text-sm font-bold text-white mb-1">Live YouTube Data Sync</h2>
+          <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-1.5">
+            Studio-Style Trajectory
+          </h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Fetches live subscriber counts, total channel view counts, verified badge status, and upload velocity straight from YouTube.
+            Plots performance curves against typical channel baseline envelopes, mirroring YouTube Studio analytics.
           </p>
         </div>
 
-        <div className="rounded-2xl border border-slate-800/80 bg-slate-900/60 p-5 backdrop-blur-sm">
-          <div className="h-10 w-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-3 border border-purple-500/20">
-            <BrainCircuit className="h-5 w-5" />
+        <div className="rounded-xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-xs transition hover:border-slate-750">
+          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
+            <BrainCircuit className="h-4 w-4 text-indigo-400" />
           </div>
-          <h2 className="text-sm font-bold text-white mb-1">Gemini AI Executive Briefing</h2>
+          <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-1.5">
+            Demand &amp; Retention Telemetry
+          </h2>
           <p className="text-xs text-slate-400 leading-relaxed">
-            Generates strategic creator insights evaluating retention dynamics, upload cadence, and competitive positioning.
+            Identifies high-demand topic opportunities, retention curve drop-offs, and audience search volume gaps.
           </p>
         </div>
       </div>

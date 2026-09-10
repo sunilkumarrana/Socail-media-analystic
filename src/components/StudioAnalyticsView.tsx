@@ -4,6 +4,7 @@ import { formatNumber } from "../utils/mockGenerator";
 import { ReachTab } from "./ReachTab";
 import { EngagementTab } from "./EngagementTab";
 import { AudienceTab } from "./AudienceTab";
+import { HighDemandContentSection } from "./HighDemandContentSection";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -39,7 +40,19 @@ import {
   Radio,
   CheckCircle2,
   Video,
+  Link2,
+  Layers,
 } from "lucide-react";
+
+// Sanitize jokey placeholder phrases like "subscribe for a cookie :)"
+function cleanBioText(bio?: string): string {
+  if (!bio) return "";
+  let text = bio.replace(/subscribe for a cookie\s*:\s*\)/gi, "").replace(/🍪/g, "").trim();
+  if (text.startsWith("Accomplish something impossible or")) {
+    text = "Accomplish something impossible.";
+  }
+  return text;
+}
 
 interface StudioAnalyticsViewProps {
   dataset: DashboardDataset;
@@ -231,111 +244,153 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
       {/* 1. Perspective YouTube Channel Account Card */}
       <div
         id="channel-perspective-account-card"
-        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/90 shadow-xl backdrop-blur-md"
+        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl backdrop-blur-sm"
       >
-        {/* Banner header if bannerUrl exists or stylized brand pattern */}
-        <div className="h-28 sm:h-36 w-full relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950/60 to-slate-900 border-b border-slate-800/80">
+        {/* Rule 3: Clean channel banner image or subtle neutral gradient placeholder (no jokes/cookie emoji) */}
+        <div className="h-28 sm:h-36 w-full relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border-b border-slate-800/80">
           {profile.bannerUrl ? (
             <img
               src={profile.bannerUrl}
               alt={`${profile.displayName} Banner`}
               referrerPolicy="no-referrer"
-              className="h-full w-full object-cover opacity-80"
+              className="h-full w-full object-cover opacity-85"
+              onError={(e) => {
+                (e.target as HTMLElement).style.display = "none";
+              }}
             />
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-r from-red-950/30 via-slate-900 to-indigo-950/40 flex items-center justify-end px-8">
-              <span className="text-slate-800/50 font-black text-6xl tracking-widest uppercase select-none">
-                {profile.displayName.slice(0, 10)}
-              </span>
-            </div>
+            <div className="h-full w-full bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
         </div>
 
         {/* Profile Info Row */}
-        <div className="px-5 sm:px-6 pb-5 pt-0 relative">
+        <div className="px-5 sm:px-6 pb-6 pt-0 relative">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 sm:-mt-12 mb-4">
-            <div className="flex items-end gap-3.5">
-              {/* Avatar */}
-              <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border-4 border-slate-950 bg-slate-800 shadow-2xl overflow-hidden shrink-0">
+            <div className="flex items-end gap-4">
+              {/* Avatar without duplicate live badges */}
+              <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border-4 border-slate-950 bg-slate-800 shadow-xl overflow-hidden shrink-0">
                 {profile.avatarUrl ? (
                   <img
                     src={profile.avatarUrl}
                     alt={profile.displayName}
                     referrerPolicy="no-referrer"
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
                   />
                 ) : (
                   <div className={`h-full w-full flex items-center justify-center font-bold text-white text-2xl bg-gradient-to-br ${profile.avatarBg}`}>
                     {profile.initials}
                   </div>
                 )}
-                <div className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-slate-950" title="Active Live Channel" />
               </div>
 
-              {/* Names & Handle */}
+              {/* Names & Handle: Rule 4 max 1 pill (verified checkmark) */}
               <div className="mb-1">
-                <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-2">
                   <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
                     {profile.displayName}
                   </h2>
                   {profile.verified && (
-                    <CheckCircle2 className="h-5 w-5 text-sky-400 shrink-0" title="Verified Creator" />
+                    <CheckCircle2 className="h-4 w-4 text-sky-400 shrink-0" title="Verified Creator" />
                   )}
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    Live Perspective Synced
-                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                  <span className="font-mono text-slate-300 font-semibold">{profile.handle}</span>
-                  <span>•</span>
-                  <span>Category: {profile.category || "Entertainment & Education"}</span>
+                  <span className="font-mono text-slate-300">{profile.handle}</span>
+                  {profile.category && (
+                    <>
+                      <span>•</span>
+                      <span>{profile.category}</span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Direct Channel External Link button */}
-            <div className="flex items-center gap-2 self-start sm:self-end">
+            {/* Rule 4 & Rule 2: Right-aligned single neutral ghost/outline button */}
+            <div className="self-start sm:self-end">
               <a
                 href={channelPerspectiveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-red-600 hover:bg-red-500 text-white px-3.5 py-2 text-xs font-semibold shadow-md shadow-red-600/20 transition group"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white px-3.5 py-1.5 text-xs font-medium transition"
               >
-                <Video className="h-4 w-4 fill-white" />
-                <span>Open Channel on YouTube</span>
-                <ExternalLink className="h-3.5 w-3.5 text-red-200 group-hover:translate-x-0.5 transition-transform" />
+                <span>Open Channel</span>
+                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
               </a>
             </div>
           </div>
 
-          {/* Channel Bio */}
-          {profile.bio && (
-            <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-4xl mb-4 leading-relaxed">
-              {profile.bio}
+          {/* Clean channel bio without joke/cookie text */}
+          {cleanBioText(profile.bio) && (
+            <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-3xl mb-4 leading-relaxed">
+              {cleanBioText(profile.bio)}
             </p>
           )}
 
-          {/* Quick Perspective Channel Stat Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 border-t border-slate-800/80 text-xs">
-            <div className="rounded-xl bg-slate-950/60 p-2.5 border border-slate-800">
-              <span className="text-[11px] text-slate-400 block">Subscribers (Live)</span>
-              <span className="text-base font-bold text-white font-mono mt-0.5 block">{stats.followersFormatted}</span>
+          {/* Rule 5 & 6: Consistent 4 Stat Cards - same label style, prominent numbers, same padding, icons */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-800/80">
+            {/* Card 1: Subscribers */}
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                <span>Subscribers</span>
+                <Users className="h-4 w-4 text-slate-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+                {stats.followersFormatted}
+              </div>
+              <div className="mt-2 text-[11px] text-slate-400 font-medium">
+                {stats.followersDelta} vs last 30d
+              </div>
             </div>
-            <div className="rounded-xl bg-slate-950/60 p-2.5 border border-slate-800">
-              <span className="text-[11px] text-slate-400 block">Total Uploads (Live)</span>
-              <span className="text-base font-bold text-white font-mono mt-0.5 block">{stats.postsCountFormatted}</span>
+
+            {/* Card 2: Total Uploads */}
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                <span>Total Uploads</span>
+                <Video className="h-4 w-4 text-slate-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+                {stats.postsCountFormatted}
+              </div>
+              <div className="mt-2 text-[11px] text-slate-400 font-medium">
+                {stats.postsDelta} published
+              </div>
             </div>
-            <div className="rounded-xl bg-slate-950/60 p-2.5 border border-slate-800">
-              <span className="text-[11px] text-slate-400 block">Est. Channel Views</span>
-              <span className="text-base font-bold text-white font-mono mt-0.5 block">{stats.totalViewsFormatted}</span>
+
+            {/* Card 3: Channel Views */}
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                <span>Channel Views</span>
+                <Eye className="h-4 w-4 text-slate-400" />
+              </div>
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+                {stats.totalViewsFormatted}
+              </div>
+              <div className="mt-2 text-[11px] text-slate-400 font-medium">
+                {stats.viewsDelta} vs last 30d
+              </div>
             </div>
-            <div className="rounded-xl bg-slate-950/60 p-2.5 border border-slate-800">
-              <span className="text-[11px] text-slate-400 block">Perspective Link</span>
-              <span className="text-xs font-mono text-indigo-400 hover:underline truncate block mt-0.5">
+
+            {/* Card 4: Channel Handle */}
+            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+                <span>Channel Handle</span>
+                <Link2 className="h-4 w-4 text-slate-400" />
+              </div>
+              <a
+                href={channelPerspectiveUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl sm:text-2xl font-bold tracking-tight text-slate-200 hover:text-white font-mono truncate block"
+              >
+                @{profile.handle.replace(/^@/, "")}
+              </a>
+              <div className="mt-2 text-[11px] text-slate-400 font-medium truncate">
                 youtube.com/{profile.handle.replace(/^@/, "")}
-              </span>
+              </div>
             </div>
           </div>
         </div>
@@ -416,9 +471,9 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
                 <button
                   key={period}
                   onClick={() => setStudioPeriod(period)}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition ${
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition ${
                     studioPeriod === period
-                      ? "bg-indigo-600 text-white shadow"
+                      ? "bg-slate-800 text-white shadow-sm"
                       : "text-slate-400 hover:text-slate-200"
                   }`}
                 >
@@ -435,34 +490,30 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
       {/* ================= OVERVIEW TAB ================= */}
       {activeTab === "overview" && (
         <div className="space-y-6">
-          {/* Top KPI Cards in Studio Style with Badges */}
+          {/* Top KPI Cards in Studio Style - Clean, Consistent, No Redundant Badges */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* 1. Views */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span className="font-medium">Views in this period</span>
-                <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                  🟢 Real-Time Synced
-                </span>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+                <span>Period Views</span>
+                <Eye className="h-4 w-4 text-slate-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
                 {periodViewsFormatted}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-indigo-300 font-medium">
-                <Calendar className="h-3.5 w-3.5 text-indigo-400" />
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
+                <Calendar className="h-3.5 w-3.5 text-slate-400" />
                 <span>{dateRangeString}</span>
               </div>
             </div>
 
             {/* 2. Watch Time */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span className="font-medium">Watch Time (hours)</span>
-                <span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                  📊 Modeled
-                </span>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+                <span>Watch Time (hours)</span>
+                <Clock className="h-4 w-4 text-slate-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
                 {periodWatchTimeFormatted}
               </div>
               <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
@@ -474,40 +525,36 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             </div>
 
             {/* 3. Subscribers */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span className="font-medium">Current Subscribers</span>
-                <span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                  🟢 Live Count
-                </span>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+                <span>Subscribers</span>
+                <Users className="h-4 w-4 text-slate-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
                 {stats.followersFormatted}
               </div>
               <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
                 stats.followersDeltaPositive ? "text-emerald-400" : "text-rose-400"
               }`}>
                 <UserPlus className="h-3.5 w-3.5" />
-                <span>{stats.followersDelta} recent net growth</span>
+                <span>{stats.followersDelta} net growth</span>
               </div>
             </div>
 
             {/* 4. Estimated Engagement Rate */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-                <span className="font-medium">Studio Engagement Rate</span>
-                <span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-400 border border-indigo-500/20">
-                  📊 Modeled
-                </span>
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+                <span>Engagement Rate</span>
+                <TrendingUp className="h-4 w-4 text-slate-400" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
+              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
                 {stats.engagementRate}%
               </div>
               <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
                 stats.engagementDeltaPositive ? "text-emerald-400" : "text-rose-400"
               }`}>
                 {stats.engagementDeltaPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-                <span>{stats.engagementDelta} {stats.engagementDeltaPositive ? "above" : "below"} creator benchmark</span>
+                <span>{stats.engagementDelta} vs benchmark</span>
               </div>
             </div>
           </div>
@@ -575,28 +622,28 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             </div>
 
             {/* Realtime 48h / 60m Activity Panel */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md flex flex-col justify-between">
+            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-xl backdrop-blur-md flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                   <div className="flex items-center gap-2">
-                    <Radio className="h-4 w-4 text-emerald-400 animate-pulse" />
-                    <h3 className="text-sm font-bold text-white">Realtime Activity</h3>
+                    <Activity className="h-4 w-4 text-slate-400" />
+                    <h3 className="text-sm font-bold text-white tracking-tight">Realtime Activity</h3>
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                    Updating Live
+                  <span className="text-[11px] text-slate-400 font-medium">
+                    Continuous
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 my-4">
-                  <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-                    <div className="text-[11px] text-slate-400">Views • Last 48 hrs</div>
-                    <div className="text-xl font-bold text-white mt-1">
+                  <div className="rounded-xl bg-slate-950/60 p-3.5 border border-slate-800/80">
+                    <div className="text-[11px] text-slate-400 font-medium">Views • Last 48 hrs</div>
+                    <div className="text-xl sm:text-2xl font-bold text-white font-mono mt-1">
                       {studioData.realtime.viewsLast48hFormatted}
                     </div>
                   </div>
-                  <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-                    <div className="text-[11px] text-slate-400">Views • Last 60 min</div>
-                    <div className="text-xl font-bold text-emerald-400 mt-1">
+                  <div className="rounded-xl bg-slate-950/60 p-3.5 border border-slate-800/80">
+                    <div className="text-[11px] text-slate-400 font-medium">Views • Last 60 min</div>
+                    <div className="text-xl sm:text-2xl font-bold text-white font-mono mt-1">
                       {studioData.realtime.viewsLast60mFormatted}
                     </div>
                   </div>
@@ -671,6 +718,9 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
           onPeriodChange={setStudioPeriod}
         />
       )}
+
+      {/* ================= HIGH-DEMAND CONTENT & VIEWER RATING INTELLIGENCE ================= */}
+      <HighDemandContentSection dataset={dataset} />
     </div>
   );
 };

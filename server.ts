@@ -40,6 +40,15 @@ function markModelCooldown(model: string, durationMs = 10 * 60 * 1000): void {
   modelCooldowns.set(model, Date.now() + durationMs);
 }
 
+function handleModelError(model: string, err: any): void {
+  const errMsg = String(err?.message || err || "");
+  if (errMsg.includes("404") || errMsg.includes("NOT_FOUND") || errMsg.includes("no longer available")) {
+    markModelCooldown(model, 24 * 60 * 60 * 1000);
+  } else if (errMsg.includes("429") || errMsg.includes("quota") || errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
+    markModelCooldown(model, 10 * 60 * 1000);
+  }
+}
+
 async function startServer() {
   const app = express();
   app.use(express.json());
@@ -98,13 +107,13 @@ Write a 3 to 4 sentence plain-English summary of how the account is trending and
 - Sentence 3: Key Takeaway or tactical recommendation for sustained momentum.
 Keep it strictly 3-4 sentences. Do NOT use bullet points. Do NOT use hype words like "supercharge" or "game-changer". Keep it objective, incisive, and data-grounded.`;
 
-      // Candidate models in order of priority: gemini-2.5-flash is primary (high quota, low latency), followed by flash-lite and 3.8-flash
-      const candidateModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.8-flash"];
+      // Candidate models in order of priority: gemini-3.8-flash is primary, followed by gemini-3.5-flash-lite
+      const candidateModels = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
       let generatedText: string | null = null;
-      let usedModel: string = "gemini-2.5-flash";
+      let usedModel: string = "gemini-3.8-flash";
 
       for (const modelCandidate of candidateModels) {
-        // Skip models that are currently in cooldown due to quota exhaustion
+        // Skip models that are currently in cooldown
         if (isModelInCooldown(modelCandidate)) {
           continue;
         }
@@ -129,21 +138,19 @@ Keep it strictly 3-4 sentences. Do NOT use bullet points. Do NOT use hype words 
             break;
           }
         } catch (modelErr: any) {
-          const errMsg = String(modelErr?.message || modelErr || "");
-          // If quota exceeded (429) or unavailable (503), put model in cooldown for 10 minutes
-          if (errMsg.includes("429") || errMsg.includes("quota") || errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
-            markModelCooldown(modelCandidate, 10 * 60 * 1000);
-          }
+          handleModelError(modelCandidate, modelErr);
         }
       }
 
       if (generatedText) {
         const readableModel =
-          usedModel === "gemini-2.5-flash"
-            ? "Gemini 2.5 Flash"
-            : usedModel === "gemini-2.5-flash-lite"
-            ? "Gemini 2.5 Flash Lite"
-            : "Gemini 3.8 Flash";
+          usedModel === "gemini-3.8-flash"
+            ? "Gemini 3.8 Flash"
+            : usedModel === "gemini-3.5-flash-lite"
+            ? "Gemini 3.5 Flash Lite"
+            : usedModel === "gemini-3.1-flash-lite"
+            ? "Gemini 3.1 Flash Lite"
+            : usedModel;
         return res.json({
           insight: generatedText,
           source: "live_gemini",
@@ -187,6 +194,23 @@ Keep it strictly 3-4 sentences. Do NOT use bullet points. Do NOT use hype words 
       }
 
       const ai = getAi();
+      const postsA = Math.max(1, Number(accountA.stats?.postsCount || 100));
+      const postsB = Math.max(1, Number(accountB.stats?.postsCount || 100));
+      const viewsA = Number(accountA.stats?.totalViews || 0);
+      const viewsB = Number(accountB.stats?.totalViews || 0);
+      const avgViewsA = Math.round(viewsA / postsA);
+      const avgViewsB = Math.round(viewsB / postsB);
+      const subA = Number(accountA.stats?.followers || 0);
+      const subB = Number(accountB.stats?.followers || 0);
+      const erA = Number(accountA.stats?.engagementRate || 0);
+      const erB = Number(accountB.stats?.engagementRate || 0);
+
+      const userHasBetterThumbnails = avgViewsA >= avgViewsB;
+      const userHasMoreSubs = subA >= subB;
+      const userHasMoreViews = viewsA >= viewsB;
+      const userHasHigherER = erA >= erB;
+      const competitorHasCatalogAdvantage = postsB > postsA * 1.3;
+
       if (!ai) {
         const fallback = generateFallbackCompareInsight(accountA, accountB);
         return res.json({
@@ -207,6 +231,7 @@ TARGET ACCOUNT (Account A):
 - Total Views: ${accountA.stats?.totalViewsFormatted || "N/A"} (${accountA.stats?.viewsDelta || "+0%"})
 - Engagement Rate: ${accountA.stats?.engagementRate || "N/A"}%
 - Total Content/Uploads: ${accountA.stats?.postsCountFormatted || "N/A"}
+- Average Views Per Video: ~${avgViewsA.toLocaleString()} views/upload
 
 COMPETITOR ACCOUNT (Account B):
 - Name: ${accountB.name} (${accountB.handle})
@@ -215,16 +240,39 @@ COMPETITOR ACCOUNT (Account B):
 - Total Views: ${accountB.stats?.totalViewsFormatted || "N/A"} (${accountB.stats?.viewsDelta || "+0%"})
 - Engagement Rate: ${accountB.stats?.engagementRate || "N/A"}%
 - Total Content/Uploads: ${accountB.stats?.postsCountFormatted || "N/A"}
+- Average Views Per Video: ~${avgViewsB.toLocaleString()} views/upload
 
 TASK:
-Analyze the comparative data between the target account (Account A) and the competitor account (Account B).
+Analyze the comparative data between Target Account (Account A) and Competitor Account (Account B).
 Compare their metrics specifically:
 1. Subscribers / Followers
 2. Total Views
 3. Engagement Rate
 4. Growth Velocity (trajectory & pace)
 
-At the end of the analysis, provide 5 specific, actionable ways for the target account (${accountA.name}) to beat and outperform the competitor (${accountB.name}) across Packaging & CTR, Retention & Watch Time, Topic Gaps, Upload Timing, and Community Moat.
+CRITICAL GAP-DRIVEN DIRECTIVE FOR "waysToBeatCompetitor":
+DO NOT output generic or identical steps across different competitors.
+Suggest ONLY those tips where Target Account ACTUALLY TRAILS or NEEDS TO INCREASE to beat Competitor:
+${userHasMoreSubs
+  ? `- SUBSCRIBERS: Target ALREADY HAS MORE OR EQUAL SUBSCRIBERS (${accountA.stats?.followersFormatted} vs ${accountB.stats?.followersFormatted}). FORBIDDEN: DO NOT mention any tips about getting subscribers or growing subscriber count!`
+  : `- SUBSCRIBERS: Target trails by -${Math.abs(subB - subA).toLocaleString()} subscribers (${accountA.stats?.followersFormatted} vs ${accountB.stats?.followersFormatted}). INCLUDE a tactic on closing this subscriber gap.`
+}
+${userHasMoreViews
+  ? `- TOTAL VIEWS: Target ALREADY HAS MORE OR EQUAL TOTAL VIEWS (${accountA.stats?.totalViewsFormatted} vs ${accountB.stats?.totalViewsFormatted}). FORBIDDEN: DO NOT mention tips about increasing total views!`
+  : `- TOTAL VIEWS: Target trails in total views (${accountA.stats?.totalViewsFormatted} vs ${accountB.stats?.totalViewsFormatted}). INCLUDE a tactic on closing this view gap.`
+}
+${userHasBetterThumbnails
+  ? `- THUMBNAILS & PACKAGING: Target ALREADY HAS HIGHER views-per-video (~${avgViewsA.toLocaleString()} vs ~${avgViewsB.toLocaleString()}), meaning Target already has superior thumbnails, packaging, and hook pull! FORBIDDEN: DO NOT tell Target to fix their thumbnails or change thumbnail architecture! Instead, focus on Target's real deficits (e.g. upload cadence gap, subscriber conversion, or topic gaps), or how to weaponize their thumbnail superiority against ${accountB.name}.`
+  : `- THUMBNAILS & PACKAGING: Competitor achieves higher views-per-video (~${avgViewsB.toLocaleString()} vs ~${avgViewsA.toLocaleString()}), meaning Competitor has stronger thumbnail pull/CTR. INCLUDE a tactic on out-packaging competitor thumbnails.`
+}
+${competitorHasCatalogAdvantage
+  ? `- CATALOG & UPLOAD VOLUME: Competitor has published ${postsB.toLocaleString()} videos vs Target's ${postsA.toLocaleString()} videos (+${postsB - postsA} video advantage). This massive catalog disparity is why Competitor has high aggregate reach. INCLUDE a tactic on overcoming this catalog disparity through strategic upload cadence or repurposing.`
+  : ""
+}
+${userHasHigherER
+  ? `- ENGAGEMENT: Target ALREADY has higher or equal engagement rate (${erA}% vs ${erB}%). FORBIDDEN: DO NOT advise Target to fix poor engagement.`
+  : `- ENGAGEMENT: Competitor leads in engagement rate (${erB}% vs ${erA}%). INCLUDE a tactic to bridge the engagement gap.`
+}
 
 Respond with valid JSON matching this schema:
 {
@@ -263,9 +311,9 @@ Respond with valid JSON matching this schema:
     {
       "id": "tactic-1",
       "priority": "Critical Priority",
-      "category": "Packaging & CTR",
-      "title": "Title of tactic",
-      "tacticalAction": "Specific action to take",
+      "category": "Category based on real gap",
+      "title": "Clear, specific step title reflecting real comparison",
+      "tacticalAction": "Specific, real-data-informed action for Target Account",
       "whyItBeatsCompetitor": "Why this beats Account B based on their metrics",
       "expectedAdvantage": "Expected algorithmic or viewer advantage"
     }
@@ -273,9 +321,9 @@ Respond with valid JSON matching this schema:
 }
 Return strictly valid JSON only. Do not include markdown ticks or wrap in text.`;
 
-      const candidateModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.8-flash"];
+      const candidateModels = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
       let parsedResult: any = null;
-      let usedModel = "gemini-2.5-flash";
+      let usedModel = "gemini-3.8-flash";
 
       for (const modelCandidate of candidateModels) {
         if (isModelInCooldown(modelCandidate)) continue;
@@ -299,10 +347,7 @@ Return strictly valid JSON only. Do not include markdown ticks or wrap in text.`
             break;
           }
         } catch (mErr: any) {
-          const errMsg = String(mErr?.message || mErr || "");
-          if (errMsg.includes("429") || errMsg.includes("quota") || errMsg.includes("503") || errMsg.includes("UNAVAILABLE")) {
-            markModelCooldown(modelCandidate, 10 * 60 * 1000);
-          }
+          handleModelError(modelCandidate, mErr);
         }
       }
 
@@ -335,14 +380,14 @@ Return strictly valid JSON only. Do not include markdown ticks or wrap in text.`
 
   app.post("/api/high-demand-content", async (req, res) => {
     try {
-      const { channelName, handle, platform, description, topContent, keywords } = req.body;
+      const { channelName, handle, platform, description, topContent, keywords, targetNiche } = req.body;
       if (!channelName && !handle) {
         return res.status(400).json({ error: "channelName or handle is required" });
       }
 
       const ai = getAi();
       if (!ai) {
-        const fallback = generateFallbackHighDemandContent({ channelName, handle, platform, description, topContent, keywords });
+        const fallback = generateFallbackHighDemandContent({ channelName, handle, platform, description, topContent, keywords, targetNiche });
         return res.json({
           data: fallback,
           source: "demand_intelligence_engine",
@@ -351,7 +396,7 @@ Return strictly valid JSON only. Do not include markdown ticks or wrap in text.`
         });
       }
 
-      const recentTitles = (topContent || []).slice(0, 6).map((c: any) => c.title || "").filter(Boolean).join(" | ");
+      const recentTitles = (topContent || []).slice(0, 8).map((c: any) => c.title || "").filter(Boolean).join(" | ");
 
       const prompt = `You are a premier digital media strategist and YouTube algorithm researcher specializing in audience demand patterns.
 Analyze the following YouTube creator profile and identify the specific content niches, topics, angles, and formats where user demand and viewer rating is currently HIGHEST for their field.
@@ -362,35 +407,33 @@ CREATOR IDENTITY:
 - Description: ${description || "Creator channel in digital media"}
 - Recent / Top Videos: ${recentTitles || "N/A"}
 - Keywords: ${(keywords || []).join(", ") || "N/A"}
+- Specified Target Field: ${targetNiche || "Auto-detect from channel content"}
+
+CRITICAL DOMAIN SPECIFICITY REQUIREMENT:
+You MUST tailor ALL recommendations strictly according to the channel's actual content and medium.
+For example:
+- If the channel makes PODCASTS, longform interviews, or talk shows (or if Specified Target Field is "podcast"): Recommend ONLY podcast topics, guest discussion hooks, 2-person debate angles, solo narrative audio/video essays, and podcast clip formats. NEVER suggest coding tutorials or unrelated subjects to a podcaster!
+- If the channel is about CODING/PROGRAMMING: Recommend software engineering builds and tech roadmaps.
+- If the channel is about FINANCE: Recommend market breakdowns and investing guides.
+- If the channel is about GAMING: Recommend gaming walkthroughs and challenge formats.
+- If the channel is about FITNESS: Recommend workout protocols and nutrition breakdowns.
 
 OBJECTIVE:
-Pinpoint in what content user demand and rating is currently highest in this specific field, so the creator can immediately produce those kinds of high-impact videos for their YouTube channel to maximize viewership, engagement, watch time, and subscriber growth.
+Pinpoint what content user demand and rating is currently highest in this specific field, so the creator can immediately produce those kinds of high-impact videos for their YouTube channel to maximize viewership, engagement, watch time, and subscriber growth.
 
 Respond with strictly valid JSON matching this schema:
 {
-  "detectedNiche": "e.g. Software Engineering & Full-Stack AI Development",
+  "detectedNiche": "e.g. Podcast & Longform Investigative Conversations",
   "nicheDescription": "Concise 1-2 sentence description of what the audience in this field is actively searching for right now.",
   "overallDemandScore": 95,
   "demandVelocity": "Accelerating Exponentially" | "Surging High Appetite" | "Consistent Peak Demand",
-  "viewerSatisfactionBenchmark": "e.g. 97.4% Positive Viewer Approval Rate in this Category",
+  "viewerSatisfactionBenchmark": "e.g. 98.6% Positive Viewer Approval Rate in this Category",
   "highestRatedFormats": [
     {
-      "formatName": "e.g. End-to-End Real-World Project Masterclasses",
+      "formatName": "e.g. Unfiltered 90-120 Min In-Person Longform Conversation",
       "userRatingPercent": 98,
       "avgViewerRetention": "64%",
-      "whyItPerforms": "Hands-on implementation drives high watch completion and immediate viewer gratitude."
-    },
-    {
-      "formatName": "e.g. 'Stop Doing This' Architectural Anti-Patterns",
-      "userRatingPercent": 94,
-      "avgViewerRetention": "61%",
-      "whyItPerforms": "Curiosity and fear of making rookie mistakes hooks viewers through the entire video."
-    },
-    {
-      "formatName": "e.g. 2026 Definitive Technology Roadmaps",
-      "userRatingPercent": 95,
-      "avgViewerRetention": "58%",
-      "whyItPerforms": "Provides clarity through industry noise, earning high bookmark and share rates."
+      "whyItPerforms": "Raw, uncut dialogue creates deep intimacy and high watch time."
     }
   ],
   "trendingViewerQueries": [
@@ -408,7 +451,7 @@ Respond with strictly valid JSON matching this schema:
       "demandLevel": "Extreme Demand" | "High Demand" | "Rising Trend" | "High Search Volume",
       "userRatingLevel": "e.g. 98% Positive Viewer Rating",
       "whyDemandIsHigh": "Concrete explanation of why user appetite is currently surging for this topic in this field.",
-      "recommendedFormat": "e.g. 35-min Build-Along with GitHub Repo",
+      "recommendedFormat": "e.g. 90-min 2-Mic Conversation with Chapter Markers",
       "suggestedTitles": [
         "Ready-to-use high-CTR Title 1",
         "Ready-to-use high-CTR Title 2",
@@ -428,9 +471,9 @@ Respond with strictly valid JSON matching this schema:
 }
 Provide exactly 5 rich, highly tailored opportunities. Return strictly valid JSON only. Do not include markdown ticks or wrap in text.`;
 
-      const candidateModels = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.8-flash"];
+      const candidateModels = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemini-3.1-flash-lite"];
       let generatedJson: any = null;
-      let usedModel: string = "gemini-2.5-flash";
+      let usedModel: string = "gemini-3.8-flash";
 
       for (const modelCandidate of candidateModels) {
         if (isModelInCooldown(modelCandidate)) continue;
@@ -462,10 +505,7 @@ Provide exactly 5 rich, highly tailored opportunities. Return strictly valid JSO
             break;
           }
         } catch (err: any) {
-          console.warn(`Demand model ${modelCandidate} failed:`, err?.message || err);
-          if (String(err).includes("429") || String(err).includes("quota")) {
-            markModelCooldown(modelCandidate);
-          }
+          handleModelError(modelCandidate, err);
         }
       }
 
@@ -478,7 +518,7 @@ Provide exactly 5 rich, highly tailored opportunities. Return strictly valid JSO
         });
       }
 
-      const fallback = generateFallbackHighDemandContent({ channelName, handle, platform, description, topContent, keywords });
+      const fallback = generateFallbackHighDemandContent({ channelName, handle, platform, description, topContent, keywords, targetNiche });
       return res.json({
         data: fallback,
         source: "demand_intelligence_engine",
@@ -579,143 +619,666 @@ function generateFallbackCompareInsight(accountA: any, accountB: any) {
   const avgViewsPerPostA = Math.round(viewsA / postsA);
   const avgViewsPerPostB = Math.round(viewsB / postsB);
 
-  return {
-    executiveSummary: `${nameA} (Account A) and ${nameB} (Account B) display distinct competitive postures: ${
-      subLeader === "Account A" ? `${nameA} controls the broader audience scale in total subscribers` : `${nameB} commands greater baseline subscriber scale`
-    }, while ${
-      erLeader === "Account A" ? `${nameA} achieves superior community engagement stickiness (${erA}% vs ${erB}%)` : `${nameB} currently holds stronger engagement conversion (${erB}% vs ${erA}%)`
-    }. ${
-      velLeader === "Account A"
-        ? `${nameA}'s trajectory is accelerating at a higher velocity (${velRawA}% vs ${velRawB}%).`
-        : `${nameB} holds the momentum advantage (${velRawB}% vs ${velRawA}%), requiring tactical counter-programming.`
-    }`,
-    metricsComparison: {
-      subscribers: {
-        leader: subLeader,
-        differential: subDifferential,
-        analysis: `${nameA} currently holds ${accountA?.stats?.followersFormatted || "0"} subscribers compared to ${nameB}'s ${accountB?.stats?.followersFormatted || "0"}. ${
-          subLeader === "Account A"
-            ? `Account A enjoys a ${subDifferential} buffer, establishing high authoritative standing and broad initial algorithmic reach.`
-            : `Account B has built a ${subDifferential} audience moat, granting it greater algorithmic distribution during initial video launch windows.`
-        }`,
-      },
-      totalViews: {
-        leader: viewsLeader,
-        differential: viewsDifferential,
-        analysis: `${nameA} has generated ${accountA?.stats?.totalViewsFormatted || "0"} views across ${postsA} uploads (~${formatNumberClean(avgViewsPerPostA)}/upload), against ${nameB}'s ${accountB?.stats?.totalViewsFormatted || "0"} across ${postsB} uploads (~${formatNumberClean(avgViewsPerPostB)}/upload). ${
-          avgViewsPerPostA > avgViewsPerPostB
-            ? `Account A operates with higher view-per-video efficiency, extracting greater audience interest per published asset.`
-            : `Account B achieves higher average view density per upload, demonstrating strong packaging and broad-appeal title hooks.`
-        }`,
-      },
-      engagementRate: {
-        leader: erLeader,
-        differential: erDifferential,
-        analysis: `Engagement rate stands at ${erA}% for ${nameA} versus ${erB}% for ${nameB}. ${
-          erLeader === "Account A"
-            ? `Account A holds a distinct community loyalty advantage (+${erDiff}%), indicating active viewer retention and high algorithmic satisfaction signals.`
-            : `Account B outperforms in audience interaction depth (+${erDiff}%), converting casual viewers into active commenters and likers more effectively.`
-        }`,
-      },
-      growthVelocity: {
-        leader: velLeader,
-        differential: velDifferential,
-        analysis: `Trailing growth velocity shows ${nameA} at ${accountA?.stats?.followersDelta || "+0%"} compared to ${nameB} at ${accountB?.stats?.followersDelta || "+0%"}. ${
-          velLeader === "Account A"
-            ? `Account A's momentum curve is pulling ahead, widening its competitive spread across active search and browse recommendation feeds.`
-            : `Account B is expanding at a steeper velocity trajectory, indicating stronger discovery loop traction in recent algorithm cycles.`
-        }`,
-      },
-    },
-    actionableRecommendations: [
-      {
-        priority: "High",
-        category: "Content Cadence & Publishing Schedule",
-        title: avgViewsPerPostA < avgViewsPerPostB ? "Consolidate into Flagship Comprehensive Masterclasses" : "Maintain Cadence & Pre-Empt Competitor Drops",
-        action: avgViewsPerPostA < avgViewsPerPostB
-          ? `Competitor ${nameB} generates higher views per upload (~${formatNumberClean(avgViewsPerPostB)}). Rather than increasing volume, consolidate fragmented tutorials into comprehensive, authoritative flagship masterclasses to capture longer session watch time.`
-          : `Maintain current high-efficiency format with predictable weekly drops. Study ${nameB}'s publishing patterns and publish 2 hours prior to capture prime peak-hour viewer discovery before competitor notifications drop.`,
-      },
-      {
-        priority: "High",
-        category: "Thumbnail Packaging & Hook Architecture",
-        title: "Contrast Packaging Against Competitor Visual Patterns",
-        action: `Audit ${nameB}'s recent top 5 thumbnails for recurring color schemes and typography. Implement high-contrast visual packaging with 3-word curiosity hooks and emotive focal points to win the browse-feature click-through battle in suggested sidebars.`,
-      },
-      {
-        priority: "High",
-        category: "Audience Retention & Community Levers",
-        title: erLeader === "Account B" ? "Deploy Active Comment Loops & Timed Prompts" : "Convert High ER into Subscriber Retention",
-        action: erLeader === "Account B"
-          ? `Bridge the ${erDiff}% engagement gap by baking verbal discussion prompts at timestamps 2:00 and 7:00, pin an engaging debate prompt in the top comment within 10 minutes of upload, and reply to the first 30 responses.`
-          : `Capitalize on your +${erDiff}% engagement advantage by featuring community comments and code questions on-screen in future videos, turning loyal commenters into active ambassadors who share your content to external tech forums.`,
-      },
-      {
-        priority: "Medium",
-        category: "Topic Gap & Content Differentiation",
-        title: "Exploit Long-Tail Search & Emerging Framework Gaps",
-        action: `Identify core tutorial topics where ${nameB} has not updated content within the past 6 months. Produce updated 2026-ready guides addressing modern best practices, tooling shifts, and practical project builds that outrank dated competitor videos.`,
-      },
-      {
-        priority: "Medium",
-        category: "Short-Form to Long-Form Conversion Funnel",
-        title: "Synergize Micro-Clips to Cannibalize Competitor Search",
-        action: `Extract 45-second high-impact coding snippets and counter-intuitive insights from your long videos as Shorts/Reels, linking directly back to the full-length deep dive to capture top-of-funnel traffic from users searching for ${nameB}'s typical subject matter.`,
-      },
-    ],
-    waysToBeatCompetitor: [
-      {
-        id: "tactic-packaging",
+  const waysToBeatCompetitor: any[] = [];
+  const userHasBetterThumbnails = avgViewsPerPostA >= avgViewsPerPostB;
+    const userNeedsSubscribers = subA < subB;
+    const userNeedsViews = viewsA < viewsB;
+    const userNeedsER = erA < erB;
+    const competitorHasHugeCatalog = postsB > postsA * 1.3;
+
+    // 1. Thumbnail / Packaging: ONLY if competitor has better views per video
+    if (!userHasBetterThumbnails) {
+      waysToBeatCompetitor.push({
+        id: "tactic-packaging-deficit",
         priority: "Critical Priority",
         category: "Packaging & CTR",
-        title: `Counter-Package Thumbnails to Hijack ${nameB}'s Suggested Feeds`,
-        tacticalAction: `Audit ${nameB}'s last 10 uploads for color palette and thumbnail layout. If they rely on dark or busy backgrounds, use high-contrast vibrant backdrops. Restrict thumbnail text to 3 high-curiosity words rather than repeating the video title. Suggested video feeds rank highest when packaging pops directly beside competitor uploads.`,
-        whyItBeatsCompetitor: avgViewsPerPostA < avgViewsPerPostB
-          ? `Competitor averages ~${formatNumberClean(avgViewsPerPostB)} views per video. Capturing even a fraction of their suggested video sidebar clicks funnels significant browse traffic straight to your channel.`
-          : `Your view efficiency (~${formatNumberClean(avgViewsPerPostA)}/upload) creates strong algorithm confidence; contrasting thumbnails lock in higher CTR when paired against ${nameB}.`,
+        title: `Upgrade Thumbnail CTR to Match ${nameB}'s ${formatNumberClean(avgViewsPerPostB)} Views/Video`,
+        tacticalAction: `Audit ${nameB}'s last 10 uploads for color palette and thumbnail layout. Because ${nameB} currently achieves higher views per video (~${formatNumberClean(avgViewsPerPostB)} vs ~${formatNumberClean(avgViewsPerPostA)}), adopt high-contrast vibrant visuals and maximum 3-word curiosity hooks to win impression clicks in suggested sidebars.`,
+        whyItBeatsCompetitor: `Capturing impressions directly adjacent to ${nameB}'s videos diverts their browse traffic into your channel.`,
         expectedAdvantage: "+18% to +32% higher Click-Through-Rate on competitor suggested sidebars",
-      },
-      {
-        id: "tactic-retention",
+      });
+    }
+
+    // 2. Subscriber Gap: ONLY if competitor has more subscribers
+    if (userNeedsSubscribers) {
+      waysToBeatCompetitor.push({
+        id: "tactic-subscriber-gap",
+        priority: "Critical Priority",
+        category: "Audience Scaling",
+        title: `Bridge the ${formatNumberClean(subDiff)} Subscriber Deficit via Peak-Retention Calls-to-Action`,
+        tacticalAction: `${nameB} holds ${accountA?.stats?.followersFormatted || "0"} subscribers versus your ${accountB?.stats?.followersFormatted || "0"}. Bridge this audience gap by inserting a context-driven, organic call-to-subscribe at minute 3:30 (your peak retention window) rather than delaying it to the video outro.`,
+        whyItBeatsCompetitor: `Raising viewer-to-subscriber conversion from 1.5% to 3.5%+ rapidly closes the ${formatNumberClean(subDiff)} audience spread.`,
+        expectedAdvantage: "Accelerates subscriber acquisition velocity by +28%",
+      });
+    }
+
+    // 3. Catalog Volume Disparity: ONLY if competitor has significantly more uploads
+    if (competitorHasHugeCatalog) {
+      const postDeficit = postsB - postsA;
+      waysToBeatCompetitor.push({
+        id: "tactic-catalog-disparity",
+        priority: "High Leverage",
+        category: "Upload Cadence",
+        title: `Overcome ${nameB}'s ${postDeficit}-Video Catalog Surface Area Advantage`,
+        tacticalAction: `${nameB} has published ${postsB.toLocaleString()} uploads compared to your ${postsA.toLocaleString()}, creating immense evergreen search surface area. Neutralize this advantage by extracting modular micro-clips from your long-form videos to capture multiple entry points without increasing production burnout.`,
+        whyItBeatsCompetitor: `Compensates for ${nameB}'s upload volume moat by expanding multi-platform discoverability.`,
+        expectedAdvantage: "Recovers +35% search impression market share against competitor's back-catalog",
+      });
+    }
+
+    // 4. Total Views Gap: ONLY if user trails in views and not already covered by catalog disparity
+    if (userNeedsViews && !competitorHasHugeCatalog) {
+      waysToBeatCompetitor.push({
+        id: "tactic-total-views-gap",
         priority: "High Leverage",
         category: "Retention & Watch Time",
-        title: `Cut Intros to Under 5 Seconds to Beat ${nameB}'s Relative Retention`,
-        tacticalAction: `Eliminate animated intros, channel taglines, and rambling agendas. Start immediately with the highest-stakes problem, payoff, or code demo at second 0. Integrate pattern interrupts (dynamic zoom, graphic callouts, sound cues) every 45 seconds to keep 3-minute retention above 60%.`,
-        whyItBeatsCompetitor: `YouTube rewards Relative Audience Retention over raw duration. When your retention at minute 2 surpasses ${nameB}'s, the algorithm actively replaces their videos on search and suggested shelves.`,
-        expectedAdvantage: "Pushes average watch-time past 55%, prioritizing your videos in recommendation carousels",
-      },
-      {
-        id: "tactic-topic",
-        priority: "High Leverage",
-        category: "Topic Gaps",
-        title: `Cannibalize ${nameB}'s Outdated Videos with 2026 Modernized Guides`,
-        tacticalAction: `Identify ${nameB}'s highest-viewed videos published 12-24 months ago. Spot deprecated libraries, changed APIs, or missing steps in their comments. Produce updated 2026 definitive masterclasses with downloadable cheat-sheets to make competitor videos obsolete.`,
-        whyItBeatsCompetitor: `Viewers searching for programming tutorials actively avoid dated videos. Intercepting high-volume keywords with fresh, comprehensive content captures search dominance from ${nameB}.`,
-        expectedAdvantage: "Captures top search positions for high-intent keywords currently owned by competitor",
-      },
-      {
-        id: "tactic-timing",
-        priority: "Quick Win",
-        category: "Upload Timing",
-        title: `Pre-Empt ${nameB}'s Prime Upload Window by 2 Hours`,
-        tacticalAction: `Track the days and hours ${nameB} routinely drops new uploads. Schedule your release 90-120 minutes earlier. This warms up YouTube's notification loop and seed audience right as your shared niche audience opens the platform.`,
-        whyItBeatsCompetitor: `Viewers have finite daily watch time. Securing their initial session pre-empts them from prioritizing competitor uploads during peak hours.`,
-        expectedAdvantage: "Accelerates Day-1 subscriber velocity and notification click rates",
-      },
-      {
-        id: "tactic-community",
+        title: `Close the ${formatNumberClean(viewsDiff)} Total View Gap with Bingeable Series Playlists`,
+        tacticalAction: `Organize your top-performing formats into sequential playlists with end-screen cards linking to part 2 within the final 15 seconds. Trigger consecutive video viewing chains to multiply views per session.`,
+        whyItBeatsCompetitor: `Signals extended session duration to the recommendation engine, unlocking broader browse shelf distribution.`,
+        expectedAdvantage: "+25% increase in consecutive session views per user",
+      });
+    }
+
+    // 5. Engagement Rate Gap: ONLY if competitor has higher ER
+    if (userNeedsER) {
+      waysToBeatCompetitor.push({
+        id: "tactic-engagement-gap",
         priority: "Strategic Moat",
         category: "Community Moat",
-        title: erLeader === "Account A"
-          ? `Leverage Your ${erA}% Engagement Lead to Convert Viewers into Vocal Advocates`
-          : `Close the Engagement Gap with Pinned Discussion Loops & Direct Utility`,
-        tacticalAction: erLeader === "Account A"
-          ? `Your ${erA}% engagement rate leads ${nameB}'s ${erB}%. Capitalize on this loyalty moat by pinning interactive challenge prompts, responding to early commenters, and featuring community solutions on-screen.`
-          : `Competitor currently achieves ${erB}% ER vs your ${erA}%. Bridge this gap immediately: pin a curated resource link and open-ended question within 5 minutes of uploading, and reply to the first 30 comments.`,
-        whyItBeatsCompetitor: `Early comment velocity signals strong viewer satisfaction to the YouTube algorithm, boosting homepage distribution speed.`,
-        expectedAdvantage: "Lifts viewer-to-subscriber conversion rate to 3.8%+",
+        title: `Bridge the ${erDiff}% Engagement Gap with Pinned Discussion Loops`,
+        tacticalAction: `${nameB} currently achieves ${erB}% ER vs your ${erA}%. Pin a provocative question in your top comment within 5 minutes of upload and reply to early commenters within the first hour.`,
+        whyItBeatsCompetitor: `Early comment velocity triggers rapid algorithmic distribution during the crucial Day-1 launch window.`,
+        expectedAdvantage: "Lifts viewer interaction rate and comment velocity by +35%",
+      });
+    }
+
+    // 6. If user already has superior thumbnails / views-per-video:
+    if (userHasBetterThumbnails) {
+      waysToBeatCompetitor.push({
+        id: "tactic-leverage-thumbnail-lead",
+        priority: "High Leverage",
+        category: "Strategic Dominance",
+        title: `Weaponize Your ~${formatNumberClean(avgViewsPerPostA)} Views/Video Advantage against ${nameB}`,
+        tacticalAction: `Your packaging efficiency (~${formatNumberClean(avgViewsPerPostA)}/video) already beats ${nameB}'s (~${formatNumberClean(avgViewsPerPostB)}/video), indicating your thumbnail click magnetism is superior. Target ${nameB}'s exact core video topics with your proven thumbnail format to siphon the majority of clicks from side-by-side search results.`,
+        whyItBeatsCompetitor: `When both channels appear for the same search query, your superior click rate ensures you win the viewer.`,
+        expectedAdvantage: "Directly captures 25-35% of competitor's suggested sidebar traffic",
+      });
+    }
+
+    // 7. Topic Gaps (Always valuable)
+    waysToBeatCompetitor.push({
+      id: "tactic-topic-gap",
+      priority: "High Leverage",
+      category: "Topic Gaps",
+      title: `Cannibalize ${nameB}'s Aging Videos with Updated 2026 Definitive Guides`,
+      tacticalAction: `Inspect ${nameB}'s highest-viewed older videos. Produce updated 2026 definitive versions with modern production value, downloadable cheat-sheets, and zero fluff that make competitor uploads obsolete.`,
+      whyItBeatsCompetitor: `Viewers actively avoid outdated content; intercepting core search terms with modern guides captures search dominance.`,
+      expectedAdvantage: "Captures top search positions for high-intent queries currently owned by competitor",
+    });
+
+    // 8. Upload Timing
+    waysToBeatCompetitor.push({
+      id: "tactic-timing",
+      priority: "Quick Win",
+      category: "Upload Timing",
+      title: `Pre-Empt ${nameB}'s Prime Upload Window by 90 Minutes`,
+      tacticalAction: `Identify when ${nameB} routinely drops new uploads and schedule releases 90-120 minutes prior. This secures viewer session attention before competitor notifications arrive.`,
+      whyItBeatsCompetitor: `Secures viewer attention before competitor notification drops occur during peak consumption hours.`,
+      expectedAdvantage: "Accelerates Day-1 notification click rates and initial view velocity",
+    });
+
+    return {
+      executiveSummary: `${nameA} (Account A) and ${nameB} (Account B) display distinct competitive postures: ${
+        subLeader === "Account A" ? `${nameA} controls the broader audience scale in total subscribers` : `${nameB} commands greater baseline subscriber scale`
+      }, while ${
+        erLeader === "Account A" ? `${nameA} achieves superior community engagement stickiness (${erA}% vs ${erB}%)` : `${nameB} currently holds stronger engagement conversion (${erB}% vs ${erA}%)`
+      }. ${
+        velLeader === "Account A"
+          ? `${nameA}'s trajectory is accelerating at a higher velocity (${velRawA}% vs ${velRawB}%).`
+          : `${nameB} holds the momentum advantage (${velRawB}% vs ${velRawA}%), requiring tactical counter-programming.`
+      }`,
+      metricsComparison: {
+        subscribers: {
+          leader: subLeader,
+          differential: subDifferential,
+          analysis: `${nameA} currently holds ${accountA?.stats?.followersFormatted || "0"} subscribers compared to ${nameB}'s ${accountB?.stats?.followersFormatted || "0"}. ${
+            subLeader === "Account A"
+              ? `Account A enjoys a ${subDifferential} buffer, establishing high authoritative standing and broad initial algorithmic reach.`
+              : `Account B has built a ${subDifferential} audience moat, granting it greater algorithmic distribution during initial video launch windows.`
+          }`,
+        },
+        totalViews: {
+          leader: viewsLeader,
+          differential: viewsDifferential,
+          analysis: `${nameA} has generated ${accountA?.stats?.totalViewsFormatted || "0"} views across ${postsA} uploads (~${formatNumberClean(avgViewsPerPostA)}/upload), against ${nameB}'s ${accountB?.stats?.totalViewsFormatted || "0"} across ${postsB} uploads (~${formatNumberClean(avgViewsPerPostB)}/upload). ${
+            avgViewsPerPostA > avgViewsPerPostB
+              ? `Account A operates with higher view-per-video efficiency, extracting greater audience interest per published asset.`
+              : `Account B achieves higher average view density per upload, demonstrating strong packaging and broad-appeal title hooks.`
+          }`,
+        },
+        engagementRate: {
+          leader: erLeader,
+          differential: erDifferential,
+          analysis: `Engagement rate stands at ${erA}% for ${nameA} versus ${erB}% for ${nameB}. ${
+            erLeader === "Account A"
+              ? `Account A holds a distinct community loyalty advantage (+${erDiff}%), indicating active viewer retention and high algorithmic satisfaction signals.`
+              : `Account B outperforms in audience interaction depth (+${erDiff}%), converting casual viewers into active commenters and likers more effectively.`
+          }`,
+        },
+        growthVelocity: {
+          leader: velLeader,
+          differential: velDifferential,
+          analysis: `Trailing growth velocity shows ${nameA} at ${accountA?.stats?.followersDelta || "+0%"} compared to ${nameB} at ${accountB?.stats?.followersDelta || "+0%"}. ${
+            velLeader === "Account A"
+              ? `Account A's momentum curve is pulling ahead, widening its competitive spread across active search and browse recommendation feeds.`
+              : `Account B is expanding at a steeper velocity trajectory, indicating stronger discovery loop traction in recent algorithm cycles.`
+          }`,
+        },
       },
+      actionableRecommendations: [
+        {
+          priority: "High",
+          category: "Content Cadence & Publishing Schedule",
+          title: avgViewsPerPostA < avgViewsPerPostB ? "Consolidate into Flagship Comprehensive Masterclasses" : "Maintain Cadence & Pre-Empt Competitor Drops",
+          action: avgViewsPerPostA < avgViewsPerPostB
+            ? `Competitor ${nameB} generates higher views per upload (~${formatNumberClean(avgViewsPerPostB)}). Rather than increasing volume, consolidate fragmented tutorials into comprehensive, authoritative flagship masterclasses to capture longer session watch time.`
+            : `Maintain current high-efficiency format with predictable weekly drops. Study ${nameB}'s publishing patterns and publish 2 hours prior to capture prime peak-hour viewer discovery before competitor notifications drop.`,
+        },
+        {
+          priority: "High",
+          category: "Thumbnail Packaging & Hook Architecture",
+          title: "Contrast Packaging Against Competitor Visual Patterns",
+          action: `Audit ${nameB}'s recent top 5 thumbnails for recurring color schemes and typography. Implement high-contrast visual packaging with 3-word curiosity hooks and emotive focal points to win the browse-feature click-through battle in suggested sidebars.`,
+        },
+        {
+          priority: "High",
+          category: "Audience Retention & Community Levers",
+          title: erLeader === "Account B" ? "Deploy Active Comment Loops & Timed Prompts" : "Convert High ER into Subscriber Retention",
+          action: erLeader === "Account B"
+            ? `Bridge the ${erDiff}% engagement gap by baking verbal discussion prompts at timestamps 2:00 and 7:00, pin an engaging debate prompt in the top comment within 10 minutes of upload, and reply to the first 30 responses.`
+            : `Capitalize on your +${erDiff}% engagement advantage by featuring community comments and code questions on-screen in future videos, turning loyal commenters into active ambassadors who share your content to external tech forums.`,
+        },
+        {
+          priority: "Medium",
+          category: "Topic Gap & Content Differentiation",
+          title: "Exploit Long-Tail Search & Emerging Framework Gaps",
+          action: `Identify core tutorial topics where ${nameB} has not updated content within the past 6 months. Produce updated 2026-ready guides addressing modern best practices, tooling shifts, and practical project builds that outrank dated competitor videos.`,
+        },
+        {
+          priority: "Medium",
+          category: "Short-Form to Long-Form Conversion Funnel",
+          title: "Synergize Micro-Clips to Cannibalize Competitor Search",
+          action: `Extract 45-second high-impact coding snippets and counter-intuitive insights from your long videos as Shorts/Reels, linking directly back to the full-length deep dive to capture top-of-funnel traffic from users searching for ${nameB}'s typical subject matter.`,
+        },
+      ],
+      waysToBeatCompetitor: waysToBeatCompetitor.slice(0, 5),
+    };
+}
+
+function generateFallbackHighDemandContent(params: any) {
+  const name = params?.channelName || params?.handle || "Creator";
+  const desc = (params?.description || "").toLowerCase();
+  const handle = (params?.handle || "").toLowerCase();
+  const targetNiche = (params?.targetNiche || "").toLowerCase();
+  const keywords = Array.isArray(params?.keywords) ? params.keywords.join(" ").toLowerCase() : "";
+  const recentTitles = Array.isArray(params?.topContent)
+    ? params.topContent.map((c: any) => c.title || "").join(" ").toLowerCase()
+    : "";
+  const combinedContext = `${name.toLowerCase()} ${handle} ${desc} ${keywords} ${recentTitles}`;
+
+  // 1. Check for Podcast / Interview / Talk Show medium
+  const isPodcast =
+    targetNiche === "podcast" ||
+    /podcast|pod\b|interview|talk show|conversation|huberman|rogan|fridman|dialogue|episode|ep \d|ep\.\d|guest|host|audio show|broadcasting|deep dive conversation|roundtable/i.test(
+      combinedContext
+    );
+
+  if (isPodcast) {
+    return {
+      detectedNiche: "Podcast, Longform Interviews & Talk Shows",
+      nicheDescription: "Podcast viewers in 2026 overwhelmingly demand raw, unfiltered longform conversations, high-tension opposing dialogues, and behind-the-scenes insider revelations with zero PR polish.",
+      overallDemandScore: 98,
+      demandVelocity: "Accelerating Exponentially",
+      viewerSatisfactionBenchmark: "99.1% Positive Viewer Rating for Uncut Longform Conversations",
+      highestRatedFormats: [
+        {
+          formatName: "Unfiltered 90–120 Min In-Person 2-Mic Conversation",
+          userRatingPercent: 99,
+          avgViewerRetention: "67%",
+          whyItPerforms: "Longform intimacy bypasses superficial soundbites. Viewers treat it as background mentorship and companionship, resulting in massive total watch time.",
+        },
+        {
+          formatName: "High-Tension Deep-Dive 1-on-1 Interview with Chapter Climax",
+          userRatingPercent: 98,
+          avgViewerRetention: "64%",
+          whyItPerforms: "Structured tension arcs and challenging questions keep viewers hooked through the middle 45 minutes instead of dropping off.",
+        },
+        {
+          formatName: "Bite-Sized Viral Short-Form Clips (Vertical Shorts to Full Episode Funnel)",
+          userRatingPercent: 96,
+          avgViewerRetention: "79%",
+          whyItPerforms: "A 45-second high-stakes moment or counter-intuitive confession converts cold viewers into multi-hour longform listeners.",
+        },
+        {
+          formatName: "Solo Philosophical / Strategy Deep-Dive with Visual Visualizer",
+          userRatingPercent: 95,
+          avgViewerRetention: "61%",
+          whyItPerforms: "Audiences seek the host's direct, unvarnished thoughts and personal life lessons without the filter of guest small-talk.",
+        },
+      ],
+      trendingViewerQueries: [
+        "Uncensored podcast interview with industry insider on what is really happening",
+        "Best podcast episodes for high performance, discipline, and psychology",
+        "Raw conversations on controversial truths nobody talks about in public",
+        "How top creators, founders, and leaders built their moats from zero",
+      ],
+      opportunities: [
+        {
+          id: "opp-pod-insider",
+          topic: "The Unfiltered Insider Exposé: What Nobody Dares to Admit",
+          nicheCategory: "1-on-1 Insider Interview",
+          demandScore: 99,
+          demandLevel: "Extreme Demand",
+          userRatingLevel: "99.4% Positive Viewer Rating",
+          whyDemandIsHigh: "Audiences are fatigued by sanitized PR interviews. When a podcast guest breaks non-disclosure culture and reveals raw industry realities, viewers share the episode compulsively.",
+          recommendedFormat: "90–120 min Studio 2-Mic Conversation with chapter hooks",
+          suggestedTitles: [
+            "The Truth About This Industry That Everyone Is Hiding (Uncut Episode)",
+            "I Asked an Industry Insider What's Coming Next — His Answer Shocked Me",
+            "Stop Believing the PR: The Real Story Behind What Happened",
+          ],
+          thumbnailConcept: "Close-up 2-camera split: Guest leaning into Shure SM7B mic with intense stare: 'THE REAL TRUTH'",
+          targetKeywords: ["unfiltered podcast", "exclusive interview 2026", "deep dive conversation", "insider confession"],
+          productionDifficulty: "High Leverage (Deep Dive)",
+          projectedViewerImpact: "Extremely high algorithmic recommendation on homepage; triggers massive comment section debate.",
+        },
+        {
+          id: "opp-pod-debate",
+          topic: "The High-Stakes Debate: Two Opposing Experts in One Room",
+          nicheCategory: "Moderated Debate Podcast",
+          demandScore: 97,
+          demandLevel: "High Search Volume",
+          userRatingLevel: "97.8% Positive Viewer Rating",
+          whyDemandIsHigh: "Echo chambers dominate social media. Bringing two credible people who fiercely disagree into a civil, longform conversation creates unmatched curiosity and watch-through rates.",
+          recommendedFormat: "100 min Moderated Discussion with 5 specific disagreement pillars",
+          suggestedTitles: [
+            "[Guest A] vs [Guest B]: The 2-Hour Debate That Broke the Internet",
+            "Can We Agree On Anything? 2 Opposing Minds Battle It Out Live",
+            "The Ultimate Confrontation: Who Is Actually Right in 2026?",
+          ],
+          thumbnailConcept: "Side-by-side headshots angled toward each other with lightning/divider: 'THE 2-HOUR DEBATE'",
+          targetKeywords: ["podcast debate", "opposing viewpoints", "heated discussion", "roundtable talk"],
+          productionDifficulty: "High Leverage (Deep Dive)",
+          projectedViewerImpact: "Drives 3x higher comment volume than standard episodes, amplifying algorithmic velocity.",
+        },
+        {
+          id: "opp-pod-solo-narrative",
+          topic: "Solo Narrative Investigation: The Rise, Fall & Hidden Reality of [Phenomenon]",
+          nicheCategory: "Solo Documentary Essay",
+          demandScore: 96,
+          demandLevel: "Extreme Demand",
+          userRatingLevel: "98.5% Positive Viewer Rating",
+          whyDemandIsHigh: "Listeners love documentary-style storytelling where the host connects historical threads, leaks, and psychological patterns into a compelling narrative.",
+          recommendedFormat: "45–60 min Solo Host Recording with archival B-roll and subtle sound design",
+          suggestedTitles: [
+            "The Dark Reality Nobody Tells You: A 60-Minute Investigation",
+            "Why Everyone Is Quietly Quitting in 2026 (The Untold Story)",
+            "The Psychology of Failure: What Destroys 99% of People",
+          ],
+          thumbnailConcept: "Moody studio lighting with host at desk looking directly into camera lens: 'THE UNTOLD STORY'",
+          targetKeywords: ["solo podcast deep dive", "documentary essay", "psychology breakdown", "mindset podcast"],
+          productionDifficulty: "Medium (Standard Build)",
+          projectedViewerImpact: "Compounds long-term evergreen views and establishes authoritative personal brand.",
+        },
+        {
+          id: "opp-pod-hotline",
+          topic: "Viewer Crisis Hotline: Reviewing Your Hardest Dilemmas with Brutal Honesty",
+          nicheCategory: "Interactive Community Hotline",
+          demandScore: 94,
+          demandLevel: "Rising Trend",
+          userRatingLevel: "97.2% Positive Viewer Rating",
+          whyDemandIsHigh: "Audiences crave relatable human struggles and honest reality checks. Interactive advice shows turn listeners into deeply invested community members.",
+          recommendedFormat: "60–75 min Episode reviewing 6 submitted voice notes or written dilemmas",
+          suggestedTitles: [
+            "I Solved 5 of My Viewers' Hardest Life Dilemmas (Brutally Honest)",
+            "Stop Making This Excuse: Honest Reality Checks for 2026",
+            "Viewer Intervention: The Questions You're Too Afraid to Ask",
+          ],
+          thumbnailConcept: "Audio wave graphic with text bubble screenshot and host hand-to-forehead reaction: 'BRUTAL HONESTY'",
+          targetKeywords: ["audience advice podcast", "life dilemmas answered", "call in show", "honest feedback"],
+          productionDifficulty: "Quick Win (Low Effort)",
+          projectedViewerImpact: "Generates high subscriber loyalty and massive user submissions for recurring episodes.",
+        },
+        {
+          id: "opp-pod-mastermind",
+          topic: "The 2026 Future Predictions Mastermind: 3 Visionaries Dissect What's Next",
+          nicheCategory: "Panel Roundtable",
+          demandScore: 95,
+          demandLevel: "High Demand",
+          userRatingLevel: "98.0% Positive Viewer Rating",
+          whyDemandIsHigh: "Viewers listen to podcasts to stay ahead of cultural and market curves. A high-energy panel predicting the next 3–5 years earns thousands of saves and Twitter/LinkedIn mentions.",
+          recommendedFormat: "90 min 3-Guest Roundtable with timer rounds on each prediction",
+          suggestedTitles: [
+            "Everything Is About to Shift: 3 Visionaries Predict What Happens Next",
+            "The 2026 Mastermind: What the World Looks Like in 5 Years",
+            "If You Want to Win in 2026, Listen to This 90-Minute Warning",
+          ],
+          thumbnailConcept: "3-mic table perspective with warm neon studio glow: 'WHAT'S COMING'",
+          targetKeywords: ["future predictions podcast", "mastermind discussion", "tech society 2026", "expert roundtable"],
+          productionDifficulty: "Medium (Standard Build)",
+          projectedViewerImpact: "Attracts high-value sponsor inquiries and premium demographics (25–44 age bracket).",
+        },
+      ],
+      productionActionPlan: [
+        "Record an episode around Topic #1 (The Unfiltered Insider) or Topic #3 (Solo Investigation) this week.",
+        "Cut 3 high-tension 45-second vertical clips from the 30-45 minute mark to post across YouTube Shorts and Reels.",
+        "Include timestamps and direct chapter markers with evocative, curiosity-driven titles in the video description.",
+      ],
+    };
+  }
+
+  // 2. Detect other specific niches
+  let isCoding =
+    targetNiche === "coding" ||
+    /code|programm|develop|python|javascript|react|web|software|css|html|dev|ai|tech|frontend|backend/i.test(
+      combinedContext
+    );
+  let isGaming =
+    targetNiche === "gaming" ||
+    /game|gaming|play|esport|minecraft|gta|fortnite|roblox|walkthrough|twitch|streamer/i.test(
+      combinedContext
+    );
+  let isFinance =
+    targetNiche === "finance" ||
+    /crypto|bitcoin|invest|money|finance|stock|trading|wealth|budget|real estate|economy/i.test(
+      combinedContext
+    );
+  let isFitness =
+    targetNiche === "fitness" ||
+    /fitness|workout|gym|health|diet|muscle|cardio|training|calisthenics|bodybuilding/i.test(
+      combinedContext
+    );
+
+  if (isCoding || (!isGaming && !isFinance && !isFitness)) {
+    // Tech & Developer Niche (Default for programming channels like CodeWithHarry, etc.)
+    return {
+      detectedNiche: "Software Engineering, AI Tooling & Full-Stack Development",
+      nicheDescription: "Viewers in this field have overwhelmingly high demand for end-to-end practical builds, modern AI workflow integration, and zero-fluff troubleshooting guides that directly accelerate their careers.",
+      overallDemandScore: 97,
+      demandVelocity: "Accelerating Exponentially",
+      viewerSatisfactionBenchmark: "98.2% Positive Viewer Rating for End-to-End Build Formats",
+      highestRatedFormats: [
+        {
+          formatName: "End-to-End Real-World Full-Stack Project Masterclasses",
+          userRatingPercent: 99,
+          avgViewerRetention: "68%",
+          whyItPerforms: "Viewers value tangible artifacts they can showcase in portfolios; practical coding drives exceptional average watch duration and high bookmark/share rates."
+        },
+        {
+          formatName: "'Stop Doing This' / Common Architecture Traps & Refactoring",
+          userRatingPercent: 96,
+          avgViewerRetention: "63%",
+          whyItPerforms: "Curiosity and fear of writing substandard code trigger immediate clicks, while step-by-step before/after code comparisons sustain high engagement."
+        },
+        {
+          formatName: "2026 Modern Tech Stack Battle & Migration Breakdowns",
+          userRatingPercent: 95,
+          avgViewerRetention: "59%",
+          whyItPerforms: "Engineers constantly search for clarity in fast-moving tooling ecosystems (e.g. Next.js vs Vite, Cursor vs Copilot, TypeScript 5.8+)."
+        },
+        {
+          formatName: "Deep-Dive System Design & Backend Architecture for Production",
+          userRatingPercent: 97,
+          avgViewerRetention: "64%",
+          whyItPerforms: "Interview candidates and mid-level developers actively seek production-grade architectural blueprints rather than basic syntax tutorials."
+        }
+      ],
+      trendingViewerQueries: [
+        "How to build full-stack AI applications with live vector databases",
+        "Modern authentication & payment flow integration step-by-step",
+        "Clean architecture best practices for large-scale production codebases",
+        "Which framework to learn in 2026 for highest industry hireability"
+      ],
+      opportunities: [
+        {
+          id: "opp-fullstack-ai",
+          topic: "Building a Production-Ready Full-Stack AI Agent from Scratch",
+          nicheCategory: "AI Engineering & Full-Stack",
+          demandScore: 99,
+          demandLevel: "Extreme Demand",
+          userRatingLevel: "99.1% Positive Viewer Rating",
+          whyDemandIsHigh: "AI integration is the single most searched technical skill right now. Viewers are exhausted by superficial chat wrappers and demand realistic, deployed multi-agent applications with database persistence and rate-limiting.",
+          recommendedFormat: "40-60 min Complete Project Build with downloadable GitHub repository",
+          suggestedTitles: [
+            "Build a Production Full-Stack AI App from Scratch (Complete 2026 Guide)",
+            "I Built a Real AI SaaS in 48 Hours — Here's Every Line of Code",
+            "Stop Building Basic Chatbots: The Modern AI Agent Architecture"
+          ],
+          thumbnailConcept: "Split screen: Confusing code vs Clean Flow Diagram with bold 3-word hook: 'REAL AI APP'",
+          targetKeywords: ["full stack AI project", "build AI agent 2026", "software engineering portfolio", "react node AI"],
+          productionDifficulty: "High Leverage (Deep Dive)",
+          projectedViewerImpact: "Captures top ranking for career-search keywords; expected 65%+ watch time and 4.5% subscriber conversion."
+        },
+        {
+          id: "opp-clean-code-mistakes",
+          topic: "10 Senior Developer Code Smells Junior Engineers Keep Writing",
+          nicheCategory: "Code Quality & Career Growth",
+          demandScore: 96,
+          demandLevel: "High Search Volume",
+          userRatingLevel: "97.5% Positive Viewer Rating",
+          whyDemandIsHigh: "Engineers frequently worry whether their codebase adheres to industry standards. Videos that clearly critique bad habits with clean refactoring solutions earn immense organic shares and active comment discussions.",
+          recommendedFormat: "15-20 min Fast-Paced Refactoring Breakdown (2 min per bad pattern)",
+          suggestedTitles: [
+            "10 Code Mistakes that Instantly Reveal You're a Junior Developer",
+            "Stop Writing Code Like This (5 Modern Replacements)",
+            "How Senior Engineers Actually Structure Code in 2026"
+          ],
+          thumbnailConcept: "Red highlighted bad code snippet with cross icon next to clean green refactor: 'NEVER DO THIS'",
+          targetKeywords: ["clean code tips", "junior vs senior developer", "software design patterns", "code refactoring"],
+          productionDifficulty: "Quick Win (Low Effort)",
+          projectedViewerImpact: "High browse/suggested CTR (+25% over average); strong comment section debate loops."
+        },
+        {
+          id: "opp-modern-roadmap",
+          topic: "The Only Full-Stack Developer Roadmap You Need in 2026 (Zero BS)",
+          nicheCategory: "Learning Path & Curated Curriculum",
+          demandScore: 98,
+          demandLevel: "Extreme Demand",
+          userRatingLevel: "98.8% Positive Viewer Rating",
+          whyDemandIsHigh: "Overwhelmed self-taught developers, bootcamp grads, and college students struggle with tech overload. A definitive, opinionated roadmap eliminating outdated technologies generates thousands of bookmarks and continuous evergreen views.",
+          recommendedFormat: "25-35 min Structured Tier-List or Visual Mindmap with downloadable roadmap PDF",
+          suggestedTitles: [
+            "The 2026 Full-Stack Roadmap (What's Actually Worth Learning)",
+            "If I Started Coding in 2026, I Would ONLY Learn These 4 Things",
+            "Don't Learn Web Development the Old Way — Updated 2026 Guide"
+          ],
+          thumbnailConcept: "Visually striking roadmap graphic with striking checkmarks and crossed-out legacy tools: '2026 ROADMAP'",
+          targetKeywords: ["full stack roadmap 2026", "how to learn coding fast", "web development career path"],
+          productionDifficulty: "Medium (Standard Build)",
+          projectedViewerImpact: "Evergreen traffic asset that compounds monthly views for 12+ months."
+        },
+        {
+          id: "opp-auth-database-mastery",
+          topic: "Authentication & Database Security Masterclass: Next.js + PostgreSQL",
+          nicheCategory: "Backend & Systems",
+          demandScore: 94,
+          demandLevel: "Rising Trend",
+          userRatingLevel: "96.7% Positive Viewer Rating",
+          whyDemandIsHigh: "User auth (session tokens, OAuth, role-based access) is notoriously difficult for developing programmers to implement safely. High-utility tutorials solving real deployment blockers build massive viewer loyalty.",
+          recommendedFormat: "30 min Hands-on Security Walkthrough with live edge cases handled",
+          suggestedTitles: [
+            "Complete Modern Authentication Guide (OAuth, Roles & Security)",
+            "How Real Companies Protect User Data in 2026",
+            "Next.js Authentication Without Headaches (Production Ready)"
+          ],
+          thumbnailConcept: "Shield or Lock graphic with real database connection wireframe: 'SECURE AUTH 2026'",
+          targetKeywords: ["modern authentication tutorial", "oauth role based access", "postgresql fullstack security"],
+          productionDifficulty: "Medium (Standard Build)",
+          projectedViewerImpact: "Very high like-to-view ratio (9%+) and deep bookmarking rate."
+        },
+        {
+          id: "opp-performance-debugging",
+          topic: "I Sped Up a Slow Web App by 800%: Complete Performance Audit",
+          nicheCategory: "Performance Optimization",
+          demandScore: 93,
+          demandLevel: "High Demand",
+          userRatingLevel: "97.0% Positive Viewer Rating",
+          whyDemandIsHigh: "Real-world debugging scenarios with measurable metrics (bundle size drops, Lighthouse scores rising from 34 to 99) trigger intense viewer fascination and algorithmic recommendation.",
+          recommendedFormat: "20 min Case Study breakdown with profiling tools and live benchmarks",
+          suggestedTitles: [
+            "How I Made a Slow Web App 8x Faster (Step-by-Step Profiling)",
+            "The Hidden Performance Bottlenecks Killing Your App",
+            "From 30 to 100 on Lighthouse: Modern Web Optimization"
+          ],
+          thumbnailConcept: "Side-by-side Chrome DevTools gauge: 34 (Red) vs 99 (Bright Green): '8X FASTER'",
+          targetKeywords: ["web performance optimization", "lighthouse speed audit", "react bundle optimization"],
+          productionDifficulty: "Medium (Standard Build)",
+          projectedViewerImpact: "Attracts high-value professional developers and agency owners; generates premium CPM advertising revenue."
+        }
+      ],
+      productionActionPlan: [
+        "Pick Topic #1 (Full-Stack AI Project) or Topic #2 (Junior Code Smells) for your next immediate upload.",
+        "Include a companion GitHub repository and pinned cheat-sheet link in the top comment within 5 minutes of release.",
+        "Script your first 15 seconds around the completed outcome demo — showing the working application before typing a single line of code."
+      ]
+    };
+  }
+
+  // Generic High-Demand Fallback for other digital creator categories
+  return {
+    detectedNiche: `${name} Digital Creator & Authority Channel`,
+    nicheDescription: "Viewers in this niche demonstrate the highest engagement on actionable breakdowns, transformation proof, and curated insider workflows that simplify complex choices.",
+    overallDemandScore: 95,
+    demandVelocity: "Surging High Appetite",
+    viewerSatisfactionBenchmark: "97.5% Positive Viewer Rating in Category",
+    highestRatedFormats: [
+      {
+        formatName: "Step-by-Step Implementation Tutorials",
+        userRatingPercent: 98,
+        avgViewerRetention: "65%",
+        whyItPerforms: "Viewers want actionable utility they can execute immediately."
+      },
+      {
+        formatName: "Deep-Dive Mistakes & What to Avoid",
+        userRatingPercent: 94,
+        avgViewerRetention: "62%",
+        whyItPerforms: "High curiosity and loss aversion drive continuous retention."
+      },
+      {
+        formatName: "Curated 2026 Definitive Guides",
+        userRatingPercent: 96,
+        avgViewerRetention: "60%",
+        whyItPerforms: "Cuts through information overload, driving high bookmark rates."
+      }
     ],
+    trendingViewerQueries: [
+      `Best practices and modern workflows in ${name}'s field`,
+      "Common mistakes beginners make and how to avoid them",
+      "Definitive step-by-step masterclass for 2026",
+      "Comparison and honest review of the top tools in this category"
+    ],
+    opportunities: [
+      {
+        id: "opp-gen-1",
+        topic: "The Definitive 2026 Complete Blueprint for Beginners & Pros",
+        nicheCategory: "Mastery Guide",
+        demandScore: 98,
+        demandLevel: "Extreme Demand",
+        userRatingLevel: "98.5% Positive Viewer Rating",
+        whyDemandIsHigh: "High search volume as audiences seek modernized, clutter-free foundational guidance updated for this year.",
+        recommendedFormat: "25-35 min Comprehensive Guide with chapter markers and resource sheet",
+        suggestedTitles: [
+          `The Only ${name} Guide You Need in 2026 (Step-by-Step)`,
+          "If I Had to Start from Zero in 2026, I'd Do This",
+          "The Complete Masterclass for 2026: Everything Explained"
+        ],
+        thumbnailConcept: "High-contrast clean visual with 3-word hook: '2026 MASTERCLASS'",
+        targetKeywords: ["complete guide 2026", "step by step tutorial", "mastery course"],
+        productionDifficulty: "High Leverage (Deep Dive)",
+        projectedViewerImpact: "Compounds evergreen views month-over-month."
+      },
+      {
+        id: "opp-gen-2",
+        topic: "5 Critical Mistakes That Everyone Makes (And How to Fix Them)",
+        nicheCategory: "Mistakes & Fixes",
+        demandScore: 95,
+        demandLevel: "High Search Volume",
+        userRatingLevel: "96.8% Positive Viewer Rating",
+        whyDemandIsHigh: "Viewers actively want to validate their own approach and avoid wasting time or money.",
+        recommendedFormat: "15-20 min Fast-Paced Breakdown with real case study fixes",
+        suggestedTitles: [
+          "5 Mistakes You're Probably Making Right Now",
+          "Stop Doing This: The Better Way in 2026",
+          "The Trap Most People Fall Into (And the Fix)"
+        ],
+        thumbnailConcept: "Striking warning graphic or split before/after: 'STOP DOING THIS'",
+        targetKeywords: ["common mistakes", "how to improve", "best practices"],
+        productionDifficulty: "Quick Win (Low Effort)",
+        projectedViewerImpact: "High initial browse CTR and animated comment discussions."
+      },
+      {
+        id: "opp-gen-3",
+        topic: "Testing the Top 3 Strategies / Tools Head-to-Head: Honest Verdict",
+        nicheCategory: "Comparison & Evaluation",
+        demandScore: 94,
+        demandLevel: "High Demand",
+        userRatingLevel: "97.2% Positive Viewer Rating",
+        whyDemandIsHigh: "Audience has decision fatigue; direct head-to-head comparisons provide immense clarity.",
+        recommendedFormat: "18-24 min Objective Benchmark with clear criteria and verdict",
+        suggestedTitles: [
+          "I Tested the Top 3 Options for 30 Days — Here's the Real Winner",
+          "Which One Is Actually Best? (Honest Comparison)",
+          "Don't Choose Until You Watch This"
+        ],
+        thumbnailConcept: "Split comparison visual with checkmark vs cross: 'THE REAL WINNER'",
+        targetKeywords: ["comparison test", "honest review", "which is better"],
+        productionDifficulty: "Medium (Standard Build)",
+        projectedViewerImpact: "Drives high buyer-intent viewership and high engagement."
+      },
+      {
+        id: "opp-gen-4",
+        topic: "Real-World Workflow Walkthrough: From Idea to Completion",
+        nicheCategory: "Practical Walkthrough",
+        demandScore: 96,
+        demandLevel: "Rising Trend",
+        userRatingLevel: "98.0% Positive Viewer Rating",
+        whyDemandIsHigh: "Audiences want to see the unedited reality of execution rather than theoretical advice.",
+        recommendedFormat: "30 min Real-Time Execution with live commentary",
+        suggestedTitles: [
+          "Watch Me Build This in Real-Time (Complete Walkthrough)",
+          "My Exact Step-by-Step Workflow in 2026",
+          "How to Execute Like a Pro in Under 1 Hour"
+        ],
+        thumbnailConcept: "Working environment view with timer badge: 'STEP-BY-STEP'",
+        targetKeywords: ["workflow breakdown", "real time tutorial", "how to execute"],
+        productionDifficulty: "Medium (Standard Build)",
+        projectedViewerImpact: "Super-fans watch to completion, maximizing YouTube algorithm recommendation."
+      },
+      {
+        id: "opp-gen-5",
+        topic: "The Future of This Industry: What Changes in 2026 and Beyond",
+        nicheCategory: "Industry Trends & Vision",
+        demandScore: 92,
+        demandLevel: "High Demand",
+        userRatingLevel: "95.5% Positive Viewer Rating",
+        whyDemandIsHigh: "Audiences want forward-looking insights to prepare themselves ahead of market changes.",
+        recommendedFormat: "15 min Opinionated Analysis with 3 clear predictions",
+        suggestedTitles: [
+          "Everything Is Changing in 2026 (Are You Ready?)",
+          "The Shift No One Is Talking About",
+          "What the Next 12 Months Look Like for Creators"
+        ],
+        thumbnailConcept: "Futuristic visual overlay with bold text: 'WHAT'S COMING'",
+        targetKeywords: ["future trends", "industry predictions", "what to expect 2026"],
+        productionDifficulty: "Quick Win (Low Effort)",
+        projectedViewerImpact: "Elevates personal authority and positions channel as an industry thought leader."
+      }
+    ],
+    productionActionPlan: [
+      "Select Topic #1 (The Definitive Blueprint) for your primary upcoming flagship upload.",
+      "Pin a free downloadable reference link or summary in the top comment within 5 minutes of release.",
+      "Engage directly with the first 25 commenters to trigger the YouTube notification feedback loop."
+    ]
   };
 }
 
