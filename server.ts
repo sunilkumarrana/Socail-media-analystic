@@ -536,6 +536,295 @@ Provide exactly 5 rich, highly tailored opportunities. Return strictly valid JSO
     }
   });
 
+  // Dedicated Student Creator & Campus Influencer Analytics endpoint
+  app.post("/api/student-creator-analytics", async (req, res) => {
+    try {
+      const { university, termSeason, majorFocus, handle, platform } = req.body;
+      const uni = university || "UCLA";
+      const season = termSeason || "midterms";
+      const major = majorFocus || "All Majors";
+      const creatorHandle = handle || "@creator";
+
+      const ai = getAi();
+      if (!ai) {
+        const fallback = generateFallbackStudentCreatorAnalytics(uni, season, major, creatorHandle);
+        return res.json({
+          data: fallback,
+          source: "campus_intelligence_engine",
+          modelName: "Collegiate Demographics & Cadence Engine",
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      const prompt = `You are a premier collegiate media strategist and social media algorithm researcher specializing in campus influencers, university demographics, and academic term viewership cycles.
+Analyze campus creator trends for ${creatorHandle} (${platform || "YouTube"}) at ${uni} during the ${season} term focus (${major}).
+
+Provide a thorough, high-resolution strategic assessment covering:
+1. Academic term cycles (viewership velocity, study vs lifestyle content appetite, posting cadence, key seasonal finding).
+2. Demographic cohort distribution (Freshmen, Sophomores, Juniors, Seniors, Graduate), housing breakdown, and top field of study distributions.
+3. Campus hourly activity hotspots (e.g. late night study grinds 10pm-2am vs between-class dining hall breaks).
+4. Top campus video formats (Day in the Life, Pomodoro Study-With-Me, dorm tour, dining hall hacks, career recruiting) with virality benchmarks.
+5. Campus brand deal opportunities (e.g., Celsius, Red Bull, Notion, Prime Student, Chegg, Unidays) with realistic campus rate card ranges.
+6. Rising collegiate trend topics and hashtags.
+7. Concise strategic AI executive briefing.
+
+Respond ONLY with valid JSON matching this schema:
+{
+  "university": "${uni}",
+  "campusEnrollment": "e.g. 46,000 Students",
+  "campusReachScore": 94,
+  "peerTrustIndex": "95.2% Peer Recommendation Affinity",
+  "academicCycle": {
+    "termName": "e.g. Midterms Crunch & Project Deadlines",
+    "viewershipVelocityMultiplier": 1.35,
+    "studyContentAppetite": "Peak",
+    "lifestyleContentAppetite": "High",
+    "recommendedPostingCadence": "3-4 Posts/Week with 2 Study/Routine Streams",
+    "keyInsight": "..."
+  },
+  "cohortBreakdown": [
+    { "standing": "Freshmen", "percentage": 34, "primaryInterests": ["Dorm Setup", "Dining Hacks"], "retentionIndex": 124 },
+    { "standing": "Sophomores", "percentage": 28, "primaryInterests": ["Housing Hunt", "Declaring Major"], "retentionIndex": 108 },
+    { "standing": "Juniors", "percentage": 22, "primaryInterests": ["Internships", "Career Fairs"], "retentionIndex": 114 },
+    { "standing": "Seniors", "percentage": 12, "primaryInterests": ["Full-Time Jobs", "Capstone"], "retentionIndex": 96 },
+    { "standing": "Graduate / Postgrad", "percentage": 4, "primaryInterests": ["Research", "Work-Life"], "retentionIndex": 102 }
+  ],
+  "majorsDistribution": [
+    { "field": "STEM & Computer Science", "percentage": 38, "avgEngagementRate": 6.8 },
+    { "field": "Business & Finance", "percentage": 26, "avgEngagementRate": 6.0 },
+    { "field": "Pre-Med & Healthcare", "percentage": 18, "avgEngagementRate": 7.4 },
+    { "field": "Media, Arts & Design", "percentage": 11, "avgEngagementRate": 8.2 },
+    { "field": "Humanities & Law", "percentage": 7, "avgEngagementRate": 5.2 }
+  ],
+  "housingBreakdown": [
+    { "type": "On-Campus Dorms", "percentage": 46 },
+    { "type": "Off-Campus Apartments", "percentage": 34 },
+    { "type": "Greek / Co-op Housing", "percentage": 13 },
+    { "type": "Commuters", "percentage": 7 }
+  ],
+  "campusPeakHours": [
+    { "timeSlot": "7:00 AM - 9:00 AM", "activityLevel": 32, "note": "Morning routines & walking to 8am lectures" },
+    { "timeSlot": "11:30 AM - 1:30 PM", "activityLevel": 78, "note": "Between-class dining hall scroll & quad lunch" },
+    { "timeSlot": "4:00 PM - 6:00 PM", "activityLevel": 62, "note": "Campus gym & club meetings" },
+    { "timeSlot": "8:00 PM - 10:00 PM", "activityLevel": 88, "note": "Post-dinner homework grind & evening social" },
+    { "timeSlot": "10:30 PM - 2:00 AM", "activityLevel": 96, "note": "Peak study cramming, late-night dorm chats & ASMR" },
+    { "timeSlot": "2:00 AM - 6:00 AM", "activityLevel": 14, "note": "Dorm quiet hours" }
+  ],
+  "topCampusFormats": [
+    {
+      "formatName": "Day in the Life (Realistic Routine)",
+      "avgRetentionPercent": 68,
+      "engagementRate": 8.4,
+      "bestPostingWindow": "Sundays at 6:30 PM",
+      "collegiateViralityScore": 94,
+      "brandSponsorSuitability": "Elite",
+      "sampleTitle": "A brutally honest day in my life at ${uni}",
+      "recommendationNote": "Raw authentic timestamps outperform overly staged aesthetic reels."
+    },
+    {
+      "formatName": "Silent Pomodoro Study-With-Me (50/10)",
+      "avgRetentionPercent": 82,
+      "engagementRate": 6.1,
+      "bestPostingWindow": "Weekdays at 9:00 PM",
+      "collegiateViralityScore": 89,
+      "brandSponsorSuitability": "High",
+      "sampleTitle": "Study With Me 3 Hours for Finals 📚 (Rain sounds, library view)",
+      "recommendationNote": "High repeat view counts and multi-hour session watch times boost channel authority."
+    },
+    {
+      "formatName": "Dorm Tour & Desk Setup Upgrades",
+      "avgRetentionPercent": 64,
+      "engagementRate": 9.1,
+      "bestPostingWindow": "Fridays at 3:00 PM",
+      "collegiateViralityScore": 96,
+      "brandSponsorSuitability": "Elite",
+      "sampleTitle": "Turning my tiny ${uni} dorm into a cozy productivity haven ✨",
+      "recommendationNote": "High save-rates from product links and ambient lighting sources."
+    },
+    {
+      "formatName": "Campus Dining Hall Hacks & $15 Meal Prep",
+      "avgRetentionPercent": 71,
+      "engagementRate": 7.9,
+      "bestPostingWindow": "Mondays at 12:00 PM",
+      "collegiateViralityScore": 92,
+      "brandSponsorSuitability": "High",
+      "sampleTitle": "Top 5 secret dining hall combinations that actually taste amazing 🍜",
+      "recommendationNote": "Hyper-localized campus content sparks active peer debate in comments."
+    },
+    {
+      "formatName": "Internship Recruiting & Resume Teardowns",
+      "avgRetentionPercent": 75,
+      "engagementRate": 8.7,
+      "bestPostingWindow": "Tuesdays at 5:00 PM",
+      "collegiateViralityScore": 88,
+      "brandSponsorSuitability": "Elite",
+      "sampleTitle": "How I got a Big Tech internship as a sophomore with no connections",
+      "recommendationNote": "Massive bookmarks and peer shares into student group chats."
+    }
+  ],
+  "brandPartnerships": [
+    { "brandName": "Celsius / Red Bull", "category": "Energy & Beverage", "typicalCompensationTier": "$450 - $900 / reel + Free Product", "avgStudentConversionRate": "5.4% Promo Redemptions", "idealContentAngle": "Midterms desk study fuel shot or pre-library study pack routine." },
+    { "brandName": "Notion / Chegg", "category": "EdTech & Study", "typicalCompensationTier": "$600 - $1,400 / integration", "avgStudentConversionRate": "8.2% App Signups", "idealContentAngle": "Sharing custom semester planner templates." },
+    { "brandName": "Prime Student / Unidays", "category": "Student Productivity", "typicalCompensationTier": "$500 - $1,200 / midroll", "avgStudentConversionRate": "6.7% Student Verification", "idealContentAngle": "Dorm essentials haul and textbook discount breakdowns." },
+    { "brandName": "Liquid I.V. / Cirkul", "category": "Snacks & Dorm", "typicalCompensationTier": "$350 - $750 / story set", "avgStudentConversionRate": "4.9% Orders", "idealContentAngle": "Morning 8am class hydration walk vlog." }
+  ],
+  "risingCampusTrends": [
+    { "id": "trend-1", "topic": "Dorm Room Minimalist Aesthetic & Cable Management", "hashtag": "#DormAesthetic #CollegeDeskSetup", "viralityVelocity": "+210%", "category": "Campus Life & Dorm", "suggestedAngle": "Show before-and-after lighting upgrade with warm desk LED bar.", "bestPlatform": "YouTube Shorts / Reels" },
+    { "id": "trend-2", "topic": "Realistic 5 AM Study Vlog vs Actual 10 AM Reality", "hashtag": "#CollegeRelatable #StudyWithMe", "viralityVelocity": "+145%", "category": "Academics & Study", "suggestedAngle": "Humorous juxtaposition of romanticized aesthetic vs 8am sprint.", "bestPlatform": "YouTube Shorts / Reels" },
+    { "id": "trend-3", "topic": "College Budgeting: What I Spend in a Week at School", "hashtag": "#CollegeBudget #StudentFinance", "viralityVelocity": "+88%", "category": "Budget & Food", "suggestedAngle": "Transparent breakdown of groceries, coffee runs, and weekend dining.", "bestPlatform": "Carousel Infographic" },
+    { "id": "trend-4", "topic": "Coffee Shop & Quiet Campus Library Tier List", "hashtag": "#CampusHiddenGems #StudySpots", "viralityVelocity": "+64%", "category": "Campus Life & Dorm", "suggestedAngle": "Rating campus libraries by outlet availability, quietness, and chairs.", "bestPlatform": "Long-form Vlog" }
+  ],
+  "aiCampusStrategicBriefing": "..."
+}`;
+
+      const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"].filter(
+        (m) => !isModelInCooldown(m)
+      );
+
+      for (const model of candidateModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model,
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+            },
+          });
+
+          const rawText = response.text || "";
+          const cleanedText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+          const parsed = JSON.parse(cleanedText);
+
+          return res.json({
+            data: parsed,
+            source: "gemini_campus_intelligence",
+            modelName: `Gemini (${model})`,
+            timestamp: new Date().toISOString(),
+          });
+        } catch (err: any) {
+          handleModelError(model, err);
+        }
+      }
+
+      const fallback = generateFallbackStudentCreatorAnalytics(uni, season, major, creatorHandle);
+      return res.json({
+        data: fallback,
+        source: "campus_intelligence_engine",
+        modelName: "Collegiate Demographics & Cadence Engine",
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      const fallback = generateFallbackStudentCreatorAnalytics(req.body?.university, req.body?.termSeason, req.body?.majorFocus, req.body?.handle);
+      return res.json({
+        data: fallback,
+        source: "campus_intelligence_engine",
+        modelName: "Collegiate Demographics & Cadence Engine",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+
+  // Quick Design & Adobe Express Intelligence endpoint
+  app.post("/api/quick-design-insights", async (req, res) => {
+    try {
+      const { insightContext, topicTitle, creatorHandle, category, theme } = req.body;
+      const title = topicTitle || "Campus Creator Performance Insight";
+      const handle = creatorHandle || "@creator";
+
+      const ai = getAi();
+      if (!ai) {
+        const fallback = generateFallbackQuickDesign(title, insightContext, category, theme, handle);
+        return res.json({
+          data: fallback,
+          source: "design_engine",
+          modelName: "Adobe Express Content Stager",
+          timestamp: new Date().toISOString(),
+        });
+      }
+
+      const prompt = `You are a world-class graphic design art director and YouTube thumbnail specialist expert in Adobe Express, Firefly prompts, and high-CTR visual marketing.
+Transform this performance insight into an ultra-high-converting visual design asset ready to be edited in Adobe Express.
+
+INPUT DETAILS:
+- Topic / Performance Insight: ${title}
+- Context / Key Data Point: ${insightContext || "N/A"}
+- Creator Handle: ${handle}
+- Target Format: ${category || "youtube-thumbnail"}
+- Theme Style: ${theme || "varsity-blue"}
+
+OBJECTIVES:
+1. Craft a punchy, high-contrast Headline (maximum 4-6 words) designed for instant scannability on mobile feeds.
+2. Formulate a strong Subtitle or supporting hook.
+3. Formulate a 2-4 word Callout Badge or Sticker (e.g. "3.4X RETENTION", "CAMPUS SECRETS", "100K BLUEPRINT", "FINAL EXAMS").
+4. Compose an expert Adobe Firefly text-to-image prompt to generate a stunning background photo or artistic plate.
+5. Provide 3-4 high-contrast color codes (background, text, accent, badge) that pass WCAG AA standards.
+6. Provide recommended Adobe Express template keywords and tags for quick search in the Adobe Express library.
+
+Respond ONLY with valid JSON matching:
+{
+  "headline": "HOW I SURVIVED FINALS WEEK 📚",
+  "subtitle": "Brutally Honest UCLA Pre-Med Routine & GPA Strategy",
+  "badgeText": "3.4X RETENTION • CAMPUS EDITION",
+  "fireflyPrompt": "Warm cozy college dorm desk at midnight, glowing desk lamp, MacBook with code and study notes, rain outside window, photorealistic cinematic lighting 8k",
+  "colorPalette": {
+    "background": "#0F172A",
+    "text": "#F8FAFC",
+    "accent": "#5B5CE2",
+    "badgeBg": "#EEF2FF",
+    "badgeText": "#4338CA"
+  },
+  "adobeExpressCategory": "youtube-thumbnail",
+  "recommendedSearchTags": ["college dorm", "study vlog", "finals routine", "youtube thumbnail template", "academic minimalist"],
+  "suggestedLayout": "High-contrast bold display text left-aligned, creator cutout on right, sticker badge top-right"
+}`;
+
+      const candidateModels = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"].filter(
+        (m) => !isModelInCooldown(m)
+      );
+
+      for (const model of candidateModels) {
+        try {
+          const response = await ai.models.generateContent({
+            model,
+            contents: prompt,
+            config: {
+              responseMimeType: "application/json",
+            },
+          });
+
+          const rawText = response.text || "";
+          const cleanedText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
+          const parsed = JSON.parse(cleanedText);
+
+          return res.json({
+            data: parsed,
+            source: "gemini_design_engine",
+            modelName: `Gemini (${model})`,
+            timestamp: new Date().toISOString(),
+          });
+        } catch (err: any) {
+          handleModelError(model, err);
+        }
+      }
+
+      const fallback = generateFallbackQuickDesign(title, insightContext, category, theme, handle);
+      return res.json({
+        data: fallback,
+        source: "design_engine",
+        modelName: "Adobe Express Content Stager",
+        timestamp: new Date().toISOString(),
+      });
+    } catch {
+      const fallback = generateFallbackQuickDesign(req.body?.topicTitle, req.body?.insightContext, req.body?.category, req.body?.theme, req.body?.creatorHandle);
+      return res.json({
+        data: fallback,
+        source: "design_engine",
+        modelName: "Adobe Express Content Stager",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -554,6 +843,222 @@ Provide exactly 5 rich, highly tailored opportunities. Return strictly valid JSO
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`SocialPulse server running on http://0.0.0.0:${PORT}`);
   });
+}
+
+function generateFallbackStudentCreatorAnalytics(
+  university: string = "UCLA",
+  season: string = "midterms",
+  major: string = "All Majors",
+  handle: string = "@creator"
+) {
+  const isFinals = season === "finals";
+  const isWelcome = season === "welcome";
+  const uni = university || "UCLA";
+
+  return {
+    university: uni,
+    campusEnrollment: uni.includes("Stanford") ? "17,500 students" : "48,000+ students",
+    campusReachScore: isFinals ? 96 : isWelcome ? 98 : 92,
+    peerTrustIndex: "94.8% Peer Affinity",
+    academicCycle: {
+      termName: isFinals
+        ? "Finals Week Sprint & Exam Marathon"
+        : isWelcome
+        ? "Welcome Week & Fall Orientation Rush"
+        : "Midterms Season & Project Deadlines",
+      viewershipVelocityMultiplier: isFinals ? 1.58 : isWelcome ? 1.42 : 1.31,
+      studyContentAppetite: isFinals ? "Peak" : isWelcome ? "Moderate" : "High",
+      lifestyleContentAppetite: isWelcome ? "Peak" : isFinals ? "Low" : "High",
+      recommendedPostingCadence: isFinals
+        ? "2-3 Study-With-Me streams/week + 1 Quick Cram Hack Short/day"
+        : isWelcome
+        ? "Daily Campus Vlogs, Dorm Room Makeover, & Social Guides"
+        : "3-4 Posts/Week: 2 Routine Vlogs, 1 Study Strategy, 1 Weekend Recap",
+      keyInsight: isFinals
+        ? "Audience watch time surges by +58% during finals; students crave low-friction ambient study streams (Pomodoro 50/10) and condensed survival tips between 10:30 PM and 2 AM."
+        : isWelcome
+        ? "Incoming freshmen and transfer students drive a massive +42% spike in dorm setup tours, class schedule walkthroughs, and dining hall rankings."
+        : "Midterms season triggers peak appetite for productivity setups, study snack meal prep, and authentic 'realistic college day in the life' balance content.",
+    },
+    cohortBreakdown: [
+      { standing: "Freshmen", percentage: 34, primaryInterests: ["Dorm Setup", "Dining Hacks", "First-Year Social"], retentionIndex: 124 },
+      { standing: "Sophomores", percentage: 28, primaryInterests: ["Apartment Hunt", "Declaring Major", "Greek Life"], retentionIndex: 108 },
+      { standing: "Juniors", percentage: 22, primaryInterests: ["Internships", "Career Fairs", "Upper-Div Seminars"], retentionIndex: 114 },
+      { standing: "Seniors", percentage: 12, primaryInterests: ["Job Hunt", "Capstone", "Graduation Checklist"], retentionIndex: 96 },
+      { standing: "Graduate / Postgrad", percentage: 4, primaryInterests: ["Research Lab", "Thesis Writing", "Balance"], retentionIndex: 102 },
+    ],
+    majorsDistribution: [
+      { field: "STEM & Computer Science", percentage: 38, avgEngagementRate: 6.8 },
+      { field: "Business, Finance & Econ", percentage: 26, avgEngagementRate: 6.0 },
+      { field: "Pre-Med & Healthcare", percentage: 18, avgEngagementRate: 7.4 },
+      { field: "Media, Film & Arts", percentage: 11, avgEngagementRate: 8.2 },
+      { field: "Humanities & Law", percentage: 7, avgEngagementRate: 5.2 },
+    ],
+    housingBreakdown: [
+      { type: "On-Campus Dorms", percentage: 46 },
+      { type: "Off-Campus Apartments", percentage: 34 },
+      { type: "Greek / Co-op Housing", percentage: 13 },
+      { type: "Commuter Students", percentage: 7 },
+    ],
+    campusPeakHours: [
+      { timeSlot: "7:00 AM - 9:00 AM", activityLevel: 32, note: "Morning routines & coffee walks before 8am lectures" },
+      { timeSlot: "11:30 AM - 1:30 PM", activityLevel: 78, note: "Between-class dining hall scroll & quad lunch break" },
+      { timeSlot: "4:00 PM - 6:00 PM", activityLevel: 62, note: "Club meetings, campus gym workout & study wrap-up" },
+      { timeSlot: "8:00 PM - 10:00 PM", activityLevel: 88, note: "Post-dinner homework grind & evening social recap" },
+      { timeSlot: "10:30 PM - 2:00 AM", activityLevel: 96, note: "Peak study cramming, late-night dorm chats & ASMR" },
+      { timeSlot: "2:00 AM - 6:00 AM", activityLevel: 14, note: "Dorm quiet hours & minimal active scrolling" },
+    ],
+    topCampusFormats: [
+      {
+        formatName: "Day in the Life (Realistic Routine)",
+        avgRetentionPercent: 68,
+        engagementRate: 8.4,
+        bestPostingWindow: "Sundays at 6:30 PM",
+        collegiateViralityScore: 94,
+        brandSponsorSuitability: "Elite",
+        sampleTitle: `A brutally honest day in my life at ${uni} (pre-med + 3 exams)`,
+        recommendationNote: "Raw authentic timestamps outperform staged aesthetic reels.",
+      },
+      {
+        formatName: "Silent Pomodoro Study-With-Me (50/10)",
+        avgRetentionPercent: 82,
+        engagementRate: 6.1,
+        bestPostingWindow: "Weekdays at 9:00 PM",
+        collegiateViralityScore: 89,
+        brandSponsorSuitability: "High",
+        sampleTitle: `Study With Me 3 Hours for Finals 📚 (Rain sounds, campus library view)`,
+        recommendationNote: "Students use this as virtual co-working accountability; high repeat view count.",
+      },
+      {
+        formatName: "Dorm Tour & Desk Setup Upgrades",
+        avgRetentionPercent: 64,
+        engagementRate: 9.1,
+        bestPostingWindow: "Fridays at 3:00 PM",
+        collegiateViralityScore: 96,
+        brandSponsorSuitability: "Elite",
+        sampleTitle: `Turning my tiny ${uni} dorm into a cozy productivity haven ✨`,
+        recommendationNote: "Drive high save-rates by listing exact product links and ambient lighting sources.",
+      },
+      {
+        formatName: "Campus Dining Hall Hacks & $15 Meal Prep",
+        avgRetentionPercent: 71,
+        engagementRate: 7.9,
+        bestPostingWindow: "Mondays at 12:00 PM",
+        collegiateViralityScore: 92,
+        brandSponsorSuitability: "High",
+        sampleTitle: `Top 5 secret dining hall combinations that actually taste amazing 🍜`,
+        recommendationNote: "Hyper-localized campus content creates immediate peer comment debates.",
+      },
+      {
+        formatName: "Internship Recruiting & Resume Teardowns",
+        avgRetentionPercent: 75,
+        engagementRate: 8.7,
+        bestPostingWindow: "Tuesdays at 5:00 PM",
+        collegiateViralityScore: 88,
+        brandSponsorSuitability: "Elite",
+        sampleTitle: `How I got a Big Tech internship as a sophomore with no connections`,
+        recommendationNote: "Generates massive bookmarks and shares into campus group chats.",
+      },
+    ],
+    brandPartnerships: [
+      {
+        brandName: "Celsius / Red Bull",
+        category: "Energy & Beverage",
+        typicalCompensationTier: "$450 - $900 / reel + Free Monthly Campus Supply",
+        avgStudentConversionRate: "5.4% Promo Code Redemptions",
+        idealContentAngle: "Midterms desk study fuel shot or pre-library study pack routine.",
+      },
+      {
+        brandName: "Notion / Chegg / Quizlet",
+        category: "EdTech & Study",
+        typicalCompensationTier: "$600 - $1,400 / dedicated integration",
+        avgStudentConversionRate: "8.2% Free Tier App Signups",
+        idealContentAngle: "Sharing custom semester planner templates and exam flashcard sets.",
+      },
+      {
+        brandName: "Prime Student / Unidays",
+        category: "Student Productivity",
+        typicalCompensationTier: "$500 - $1,200 / 30s mid-roll",
+        avgStudentConversionRate: "6.7% Student Verification Clicks",
+        idealContentAngle: "Dorm essentials haul and textbook discount breakdowns.",
+      },
+      {
+        brandName: "Liquid I.V. / Cirkul",
+        category: "Snacks & Dorm",
+        typicalCompensationTier: "$350 - $750 / reel or story set",
+        avgStudentConversionRate: "4.9% Hydration Bundle Sales",
+        idealContentAngle: "Morning 8am class hydration routine and walk-to-campus vlog.",
+      },
+    ],
+    risingCampusTrends: [
+      {
+        id: "trend-1",
+        topic: "Dorm Room Minimalist Aesthetic & Cable Management",
+        hashtag: "#DormAesthetic #CollegeDeskSetup",
+        viralityVelocity: "+210%",
+        category: "Campus Life & Dorm",
+        suggestedAngle: "Show before-and-after lighting upgrade with warm desk LED bar and Notion desktop dashboard.",
+        bestPlatform: "YouTube Shorts / Reels",
+      },
+      {
+        id: "trend-2",
+        topic: "Realistic 5 AM Study Vlog vs Actual 10 AM Reality",
+        hashtag: "#CollegeRelatable #StudyWithMe",
+        viralityVelocity: "+145%",
+        category: "Academics & Study",
+        suggestedAngle: "Humorous juxtaposition of romanticized aesthetic morning vs reality of sleeping through 8am alarm.",
+        bestPlatform: "YouTube Shorts / Reels",
+      },
+      {
+        id: "trend-3",
+        topic: "College Budgeting: What I Spend in a Week at School",
+        hashtag: "#CollegeBudget #StudentFinance",
+        viralityVelocity: "+88%",
+        category: "Budget & Food",
+        suggestedAngle: "Transparent breakdown of groceries, coffee runs, printing fees, and weekend dining.",
+        bestPlatform: "Carousel Infographic",
+      },
+      {
+        id: "trend-4",
+        topic: "Coffee Shop & Quiet Campus Library Tier List",
+        hashtag: "#CampusHiddenGems #StudySpots",
+        viralityVelocity: "+64%",
+        category: "Campus Life & Dorm",
+        suggestedAngle: "Rating campus libraries by outlet availability, quietness, natural light, and chair ergonomics.",
+        bestPlatform: "Long-form Vlog",
+      },
+    ],
+    aiCampusStrategicBriefing: `Campus engagement for ${handle} at ${uni} demonstrates an exceptional 94.8% peer trust index. With ${season.toUpperCase()} dynamics in play, student retention rates peak on late-night study sessions (10:30 PM - 2 AM) and mid-day dining hall updates. Freshmen and sophomores represent 62% of your aggregate audience, indicating tremendous leverage for relatable lifestyle vlogs and practical dorm/study survival tips. To maximize collegiate brand sponsorship valuation, bundle your 50/10 study streams with campus ambassador partner links (e.g. Celsius or Notion), which convert at 2.4x the standard retail average on campus.`,
+  };
+}
+
+function generateFallbackQuickDesign(
+  topicTitle: string = "High Demand Study Topic",
+  insightContext: string = "",
+  category: string = "youtube-thumbnail",
+  theme: string = "varsity-blue",
+  creatorHandle: string = "@creator"
+) {
+  const isYouTube = category === "youtube-thumbnail";
+  const isStory = category === "instagram-story";
+  const isFlyer = category === "campus-flyer";
+
+  return {
+    headline: topicTitle.length > 36 ? topicTitle.slice(0, 34) + "..." : topicTitle.toUpperCase(),
+    subtitle: insightContext || `Optimized for ${creatorHandle} • High Retention Format`,
+    badgeText: isYouTube ? "3.4X RETENTION • HIGH DEMAND" : isFlyer ? "CAMPUS EVENT • JOIN LIVE" : "VIRAL TREND • 100K REACH",
+    fireflyPrompt: "High-contrast minimalist collegiate aesthetic, clean modern typography overlay, warm desk lamps, bokeh library background, photorealistic 8k",
+    colorPalette: theme === "campus-crimson"
+      ? { background: "#1C1917", text: "#FAFAF9", accent: "#DC2626", badgeBg: "#FEF2F2", badgeText: "#991B1B" }
+      : theme === "cyber-neon"
+      ? { background: "#09090B", text: "#FAFAFA", accent: "#06B6D4", badgeBg: "#ECFEFF", badgeText: "#0E7490" }
+      : theme === "academic-minimal"
+      ? { background: "#F8FAFC", text: "#0F172A", accent: "#475569", badgeBg: "#F1F5F9", badgeText: "#1E293B" }
+      : { background: "#0B1120", text: "#F8FAFC", accent: "#3B82F6", badgeBg: "#EFF6FF", badgeText: "#1D4ED8" },
+    adobeExpressCategory: category,
+    recommendedSearchTags: ["college thumbnail", "study vlog", "campus influencer", "minimalist poster", "high CTR"],
+    suggestedLayout: "Left-aligned high-contrast typography with right-anchored subject cutout and top-right metric badge",
+  };
 }
 
 function generateFallbackInsight(handle: string, platform: string, stats: any): string {

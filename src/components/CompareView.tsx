@@ -640,17 +640,17 @@ export const CompareView: React.FC<CompareViewProps> = ({
   return (
     <div className="space-y-6">
       {/* Top Search / Comparison Bar */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl sm:p-6">
+      <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs sm:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#EEF2FF] text-[#5B5CE2] border border-[#E0E7FF]">
               <Swords className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <h2 className="text-base font-bold text-[#111827] flex items-center gap-2">
                 Competitive Benchmark &amp; Battle Engine
               </h2>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-[#6B7280]">
                 Compare your channel with any competitor to discover actionable ways to beat them
               </p>
             </div>
@@ -661,23 +661,23 @@ export const CompareView: React.FC<CompareViewProps> = ({
         <form onSubmit={handleRunCompare} className="grid grid-cols-1 gap-3 lg:grid-cols-12 lg:items-end">
           {/* Account 1 Input (Target) */}
           <div className="lg:col-span-5">
-            <label className="block text-[11px] font-semibold text-indigo-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-              <Target className="h-3 w-3 text-indigo-400" />
+            <label className="block text-[11px] font-semibold text-[#5B5CE2] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+              <Target className="h-3 w-3 text-[#5B5CE2]" />
               Account A (Your Channel)
             </label>
-            <div className="flex h-[42px] items-center rounded-xl border border-slate-700 bg-slate-950 px-3 text-xs text-slate-100 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition">
+            <div className="flex h-[42px] items-center rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] px-3 text-xs text-[#111827] focus-within:border-[#5B5CE2] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#5B5CE2] transition">
               <input
                 type="text"
                 value={handleA}
                 onChange={(e) => setHandleA(e.target.value)}
                 placeholder="Enter your channel link or @handle..."
-                className="w-full bg-transparent placeholder-slate-500 focus:outline-none"
+                className="w-full bg-transparent placeholder-[#9CA3AF] focus:outline-none"
               />
             </div>
           </div>
 
-          <div className="hidden lg:flex lg:col-span-1 items-center justify-center h-[42px] text-slate-500">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 bg-slate-800/80 px-2 py-1 rounded-md">
+          <div className="hidden lg:flex lg:col-span-1 items-center justify-center h-[42px] text-[#9CA3AF]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#6B7280] bg-[#F3F4F6] px-2 py-1 rounded-md border border-[#E5E7EB]">
               VS
             </span>
           </div>
@@ -685,12 +685,12 @@ export const CompareView: React.FC<CompareViewProps> = ({
           {/* Account 2 Input (Competitor) and Compare & Beat Competitor Button Beside It */}
           <div className="lg:col-span-6">
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-[11px] font-semibold text-violet-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Crosshair className="h-3 w-3 text-violet-400" />
+              <label className="block text-[11px] font-semibold text-[#4B5563] uppercase tracking-wider flex items-center gap-1.5">
+                <Crosshair className="h-3 w-3 text-[#5B5CE2]" />
                 Account B (Competitor to Beat)
               </label>
               {isDuplicateInput && (
-                <span className="text-[10px] font-bold text-rose-400 bg-rose-500/20 px-1.5 py-0.5 rounded border border-rose-500/30">
+                <span className="text-[10px] font-bold text-[#DC2626] bg-[#FEF2F2] px-1.5 py-0.5 rounded border border-[#FECACA]">
                   Duplicate Link
                 </span>
               )}
@@ -699,8 +699,8 @@ export const CompareView: React.FC<CompareViewProps> = ({
               <div
                 className={`flex h-[42px] items-center flex-1 min-w-0 rounded-xl border px-3 text-xs transition ${
                   isDuplicateInput
-                    ? "border-rose-500 bg-rose-950/20 ring-1 ring-rose-500/40 text-rose-100"
-                    : "border-slate-700 bg-slate-950 text-slate-100 focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500"
+                    ? "border-[#DC2626] bg-[#FEF2F2] ring-1 ring-[#DC2626]/40 text-[#DC2626]"
+                    : "border-[#E5E7EB] bg-[#F9FAFB] text-[#111827] focus-within:border-[#5B5CE2] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#5B5CE2]"
                 }`}
               >
                 <input
@@ -708,7 +708,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   value={handleB}
                   onChange={(e) => setHandleB(e.target.value)}
                   placeholder="Paste competitor YouTube link or @handle..."
-                  className="w-full bg-transparent placeholder-slate-500 focus:outline-none"
+                  className="w-full bg-transparent placeholder-[#9CA3AF] focus:outline-none"
                 />
               </div>
 
@@ -723,12 +723,12 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     ? "Enter competitor link to benchmark"
                     : "Compare and unlock ways to beat competitor"
                 }
-                className={`h-[42px] shrink-0 whitespace-nowrap rounded-xl px-4 text-xs font-bold shadow-md transition flex items-center justify-center gap-2 cursor-pointer ${
+                className={`h-[42px] shrink-0 whitespace-nowrap rounded-xl px-4 text-xs font-bold shadow-xs transition flex items-center justify-center gap-2 cursor-pointer ${
                   isDuplicateInput
-                    ? "bg-rose-950/60 border border-rose-500/40 text-rose-300/80 cursor-not-allowed"
+                    ? "bg-[#F3F4F6] border border-[#FECACA] text-[#DC2626] cursor-not-allowed"
                     : !handleB.trim()
-                    ? "bg-slate-800 text-slate-400 border border-slate-700 cursor-not-allowed"
-                    : "bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 text-white hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99]"
+                    ? "bg-[#F3F4F6] text-[#9CA3AF] border border-[#E5E7EB] cursor-not-allowed"
+                    : "bg-[#5B5CE2] hover:bg-[#4F46E5] text-white active:scale-[0.99]"
                 }`}
               >
                 {isComparing ? (
@@ -753,24 +753,24 @@ export const CompareView: React.FC<CompareViewProps> = ({
         {isDuplicate && (
           <div
             id="duplicate-link-attention-alert"
-            className="mt-4 rounded-xl border border-rose-500/80 bg-gradient-to-r from-rose-950/80 via-rose-900/50 to-slate-900/95 p-4 shadow-lg shadow-rose-950/60 transition"
+            className="mt-4 rounded-xl border border-[#FECACA] bg-[#FEF2F2] p-4 shadow-xs transition"
           >
             <div className="flex items-start gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-rose-500/20 text-rose-400 border border-rose-500/40">
-                <AlertTriangle className="h-5 w-5 text-rose-400 animate-pulse" />
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-100 text-[#DC2626] border border-[#FECACA]">
+                <AlertTriangle className="h-5 w-5 text-[#DC2626]" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-rose-300 flex items-center gap-1.5">
-                    <span className="inline-block h-2 w-2 rounded-full bg-rose-500 animate-ping" />
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#DC2626] flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 rounded-full bg-[#DC2626]" />
                     Attention: Identical Account Link Provided on Both Sides
                   </h4>
-                  <span className="rounded bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300 border border-rose-500/30">
+                  <span className="rounded bg-[#DC2626]/10 px-2 py-0.5 text-[10px] font-bold text-[#DC2626] border border-[#FECACA]">
                     Conflict
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-rose-200/90 leading-relaxed">
-                  You have entered the exact same account link for both <strong className="text-white">Account A (Your Channel)</strong> and <strong className="text-white">Account B (Competitor)</strong>. A competitive analysis requires a distinct competitor channel to measure audience differentials and unlock strategic ways to beat them. Please enter a different channel link or handle in the competitor field above.
+                <p className="mt-1 text-xs text-[#991B1B] leading-relaxed">
+                  You have entered the exact same account link for both <strong className="text-[#111827]">Account A (Your Channel)</strong> and <strong className="text-[#111827]">Account B (Competitor)</strong>. A competitive analysis requires a distinct competitor channel to measure audience differentials and unlock strategic ways to beat them. Please enter a different channel link or handle in the competitor field above.
                 </p>
               </div>
             </div>
@@ -781,12 +781,11 @@ export const CompareView: React.FC<CompareViewProps> = ({
       {/* Side by Side Profile Cards */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* Card A (Target Account / User's Channel) */}
-        <div className="rounded-2xl border border-indigo-500/40 bg-gradient-to-b from-indigo-950/40 to-slate-900/90 p-5 shadow-lg relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none" />
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800 relative">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB] relative">
             <div className="flex items-center gap-3">
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${dataA.profile.avatarBg} text-base font-bold text-white shadow overflow-hidden`}
+                className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3F4F6] border border-[#E5E7EB] text-base font-bold text-[#111827] shadow-xs overflow-hidden`}
               >
                 {dataA.profile.avatarUrl ? (
                   <img
@@ -801,42 +800,42 @@ export const CompareView: React.FC<CompareViewProps> = ({
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-bold text-white text-base">
+                  <h3 className="font-bold text-[#111827] text-base">
                     {dataA.profile.displayName}
                   </h3>
                   {dataA.profile.verified && (
-                    <CheckCircle2 className="h-3.5 w-3.5 text-sky-400" />
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#5B5CE2]" />
                   )}
                 </div>
-                <span className="text-xs text-slate-400 font-mono">
+                <span className="text-xs text-[#6B7280] font-mono">
                   {dataA.profile.handle} ({PLATFORM_CONFIGS[dataA.profile.platform].name})
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="inline-flex rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                🟢 Live Data
+              <span className="inline-flex rounded bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-semibold text-[#059669] border border-[#A7F3D0]">
+                Live Data
               </span>
-              <span className="rounded bg-indigo-500/20 px-2.5 py-0.5 text-xs font-bold text-indigo-300 border border-indigo-500/30 flex items-center gap-1">
+              <span className="rounded bg-[#EEF2FF] px-2.5 py-0.5 text-xs font-bold text-[#5B5CE2] border border-[#E0E7FF] flex items-center gap-1">
                 <Target className="h-3 w-3" /> Target Channel
               </span>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
-            <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80 relative">
-              <span className="text-slate-400 block text-[11px]">
+            <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB] relative">
+              <span className="text-[#6B7280] block text-[11px]">
                 {PLATFORM_CONFIGS[dataA.profile.platform].followerLabel}
               </span>
               <span
                 className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
                   !dataB
-                    ? "text-white"
+                    ? "text-[#111827]"
                     : subA > subB
-                    ? "text-emerald-400"
+                    ? "text-[#059669]"
                     : subA < subB
-                    ? "text-rose-400"
-                    : "text-white"
+                    ? "text-[#DC2626]"
+                    : "text-[#111827]"
                 }`}
               >
                 {dataA.stats.followersFormatted}
@@ -845,10 +844,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span
                   className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                     subA > subB
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : subA < subB
-                      ? "text-rose-400"
-                      : "text-slate-400"
+                      ? "text-[#DC2626]"
+                      : "text-[#6B7280]"
                   }`}
                 >
                   {subA > subB
@@ -858,25 +857,25 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     : "Equal parity"}
                 </span>
               ) : (
-                <span className="text-[10px] text-emerald-400 font-medium">
+                <span className="text-[10px] text-[#059669] font-medium">
                   {dataA.stats.followersDelta} pace
                 </span>
               )}
             </div>
 
-            <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-              <span className="text-slate-400 block text-[11px]">
+            <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB]">
+              <span className="text-[#6B7280] block text-[11px]">
                 {PLATFORM_CONFIGS[dataA.profile.platform].viewsLabel}
               </span>
               <span
                 className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
                   !dataB
-                    ? "text-white"
+                    ? "text-[#111827]"
                     : viewsA > viewsB
-                    ? "text-emerald-400"
+                    ? "text-[#059669]"
                     : viewsA < viewsB
-                    ? "text-rose-400"
-                    : "text-white"
+                    ? "text-[#DC2626]"
+                    : "text-[#111827]"
                 }`}
               >
                 {dataA.stats.totalViewsFormatted}
@@ -885,10 +884,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span
                   className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                     viewsA > viewsB
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : viewsA < viewsB
-                      ? "text-rose-400"
-                      : "text-slate-400"
+                      ? "text-[#DC2626]"
+                      : "text-[#6B7280]"
                   }`}
                 >
                   {viewsA > viewsB
@@ -898,23 +897,23 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     : "Equal parity"}
                 </span>
               ) : (
-                <span className="text-[10px] text-emerald-400 font-medium">
+                <span className="text-[10px] text-[#059669] font-medium">
                   {dataA.stats.viewsDelta}
                 </span>
               )}
             </div>
 
-            <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-              <span className="text-slate-400 block text-[11px]">Engagement Rate</span>
+            <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB]">
+              <span className="text-[#6B7280] block text-[11px]">Engagement Rate</span>
               <span
                 className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
                   !dataB
-                    ? "text-amber-300"
+                    ? "text-amber-600"
                     : erA > erB
-                    ? "text-emerald-400"
+                    ? "text-[#059669]"
                     : erA < erB
-                    ? "text-rose-400"
-                    : "text-amber-300"
+                    ? "text-[#DC2626]"
+                    : "text-amber-600"
                 }`}
               >
                 {dataA.stats.engagementRate}%
@@ -923,10 +922,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span
                   className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                     erA > erB
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : erA < erB
-                      ? "text-rose-400"
-                      : "text-amber-300"
+                      ? "text-[#DC2626]"
+                      : "text-amber-600"
                   }`}
                 >
                   {erA > erB
@@ -936,21 +935,21 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     : `Parity (${erA}%)`}
                 </span>
               ) : (
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-[#6B7280]">
                   {dataA.stats.engagementDelta}
                 </span>
               )}
             </div>
 
-            <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-              <span className="text-slate-400 block text-[11px]">Upload Count</span>
-              <span className="text-lg font-bold text-white block mt-0.5 font-mono">
+            <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB]">
+              <span className="text-[#6B7280] block text-[11px]">Upload Count</span>
+              <span className="text-lg font-bold text-[#111827] block mt-0.5 font-mono">
                 {dataA.stats.postsCountFormatted}
               </span>
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[10px] text-[#6B7280]">
                 ~{formatNumber(avgVPerPostA)} / video
                 {dataB && avgVPerPostA > avgVPerPostB && (
-                  <span className="text-emerald-400 font-semibold ml-1">
+                  <span className="text-[#059669] font-semibold ml-1">
                     (▲ {(avgVPerPostA / Math.max(1, avgVPerPostB)).toFixed(1)}x pull)
                   </span>
                 )}
@@ -961,12 +960,11 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
         {/* Card B: Competitor Account OR Empty Invitation State */}
         {dataB ? (
-          <div className="rounded-2xl border border-violet-500/40 bg-gradient-to-b from-violet-950/40 to-slate-900/90 p-5 shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-violet-500/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 relative">
+          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs relative overflow-hidden">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB] relative">
               <div className="flex items-center gap-3">
                 <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${dataB.profile.avatarBg} text-base font-bold text-white shadow overflow-hidden`}
+                  className={`flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3F4F6] border border-[#E5E7EB] text-base font-bold text-[#111827] shadow-xs overflow-hidden`}
                 >
                   {dataB.profile.avatarUrl ? (
                     <img
@@ -981,40 +979,40 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <h3 className="font-bold text-white text-base">
+                    <h3 className="font-bold text-[#111827] text-base">
                       {dataB.profile.displayName}
                     </h3>
                     {dataB.profile.verified && (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-sky-400" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#5B5CE2]" />
                     )}
                   </div>
-                  <span className="text-xs text-slate-400 font-mono">
+                  <span className="text-xs text-[#6B7280] font-mono">
                     {dataB.profile.handle} ({PLATFORM_CONFIGS[dataB.profile.platform].name})
                   </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="inline-flex rounded bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                  🟢 Live Data
+                <span className="inline-flex rounded bg-[#ECFDF5] px-2 py-0.5 text-[10px] font-semibold text-[#059669] border border-[#A7F3D0]">
+                  Live Data
                 </span>
-                <span className="rounded bg-violet-500/20 px-2.5 py-0.5 text-xs font-bold text-violet-300 border border-violet-500/30 flex items-center gap-1">
+                <span className="rounded bg-[#F3F4F6] px-2.5 py-0.5 text-xs font-bold text-[#4B5563] border border-[#E5E7EB] flex items-center gap-1">
                   <Crosshair className="h-3 w-3" /> Competitor
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-4 text-xs">
-              <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80 relative">
-                <span className="text-slate-400 block text-[11px]">
+              <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB] relative">
+                <span className="text-[#6B7280] block text-[11px]">
                   {PLATFORM_CONFIGS[dataB.profile.platform].followerLabel}
                 </span>
                 <span
                   className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
                     subB > subA
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : subB < subA
-                      ? "text-rose-400"
-                      : "text-white"
+                      ? "text-[#DC2626]"
+                      : "text-[#111827]"
                   }`}
                 >
                   {dataB.stats.followersFormatted}
@@ -1022,10 +1020,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span
                   className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                     subB > subA
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : subB < subA
-                      ? "text-rose-400"
-                      : "text-slate-400"
+                      ? "text-[#DC2626]"
+                      : "text-[#6B7280]"
                   }`}
                 >
                   {subB > subA
@@ -1036,17 +1034,17 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </span>
               </div>
 
-              <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-                <span className="text-slate-400 block text-[11px]">
+              <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB]">
+                <span className="text-[#6B7280] block text-[11px]">
                   {PLATFORM_CONFIGS[dataB.profile.platform].viewsLabel}
                 </span>
                 <span
                   className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
                     viewsB > viewsA
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : viewsB < viewsA
-                      ? "text-rose-400"
-                      : "text-white"
+                      ? "text-[#DC2626]"
+                      : "text-[#111827]"
                   }`}
                 >
                   {dataB.stats.totalViewsFormatted}
@@ -1054,10 +1052,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span
                   className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                     viewsB > viewsA
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : viewsB < viewsA
-                      ? "text-rose-400"
-                      : "text-slate-400"
+                      ? "text-[#DC2626]"
+                      : "text-[#6B7280]"
                   }`}
                 >
                   {viewsB > viewsA
@@ -1068,15 +1066,15 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </span>
               </div>
 
-              <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-                <span className="text-slate-400 block text-[11px]">Engagement Rate</span>
+              <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB]">
+                <span className="text-[#6B7280] block text-[11px]">Engagement Rate</span>
                 <span
                   className={`text-lg font-bold block mt-0.5 font-mono transition-colors ${
                     erB > erA
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : erB < erA
-                      ? "text-rose-400"
-                      : "text-amber-300"
+                      ? "text-[#DC2626]"
+                      : "text-amber-600"
                   }`}
                 >
                   {dataB.stats.engagementRate}%
@@ -1084,10 +1082,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <span
                   className={`text-[10px] font-semibold flex items-center gap-0.5 ${
                     erB > erA
-                      ? "text-emerald-400"
+                      ? "text-[#059669]"
                       : erB < erA
-                      ? "text-rose-400"
-                      : "text-amber-300"
+                      ? "text-[#DC2626]"
+                      : "text-amber-600"
                   }`}
                 >
                   {erB > erA
@@ -1098,15 +1096,15 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </span>
               </div>
 
-              <div className="rounded-xl bg-slate-950/60 p-3 border border-slate-800/80">
-                <span className="text-slate-400 block text-[11px]">Upload Count</span>
-                <span className="text-lg font-bold text-white block mt-0.5 font-mono">
+              <div className="rounded-xl bg-[#F9FAFB] p-3 border border-[#E5E7EB]">
+                <span className="text-[#6B7280] block text-[11px]">Upload Count</span>
+                <span className="text-lg font-bold text-[#111827] block mt-0.5 font-mono">
                   {dataB.stats.postsCountFormatted}
                 </span>
-                <span className="text-[10px] text-slate-400">
+                <span className="text-[10px] text-[#6B7280]">
                   ~{formatNumber(avgVPerPostB)} / video
                   {avgVPerPostB > avgVPerPostA && (
-                    <span className="text-emerald-400 font-semibold ml-1">
+                    <span className="text-[#059669] font-semibold ml-1">
                       (▲ {(avgVPerPostB / Math.max(1, avgVPerPostA)).toFixed(1)}x pull)
                     </span>
                   )}
@@ -1116,17 +1114,17 @@ export const CompareView: React.FC<CompareViewProps> = ({
           </div>
         ) : (
           /* Empty State for Account B */
-          <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/40 p-6 flex flex-col items-center justify-center text-center">
-            <div className="h-12 w-12 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-violet-400 flex items-center justify-center mb-3">
+          <div className="rounded-2xl border border-dashed border-[#E5E7EB] bg-[#F9FAFB] p-6 flex flex-col items-center justify-center text-center">
+            <div className="h-12 w-12 rounded-2xl bg-[#EEF2FF] border border-[#E0E7FF] text-[#5B5CE2] flex items-center justify-center mb-3">
               <Crosshair className="h-6 w-6" />
             </div>
-            <h3 className="text-sm font-bold text-white">
+            <h3 className="text-sm font-bold text-[#111827]">
               Enter a Competitor to Beat
             </h3>
-            <p className="mt-1 text-xs text-slate-400 max-w-sm leading-relaxed">
+            <p className="mt-1 text-xs text-[#6B7280] max-w-sm leading-relaxed">
               Paste your competitor's YouTube channel link or @handle in the Account B box above to benchmark metrics and reveal actionable ways to beat them.
             </p>
-            <div className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-violet-400 bg-violet-500/10 px-3 py-1.5 rounded-lg border border-violet-500/20">
+            <div className="mt-4 inline-flex items-center gap-1 text-[11px] font-medium text-[#5B5CE2] bg-[#EEF2FF] px-3 py-1.5 rounded-lg border border-[#E0E7FF]">
               <Sparkles className="h-3 w-3" />
               <span>Awaiting competitor URL / @handle</span>
             </div>
@@ -1138,29 +1136,29 @@ export const CompareView: React.FC<CompareViewProps> = ({
       {dataB && (
         <>
           {/* Head-to-Head Metric Benchmark */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-slate-800 mb-5">
+          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-4 border-b border-[#E5E7EB] mb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#EEF2FF] text-[#5B5CE2] border border-[#E0E7FF]">
                     <Award className="h-3.5 w-3.5" />
                   </span>
-                  <h3 className="text-base font-bold text-white">
+                  <h3 className="text-base font-bold text-[#111827]">
                     Head-to-Head Metric Benchmark
                   </h3>
                 </div>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <p className="text-xs text-[#6B7280] mt-0.5">
                   Direct differential comparison between {dataA.profile.displayName} and {dataB.profile.displayName}
                 </p>
               </div>
               <div className="flex items-center gap-2 text-xs">
-                <span className="flex items-center gap-1.5 text-indigo-300 font-medium">
-                  <span className="h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                <span className="flex items-center gap-1.5 text-[#5B5CE2] font-medium">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#5B5CE2]" />
                   {dataA.profile.displayName}
                 </span>
-                <span className="text-slate-600 font-bold">vs</span>
-                <span className="flex items-center gap-1.5 text-violet-300 font-medium">
-                  <span className="h-2.5 w-2.5 rounded-full bg-violet-500" />
+                <span className="text-[#6B7280] font-bold">vs</span>
+                <span className="flex items-center gap-1.5 text-[#3B82F6] font-medium">
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#3B82F6]" />
                   {dataB.profile.displayName}
                 </span>
               </div>
@@ -1168,18 +1166,18 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Metric 1: Subscribers */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 relative overflow-hidden">
+              <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                    <Users className="h-3.5 w-3.5 text-indigo-400" /> Subscribers
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-[#4B5563]">
+                    <Users className="h-3.5 w-3.5 text-[#5B5CE2]" /> Subscribers
                   </span>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                       subLeader === "Account A"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
                         : subLeader === "Account B"
-                        ? "bg-violet-500/10 text-violet-300 border-violet-500/30"
-                        : "bg-slate-800 text-slate-300 border-slate-700"
+                        ? "bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]"
+                        : "bg-[#F3F4F6] text-[#6B7280] border-[#E5E7EB]"
                     }`}
                   >
                     {subLeader === "Account A" ? "Target Leads" : subLeader === "Account B" ? "Competitor Leads" : "Tied"}
@@ -1188,42 +1186,46 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                 <div className="flex items-baseline justify-between font-mono mt-1">
                   <div>
-                    <span className="text-xs text-indigo-400 block font-sans">Target</span>
-                    <span className="text-lg font-bold text-white">{dataA.stats.followersFormatted}</span>
+                    <span className="text-xs text-[#5B5CE2] block font-sans">Target</span>
+                    <span className={`text-lg font-bold ${subA >= subB ? "text-[#059669]" : "text-[#DC2626]"}`}>
+                      {dataA.stats.followersFormatted}
+                    </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-violet-400 block font-sans">Competitor</span>
-                    <span className="text-lg font-bold text-slate-300">{dataB.stats.followersFormatted}</span>
+                    <span className="text-xs text-[#6B7280] block font-sans">Competitor</span>
+                    <span className={`text-lg font-bold ${subB >= subA ? "text-[#059669]" : "text-[#DC2626]"}`}>
+                      {dataB.stats.followersFormatted}
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-3">
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-400">Share Ratio</span>
-                    <span className="font-semibold text-white font-mono">
+                    <span className="text-[#6B7280]">Share Ratio</span>
+                    <span className="font-semibold text-[#111827] font-mono">
                       {subLeader === "Account A" ? `+${formatNumber(subDiff)} (+${subDiffPct}%)` : `-${formatNumber(subDiff)} (-${subDiffPct}%)`}
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden flex">
-                    <div style={{ width: `${subShareA}%` }} className="bg-indigo-500 transition-all duration-500" />
-                    <div style={{ width: `${subShareB}%` }} className="bg-violet-500 transition-all duration-500" />
+                  <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden flex">
+                    <div style={{ width: `${subShareA}%` }} className="bg-[#5B5CE2] transition-all duration-500" />
+                    <div style={{ width: `${subShareB}%` }} className="bg-[#3B82F6] transition-all duration-500" />
                   </div>
                 </div>
               </div>
 
               {/* Metric 2: Total Views */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 relative overflow-hidden">
+              <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                    <Eye className="h-3.5 w-3.5 text-emerald-400" /> Total Views
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-[#4B5563]">
+                    <Eye className="h-3.5 w-3.5 text-[#059669]" /> Total Views
                   </span>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                       viewsLeader === "Account A"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
                         : viewsLeader === "Account B"
-                        ? "bg-violet-500/10 text-violet-300 border-violet-500/30"
-                        : "bg-slate-800 text-slate-300 border-slate-700"
+                        ? "bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]"
+                        : "bg-[#F3F4F6] text-[#6B7280] border-[#E5E7EB]"
                     }`}
                   >
                     {viewsLeader === "Account A" ? "Target Leads" : viewsLeader === "Account B" ? "Competitor Leads" : "Tied"}
@@ -1232,42 +1234,46 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                 <div className="flex items-baseline justify-between font-mono mt-1">
                   <div>
-                    <span className="text-xs text-indigo-400 block font-sans">Target</span>
-                    <span className="text-lg font-bold text-white">{dataA.stats.totalViewsFormatted}</span>
+                    <span className="text-xs text-[#5B5CE2] block font-sans">Target</span>
+                    <span className={`text-lg font-bold ${viewsA >= viewsB ? "text-[#059669]" : "text-[#DC2626]"}`}>
+                      {dataA.stats.totalViewsFormatted}
+                    </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-violet-400 block font-sans">Competitor</span>
-                    <span className="text-lg font-bold text-slate-300">{dataB.stats.totalViewsFormatted}</span>
+                    <span className="text-xs text-[#6B7280] block font-sans">Competitor</span>
+                    <span className={`text-lg font-bold ${viewsB >= viewsA ? "text-[#059669]" : "text-[#DC2626]"}`}>
+                      {dataB.stats.totalViewsFormatted}
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-3">
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-400">Views Difference</span>
-                    <span className="font-semibold text-white font-mono">
+                    <span className="text-[#6B7280]">Views Difference</span>
+                    <span className="font-semibold text-[#111827] font-mono">
                       {viewsLeader === "Account A" ? `+${formatNumber(viewsDiff)} (+${viewsDiffPct}%)` : `-${formatNumber(viewsDiff)} (-${viewsDiffPct}%)`}
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden flex">
-                    <div style={{ width: `${viewsShareA}%` }} className="bg-indigo-500 transition-all duration-500" />
-                    <div style={{ width: `${viewsShareB}%` }} className="bg-violet-500 transition-all duration-500" />
+                  <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden flex">
+                    <div style={{ width: `${viewsShareA}%` }} className="bg-[#5B5CE2] transition-all duration-500" />
+                    <div style={{ width: `${viewsShareB}%` }} className="bg-[#3B82F6] transition-all duration-500" />
                   </div>
                 </div>
               </div>
 
               {/* Metric 3: Engagement Rate */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 relative overflow-hidden">
+              <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                    <Percent className="h-3.5 w-3.5 text-amber-400" /> Engagement Rate
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-[#4B5563]">
+                    <Percent className="h-3.5 w-3.5 text-amber-600" /> Engagement Rate
                   </span>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                       erLeader === "Account A"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
                         : erLeader === "Account B"
-                        ? "bg-violet-500/10 text-violet-300 border-violet-500/30"
-                        : "bg-slate-800 text-slate-300 border-slate-700"
+                        ? "bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]"
+                        : "bg-[#F3F4F6] text-[#6B7280] border-[#E5E7EB]"
                     }`}
                   >
                     {erLeader === "Account A" ? "Target Leads" : erLeader === "Account B" ? "Competitor Leads" : "Tied"}
@@ -1276,42 +1282,46 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                 <div className="flex items-baseline justify-between font-mono mt-1">
                   <div>
-                    <span className="text-xs text-indigo-400 block font-sans">Target</span>
-                    <span className="text-lg font-bold text-amber-300">{erA}%</span>
+                    <span className="text-xs text-[#5B5CE2] block font-sans">Target</span>
+                    <span className={`text-lg font-bold ${erA >= erB ? "text-[#059669]" : "text-[#DC2626]"}`}>
+                      {erA}%
+                    </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-violet-400 block font-sans">Competitor</span>
-                    <span className="text-lg font-bold text-slate-300">{erB}%</span>
+                    <span className="text-xs text-[#6B7280] block font-sans">Competitor</span>
+                    <span className={`text-lg font-bold ${erB >= erA ? "text-[#059669]" : "text-[#DC2626]"}`}>
+                      {erB}%
+                    </span>
                   </div>
                 </div>
 
                 <div className="mt-3">
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-400">Differential</span>
-                    <span className="font-semibold text-white font-mono">
+                    <span className="text-[#6B7280]">Differential</span>
+                    <span className="font-semibold text-[#111827] font-mono">
                       {erLeader === "Account A" ? `+${erDiff}% higher stickiness` : `-${erDiff}% gap`}
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden flex">
-                    <div style={{ width: `${erShareA}%` }} className="bg-indigo-500 transition-all duration-500" />
-                    <div style={{ width: `${erShareB}%` }} className="bg-violet-500 transition-all duration-500" />
+                  <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden flex">
+                    <div style={{ width: `${erShareA}%` }} className="bg-[#5B5CE2] transition-all duration-500" />
+                    <div style={{ width: `${erShareB}%` }} className="bg-[#3B82F6] transition-all duration-500" />
                   </div>
                 </div>
               </div>
 
               {/* Metric 4: Growth Velocity */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 relative overflow-hidden">
+              <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 relative overflow-hidden">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="flex items-center gap-1.5 text-xs font-semibold text-slate-300">
-                    <Zap className="h-3.5 w-3.5 text-sky-400" /> Growth Velocity
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-[#4B5563]">
+                    <Zap className="h-3.5 w-3.5 text-[#5B5CE2]" /> Growth Velocity
                   </span>
                   <span
                     className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                       velLeader === "Account A"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
                         : velLeader === "Account B"
-                        ? "bg-violet-500/10 text-violet-300 border-violet-500/30"
-                        : "bg-slate-800 text-slate-300 border-slate-700"
+                        ? "bg-[#F3F4F6] text-[#4B5563] border-[#E5E7EB]"
+                        : "bg-[#F3F4F6] text-[#6B7280] border-[#E5E7EB]"
                     }`}
                   >
                     {velLeader === "Account A" ? "Target Faster" : velLeader === "Account B" ? "Competitor Faster" : "Tied"}
@@ -1320,25 +1330,25 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                 <div className="flex items-baseline justify-between font-mono mt-1">
                   <div>
-                    <span className="text-xs text-indigo-400 block font-sans">Target</span>
-                    <span className="text-lg font-bold text-white">{dataA.stats.followersDelta}</span>
+                    <span className="text-xs text-[#5B5CE2] block font-sans">Target</span>
+                    <span className="text-lg font-bold text-[#111827]">{dataA.stats.followersDelta}</span>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-violet-400 block font-sans">Competitor</span>
-                    <span className="text-lg font-bold text-slate-300">{dataB.stats.followersDelta}</span>
+                    <span className="text-xs text-[#6B7280] block font-sans">Competitor</span>
+                    <span className="text-lg font-bold text-[#4B5563]">{dataB.stats.followersDelta}</span>
                   </div>
                 </div>
 
                 <div className="mt-3">
                   <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-400">Pace Multiplier</span>
-                    <span className="font-semibold text-emerald-400 font-mono">
+                    <span className="text-[#6B7280]">Pace Multiplier</span>
+                    <span className="font-semibold text-[#059669] font-mono">
                       {velLeader === "Account A" ? `${velMultiplier}x faster` : `${velMultiplier}x deficit`}
                     </span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden flex">
-                    <div style={{ width: `${Math.round((velA / Math.max(0.1, velA + velB)) * 100)}%` }} className="bg-indigo-500 transition-all duration-500" />
-                    <div style={{ width: `${Math.round((velB / Math.max(0.1, velA + velB)) * 100)}%` }} className="bg-violet-500 transition-all duration-500" />
+                  <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden flex">
+                    <div style={{ width: `${Math.round((velA / Math.max(0.1, velA + velB)) * 100)}%` }} className="bg-[#5B5CE2] transition-all duration-500" />
+                    <div style={{ width: `${Math.round((velB / Math.max(0.1, velA + velB)) * 100)}%` }} className="bg-[#3B82F6] transition-all duration-500" />
                   </div>
                 </div>
               </div>
@@ -1346,34 +1356,34 @@ export const CompareView: React.FC<CompareViewProps> = ({
           </div>
 
           {/* Comparative Growth Chart */}
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/80 p-5 shadow-lg sm:p-6">
+          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
               <div>
-                <h3 className="text-base font-semibold text-white">Comparative Growth Velocity</h3>
-                <p className="text-xs text-slate-400 mt-0.5">
+                <h3 className="text-base font-semibold text-[#111827]">Comparative Growth Velocity</h3>
+                <p className="text-xs text-[#6B7280] mt-0.5">
                   Side-by-side progression over the trailing {timeRange.toUpperCase()} window
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 {/* Metric Toggle */}
-                <div className="flex rounded-lg border border-slate-800 bg-slate-950 p-0.5 text-xs">
+                <div className="flex rounded-lg border border-[#E5E7EB] bg-[#F3F4F6] p-0.5 text-xs">
                   <button
                     onClick={() => setCompareMetric("followers")}
-                    className={`rounded px-2.5 py-1 font-medium transition ${
+                    className={`rounded px-2.5 py-1 font-medium transition cursor-pointer ${
                       compareMetric === "followers"
-                        ? "bg-indigo-600 text-white"
-                        : "text-slate-400 hover:text-slate-200"
+                        ? "bg-white text-[#111827] font-semibold shadow-xs"
+                        : "text-[#6B7280] hover:text-[#111827]"
                     }`}
                   >
                     Audience
                   </button>
                   <button
                     onClick={() => setCompareMetric("views")}
-                    className={`rounded px-2.5 py-1 font-medium transition ${
+                    className={`rounded px-2.5 py-1 font-medium transition cursor-pointer ${
                       compareMetric === "views"
-                        ? "bg-indigo-600 text-white"
-                        : "text-slate-400 hover:text-slate-200"
+                        ? "bg-white text-[#111827] font-semibold shadow-xs"
+                        : "text-[#6B7280] hover:text-[#111827]"
                     }`}
                   >
                     Views
@@ -1381,15 +1391,15 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 </div>
 
                 {/* Time Range */}
-                <div className="flex rounded-lg border border-slate-800 bg-slate-950 p-0.5 text-xs">
+                <div className="flex rounded-lg border border-[#E5E7EB] bg-[#F3F4F6] p-0.5 text-xs">
                   {(["7d", "30d", "90d"] as const).map((t) => (
                     <button
                       key={t}
                       onClick={() => setTimeRange(t)}
-                      className={`rounded px-2 py-1 font-medium transition ${
+                      className={`rounded px-2 py-1 font-medium transition cursor-pointer ${
                         timeRange === t
-                          ? "bg-slate-800 text-white font-semibold"
-                          : "text-slate-400 hover:text-slate-200"
+                          ? "bg-white text-[#111827] font-semibold shadow-xs border border-[#E5E7EB]"
+                          : "text-[#6B7280] hover:text-[#111827]"
                       }`}
                     >
                       {t.toUpperCase()}
@@ -1402,16 +1412,16 @@ export const CompareView: React.FC<CompareViewProps> = ({
             <div className="h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartPoints} margin={{ top: 12, right: 16, left: 6, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                   <XAxis
                     dataKey="date"
-                    stroke="#64748b"
-                    tick={{ fontSize: 11, fill: "#94a3b8" }}
+                    stroke="#9CA3AF"
+                    tick={{ fontSize: 11, fill: "#9CA3AF" }}
                     tickLine={false}
                   />
                   <YAxis
-                    stroke="#64748b"
-                    tick={{ fontSize: 11, fill: "#94a3b8" }}
+                    stroke="#9CA3AF"
+                    tick={{ fontSize: 11, fill: "#9CA3AF" }}
                     tickLine={false}
                     tickFormatter={(val) => formatNumber(val)}
                     domain={["auto", "auto"]}
@@ -1419,11 +1429,11 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#0f172a",
-                      borderColor: "#334155",
+                      backgroundColor: "#FFFFFF",
+                      borderColor: "#E5E7EB",
                       borderRadius: "0.75rem",
                       fontSize: "12px",
-                      boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.5)",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                     }}
                     formatter={(value: any, name: string) => [
                       formatNumber(Number(value) || 0),
@@ -1435,7 +1445,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     verticalAlign="top"
                     height={36}
                     formatter={(val) => (
-                      <span className="text-xs font-medium text-slate-300">
+                      <span className="text-xs font-medium text-[#4B5563]">
                         {val === "aValue" ? dataA.profile.displayName : dataB?.profile.displayName || "Competitor"}
                       </span>
                     )}
@@ -1444,9 +1454,9 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     type="monotone"
                     dataKey="aValue"
                     name="aValue"
-                    stroke="#6366f1"
+                    stroke="#5B5CE2"
                     strokeWidth={2.5}
-                    dot={timeRange === "7d" ? { r: 3.5, fill: "#6366f1", strokeWidth: 1 } : false}
+                    dot={timeRange === "7d" ? { r: 3.5, fill: "#5B5CE2", strokeWidth: 1 } : false}
                     activeDot={{ r: 5 }}
                     connectNulls
                   />
@@ -1454,9 +1464,9 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     type="monotone"
                     dataKey="bValue"
                     name="bValue"
-                    stroke="#a855f7"
+                    stroke="#3B82F6"
                     strokeWidth={2.5}
-                    dot={timeRange === "7d" ? { r: 3.5, fill: "#a855f7", strokeWidth: 1 } : false}
+                    dot={timeRange === "7d" ? { r: 3.5, fill: "#3B82F6", strokeWidth: 1 } : false}
                     activeDot={{ r: 5 }}
                     connectNulls
                   />
@@ -1466,20 +1476,20 @@ export const CompareView: React.FC<CompareViewProps> = ({
           </div>
 
           {/* DEDICATED FEATURE: WAYS TO BEAT THE COMPETITOR */}
-          <div className="rounded-2xl border border-indigo-500/30 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 p-5 shadow-2xl sm:p-7 space-y-6">
+          <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs sm:p-7 space-y-6">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-slate-800">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 border-b border-[#E5E7EB]">
               <div>
                 <div className="flex items-center gap-2.5">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg shadow-amber-500/20">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#5B5CE2] text-white shadow-xs">
                     <Swords className="h-4 w-4" />
                   </div>
-                  <h3 className="text-lg font-bold text-white tracking-tight">
+                  <h3 className="text-lg font-bold text-[#111827] tracking-tight">
                     Ways to Beat {dataB.profile.displayName}
                   </h3>
                 </div>
-                <p className="text-xs text-slate-400 mt-1">
-                  High-leverage tactical battle moves calculated to outperform <span className="text-violet-300 font-semibold">{dataB.profile.displayName}</span>. Click on any step to reveal its tactical playbook, competitive edge, and execution details.
+                <p className="text-xs text-[#6B7280] mt-1">
+                  High-leverage tactical battle moves calculated to outperform <span className="text-[#3B82F6] font-semibold">{dataB.profile.displayName}</span>. Click on any step to reveal its tactical playbook, competitive edge, and execution details.
                 </p>
               </div>
 
@@ -1487,16 +1497,16 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <button
                   type="button"
                   onClick={handleCopyBattlePlan}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800 px-3.5 py-2 text-xs font-semibold text-slate-200 hover:bg-slate-700 transition"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#E5E7EB] bg-white px-3.5 py-2 text-xs font-semibold text-[#111827] hover:bg-[#F9FAFB] transition cursor-pointer"
                 >
                   {copiedRecs ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-400" />
-                      <span className="text-emerald-400">Battle Plan Copied!</span>
+                      <Check className="h-3.5 w-3.5 text-[#059669]" />
+                      <span className="text-[#059669]">Battle Plan Copied!</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="h-3.5 w-3.5 text-slate-400" />
+                      <Copy className="h-3.5 w-3.5 text-[#6B7280]" />
                       <span>Copy Battle Plan</span>
                     </>
                   )}
@@ -1507,34 +1517,34 @@ export const CompareView: React.FC<CompareViewProps> = ({
                   onClick={() => fetchComparativeInsight(dataA, dataB)}
                   disabled={isGeneratingInsight}
                   title="Recalculate tactical moves"
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 text-xs font-semibold text-indigo-300 transition disabled:opacity-50"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-[#E0E7FF] bg-[#EEF2FF] hover:bg-[#E0E7FF] px-3 py-2 text-xs font-semibold text-[#5B5CE2] transition disabled:opacity-50 cursor-pointer"
                 >
-                  <RefreshCw className={`h-3.5 w-3.5 ${isGeneratingInsight ? "animate-spin text-indigo-400" : ""}`} />
+                  <RefreshCw className={`h-3.5 w-3.5 ${isGeneratingInsight ? "animate-spin text-[#5B5CE2]" : ""}`} />
                   <span>Refresh Tactics</span>
                 </button>
               </div>
             </div>
 
             {/* Battle Plan Tracker Progress */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5 px-4 text-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-3.5 px-4 text-xs">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500/20 text-emerald-400">
+                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[#ECFDF5] text-[#059669]">
                   <CheckSquare className="h-3.5 w-3.5" />
                 </div>
                 <div>
-                  <span className="font-semibold text-white block">
+                  <span className="font-semibold text-[#111827] block">
                     Execution Tracker: {completedCount} of {currentTactics.length} tactics applied
                   </span>
-                  <span className="text-[11px] text-slate-400">
+                  <span className="text-[11px] text-[#6B7280]">
                     Click checkboxes on each tactic below as you implement them on your channel
                   </span>
                 </div>
               </div>
               <div className="w-full sm:w-48">
-                <div className="h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                <div className="h-2 w-full rounded-full bg-[#E5E7EB] overflow-hidden">
                   <div
                     style={{ width: `${Math.round((completedCount / Math.max(1, currentTactics.length)) * 100)}%` }}
-                    className="h-full bg-emerald-500 transition-all duration-300"
+                    className="h-full bg-[#059669] transition-all duration-300"
                   />
                 </div>
               </div>
@@ -1543,7 +1553,7 @@ export const CompareView: React.FC<CompareViewProps> = ({
             {/* Category Filter Pills & Bulk Step Controls */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-xs text-slate-400 mr-1 flex items-center gap-1">
+                <span className="text-xs text-[#6B7280] mr-1 flex items-center gap-1">
                   <Filter className="h-3 w-3" /> Filter:
                 </span>
                 {categories.map((cat) => (
@@ -1552,8 +1562,8 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     onClick={() => setActiveCategoryFilter(cat)}
                     className={`rounded-lg px-3 py-1 text-xs font-medium transition cursor-pointer ${
                       activeCategoryFilter === cat
-                        ? "bg-indigo-600 text-white font-semibold shadow-xs"
-                        : "bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800"
+                        ? "bg-[#5B5CE2] text-white font-semibold shadow-xs"
+                        : "bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#4B5563] hover:text-[#111827] border border-[#E5E7EB]"
                     }`}
                   >
                     {cat}
@@ -1565,14 +1575,14 @@ export const CompareView: React.FC<CompareViewProps> = ({
                 <button
                   type="button"
                   onClick={expandAllTactics}
-                  className="text-[11px] font-medium text-indigo-300 hover:text-indigo-100 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 transition cursor-pointer"
+                  className="text-[11px] font-medium text-[#5B5CE2] hover:text-[#4338CA] px-2.5 py-1 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#C7D2FE] transition cursor-pointer"
                 >
                   Expand All
                 </button>
                 <button
                   type="button"
                   onClick={collapseAllTactics}
-                  className="text-[11px] font-medium text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 hover:border-slate-700 transition cursor-pointer"
+                  className="text-[11px] font-medium text-[#6B7280] hover:text-[#111827] px-2.5 py-1 rounded-lg bg-[#F9FAFB] border border-[#E5E7EB] hover:border-[#D1D5DB] transition cursor-pointer"
                 >
                   Collapse All
                 </button>
@@ -1590,16 +1600,16 @@ export const CompareView: React.FC<CompareViewProps> = ({
                     key={tactic.id || idx}
                     className={`rounded-2xl border p-5 transition-all flex flex-col justify-between ${
                       isDone
-                        ? "border-emerald-500/40 bg-slate-950/90 shadow-md"
+                        ? "border-[#A7F3D0] bg-[#F0FDF4] shadow-xs"
                         : isExpanded
-                        ? "border-indigo-500/40 bg-slate-950/95 shadow-lg shadow-indigo-950/30"
-                        : "border-slate-800 bg-slate-950/70 hover:border-slate-700"
+                        ? "border-[#C7D2FE] bg-[#F8FAFC] shadow-xs"
+                        : "border-[#E5E7EB] bg-[#F9FAFB] hover:border-[#D1D5DB]"
                     }`}
                   >
                     <div>
                       {/* Top Badges */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/15 border border-indigo-500/30 px-2.5 py-0.5 rounded-full">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#5B5CE2] bg-[#EEF2FF] border border-[#E0E7FF] px-2.5 py-0.5 rounded-full">
                           {tactic.category}
                         </span>
 
@@ -1607,10 +1617,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                           <span
                             className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                               tactic.priority === "Critical Priority"
-                                ? "bg-rose-500/10 text-rose-300 border-rose-500/30"
+                                ? "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]"
                                 : tactic.priority === "High Leverage"
-                                ? "bg-amber-500/10 text-amber-300 border-amber-500/30"
-                                : "bg-sky-500/10 text-sky-300 border-sky-500/30"
+                                ? "bg-[#FFFBEB] text-[#D97706] border-[#FDE68A]"
+                                : "bg-[#EFF6FF] text-[#2563EB] border-[#BFDBFE]"
                             }`}
                           >
                             {tactic.priority}
@@ -1623,12 +1633,12 @@ export const CompareView: React.FC<CompareViewProps> = ({
                               toggleTactic(tactic.id);
                             }}
                             title={isDone ? "Mark as in progress" : "Mark as applied"}
-                            className="text-slate-400 hover:text-white transition cursor-pointer p-0.5"
+                            className="text-[#6B7280] hover:text-[#111827] transition cursor-pointer p-0.5"
                           >
                             {isDone ? (
-                              <CheckSquare className="h-4 w-4 text-emerald-400" />
+                              <CheckSquare className="h-4 w-4 text-[#059669]" />
                             ) : (
-                              <Square className="h-4 w-4 text-slate-500 hover:text-slate-300" />
+                              <Square className="h-4 w-4 text-[#9CA3AF] hover:text-[#4B5563]" />
                             )}
                           </button>
                         </div>
@@ -1646,16 +1656,16 @@ export const CompareView: React.FC<CompareViewProps> = ({
                           }
                         }}
                         title={isExpanded ? "Click to collapse step" : "Click to view full step breakdown"}
-                        className="group flex items-start justify-between gap-2.5 cursor-pointer select-none rounded-xl p-1.5 -m-1.5 hover:bg-slate-900/70 transition"
+                        className="group flex items-start justify-between gap-2.5 cursor-pointer select-none rounded-xl p-1.5 -m-1.5 hover:bg-white transition"
                       >
                         <div className="flex items-start gap-2.5 flex-1 min-w-0">
                           <span
                             className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-mono font-bold mt-0.5 transition ${
                               isDone
-                                ? "bg-emerald-500/20 text-emerald-300"
+                                ? "bg-[#ECFDF5] text-[#059669]"
                                 : isExpanded
-                                ? "bg-indigo-600 text-white shadow-xs"
-                                : "bg-indigo-500/20 text-indigo-300 group-hover:bg-indigo-500/30"
+                                ? "bg-[#5B5CE2] text-white shadow-xs"
+                                : "bg-white text-[#5B5CE2] border border-[#E5E7EB] group-hover:border-[#5B5CE2]"
                             }`}
                           >
                             {idx + 1}
@@ -1664,16 +1674,16 @@ export const CompareView: React.FC<CompareViewProps> = ({
                             <h4
                               className={`text-sm font-bold leading-snug transition ${
                                 isDone
-                                  ? "text-emerald-300"
+                                  ? "text-[#059669]"
                                   : isExpanded
-                                  ? "text-indigo-200"
-                                  : "text-white group-hover:text-indigo-300"
+                                  ? "text-[#111827]"
+                                  : "text-[#111827] group-hover:text-[#5B5CE2]"
                               }`}
                             >
                               {tactic.title}
                             </h4>
                             {!isExpanded && (
-                              <span className="text-[11px] text-slate-500 mt-1 line-clamp-1 group-hover:text-slate-400">
+                              <span className="text-[11px] text-[#6B7280] mt-1 line-clamp-1 group-hover:text-[#4B5563]">
                                 Click step to reveal full tactical playbook & edge analysis
                               </span>
                             )}
@@ -1681,10 +1691,10 @@ export const CompareView: React.FC<CompareViewProps> = ({
                         </div>
 
                         <div className="flex items-center gap-1 shrink-0 ml-1 mt-0.5">
-                          <span className="text-[11px] font-medium text-slate-400 group-hover:text-indigo-300 transition hidden sm:inline">
+                          <span className="text-[11px] font-medium text-[#6B7280] group-hover:text-[#5B5CE2] transition hidden sm:inline">
                             {isExpanded ? "Hide" : "Expand"}
                           </span>
-                          <div className="p-0.5 rounded-md text-slate-400 group-hover:text-indigo-300 transition">
+                          <div className="p-0.5 rounded-md text-[#6B7280] group-hover:text-[#5B5CE2] transition">
                             {isExpanded ? (
                               <ChevronUp className="h-4 w-4" />
                             ) : (
@@ -1696,27 +1706,27 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
                       {/* Remaining Part - Revealed only when user clicks on this step */}
                       {isExpanded && (
-                        <div className="mt-4 space-y-3.5 pt-1 border-t border-slate-800/60">
+                        <div className="mt-4 space-y-3.5 pt-1 border-t border-[#E5E7EB]">
                           {/* Tactical Action */}
-                          <p className="text-xs text-slate-300 leading-relaxed pl-7 font-normal">
+                          <p className="text-xs text-[#4B5563] leading-relaxed pl-7 font-normal">
                             {tactic.tacticalAction}
                           </p>
 
                           {/* Why it beats competitor box */}
-                          <div className="ml-7 rounded-xl bg-slate-900/90 border border-slate-800 p-3.5 text-xs">
-                            <span className="text-[11px] font-bold text-violet-300 flex items-center gap-1.5 mb-1.5">
-                              <Crosshair className="h-3.5 w-3.5 text-violet-400 shrink-0" />
+                          <div className="ml-7 rounded-xl bg-white border border-[#E5E7EB] p-3.5 text-xs">
+                            <span className="text-[11px] font-bold text-[#2563EB] flex items-center gap-1.5 mb-1.5">
+                              <Crosshair className="h-3.5 w-3.5 text-[#2563EB] shrink-0" />
                               Why this beats {dataB.profile.displayName}:
                             </span>
-                            <p className="text-slate-400 text-[11px] leading-relaxed">
+                            <p className="text-[#4B5563] text-[11px] leading-relaxed">
                               {tactic.whyItBeatsCompetitor}
                             </p>
                           </div>
 
                           {/* Bottom Expected Advantage & Mark Done */}
-                          <div className="pt-3 border-t border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px]">
-                            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
+                          <div className="pt-3 border-t border-[#E5E7EB] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-[11px]">
+                            <span className="flex items-center gap-1.5 text-[#059669] font-medium">
+                              <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-[#059669]" />
                               <span>Advantage: {tactic.expectedAdvantage}</span>
                             </span>
                             <button
@@ -1727,8 +1737,8 @@ export const CompareView: React.FC<CompareViewProps> = ({
                               }}
                               className={`text-[10px] font-semibold px-2.5 py-1 rounded transition cursor-pointer self-end sm:self-auto ${
                                 isDone
-                                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
-                                  : "bg-slate-800 text-slate-400 hover:text-slate-200"
+                                  ? "bg-[#ECFDF5] text-[#059669] border border-[#A7F3D0]"
+                                  : "bg-white text-[#4B5563] hover:text-[#111827] border border-[#E5E7EB]"
                               }`}
                             >
                               {isDone ? "Applied" : "Mark Done"}
@@ -1747,46 +1757,46 @@ export const CompareView: React.FC<CompareViewProps> = ({
 
       {/* When NO competitor is entered yet, show clean educational blueprint */}
       {!dataB && (
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 text-center space-y-4">
-          <div className="mx-auto h-12 w-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 sm:p-8 text-center space-y-4">
+          <div className="mx-auto h-12 w-12 rounded-2xl bg-[#EEF2FF] border border-[#E0E7FF] text-[#5B5CE2] flex items-center justify-center">
             <Target className="h-6 w-6" />
           </div>
           <div className="max-w-md mx-auto">
-            <h3 className="text-base font-bold text-white">
+            <h3 className="text-base font-bold text-[#111827]">
               How to Beat Any Competitor in 3 Steps
             </h3>
-            <p className="mt-1 text-xs text-slate-400 leading-relaxed">
+            <p className="mt-1 text-xs text-[#6B7280] leading-relaxed">
               Enter your competitor's channel link or @handle in the search box above to calculate head-to-head metrics and unlock data-driven ways to beat them.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 max-w-2xl mx-auto text-left">
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-bold font-mono mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#EEF2FF] text-[#5B5CE2] text-xs font-bold font-mono mb-2">
                 1
               </span>
-              <h4 className="text-xs font-bold text-white">Paste Competitor URL</h4>
-              <p className="text-[11px] text-slate-400 mt-1">
+              <h4 className="text-xs font-bold text-[#111827]">Paste Competitor URL</h4>
+              <p className="text-[11px] text-[#6B7280] mt-1">
                 Enter any channel link or handle into Account B above.
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-500/20 text-violet-400 text-xs font-bold font-mono mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#EFF6FF] text-[#2563EB] text-xs font-bold font-mono mb-2">
                 2
               </span>
-              <h4 className="text-xs font-bold text-white">Audit Live Metrics</h4>
-              <p className="text-[11px] text-slate-400 mt-1">
+              <h4 className="text-xs font-bold text-[#111827]">Audit Live Metrics</h4>
+              <p className="text-[11px] text-[#6B7280] mt-1">
                 Calculate real subscribers, total views, ER, and growth velocity gaps.
               </p>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-amber-400 text-xs font-bold font-mono mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FEF3C7] text-[#D97706] text-xs font-bold font-mono mb-2">
                 3
               </span>
-              <h4 className="text-xs font-bold text-white">Execute Battle Plan</h4>
-              <p className="text-[11px] text-slate-400 mt-1">
+              <h4 className="text-xs font-bold text-[#111827]">Execute Battle Plan</h4>
+              <p className="text-[11px] text-[#6B7280] mt-1">
                 Receive specific tactics across packaging, watch time, topic gaps, and timing to beat them.
               </p>
             </div>

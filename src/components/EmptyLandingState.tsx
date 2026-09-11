@@ -101,15 +101,15 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
     <div id="overview-channel-entry-landing" className="py-8 sm:py-12">
       {/* Hero Container */}
       <div className="max-w-4xl mx-auto text-center mb-8 px-4">
-        <div className="inline-flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-xs font-medium text-slate-400 mb-4 shadow-xs">
-          <Youtube className="h-3.5 w-3.5 text-red-500" />
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-3 py-1 text-xs font-medium text-[#4B5563] mb-4 shadow-xs">
+          <Youtube className="h-3.5 w-3.5 text-[#DC2626]" />
           <span>YouTube Channel &amp; Video Intelligence</span>
         </div>
 
-        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-white whitespace-nowrap text-center">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight text-[#111827] whitespace-nowrap text-center">
           Enter Channel URL or Account Name
         </h1>
-        <p className="mt-2.5 text-sm sm:text-base text-slate-400 leading-relaxed max-w-xl mx-auto">
+        <p className="mt-2.5 text-sm sm:text-base text-[#6B7280] leading-relaxed max-w-xl mx-auto">
           Search any YouTube channel by handle, URL, or creator name to inspect live studio analytics, audience retention, and growth curves.
         </p>
       </div>
@@ -118,12 +118,12 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
       <div className="max-w-2xl mx-auto mb-8 px-4">
         <form
           onSubmit={handleFormSubmit}
-          className="relative rounded-xl border border-slate-750 bg-slate-900/90 p-1.5 sm:p-2 shadow-lg shadow-black/20 backdrop-blur-sm transition-all focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500"
+          className="relative rounded-xl border border-[#D1D5DB] bg-white p-1.5 sm:p-2 shadow-xs transition-all focus-within:border-[#5B5CE2] focus-within:ring-1 focus-within:ring-[#5B5CE2]"
         >
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <div className="flex items-center flex-1 pl-2.5 pr-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-slate-800 text-slate-400 mr-2.5">
-                <Search className="h-4 w-4 text-slate-400" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F3F4F6] text-[#9CA3AF] mr-2.5 border border-[#E5E7EB]">
+                <Search className="h-4 w-4 text-[#9CA3AF]" />
               </div>
               <input
                 id="landing-channel-input"
@@ -131,7 +131,7 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
                 value={inputVal}
                 onChange={(e) => setInputVal(e.target.value)}
                 placeholder="e.g. youtube.com/@mkbhd, @mrbeast, or Veritasium..."
-                className="w-full bg-transparent py-2 text-sm sm:text-base text-white placeholder-slate-500 focus:outline-none"
+                className="w-full bg-transparent py-2 text-sm sm:text-base text-[#111827] placeholder-[#9CA3AF] focus:outline-none"
                 autoComplete="off"
                 spellCheck={false}
               />
@@ -139,7 +139,7 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
                 <button
                   type="button"
                   onClick={() => setInputVal("")}
-                  className="px-2 py-1 text-xs text-slate-400 hover:text-white transition cursor-pointer"
+                  className="px-2 py-1 text-xs text-[#6B7280] hover:text-[#111827] transition cursor-pointer"
                 >
                   Clear
                 </button>
@@ -148,7 +148,7 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
                   type="button"
                   onClick={handlePaste}
                   title="Paste from clipboard"
-                  className="hidden sm:inline-flex items-center gap-1 text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded hover:bg-slate-800 transition cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1 text-xs text-[#6B7280] hover:text-[#111827] px-2 py-1 rounded hover:bg-[#F3F4F6] transition cursor-pointer"
                 >
                   <ClipboardPaste className="h-3.5 w-3.5" />
                   <span>Paste</span>
@@ -160,7 +160,7 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
               id="landing-analyze-btn"
               type="submit"
               disabled={isLoading || !inputVal.trim()}
-              className="flex items-center justify-center gap-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white px-4 py-2.5 text-xs sm:text-sm font-medium shadow-sm transition active:scale-[0.98] cursor-pointer"
+              className="flex items-center justify-center gap-2 rounded-lg bg-[#5B5CE2] hover:bg-[#4D4ECF] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white px-4 py-2.5 text-xs sm:text-sm font-medium shadow-xs transition active:scale-[0.98] cursor-pointer"
             >
               {isLoading ? (
                 <>
@@ -180,7 +180,7 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
 
       {/* Instant Quick-Select Featured Channels */}
       <div className="max-w-3xl mx-auto mb-12 px-4">
-        <p className="text-xs font-medium text-slate-400 mb-3 text-center">
+        <p className="text-xs font-medium text-[#6B7280] mb-3 text-center">
           Suggested creator channels:
         </p>
 
@@ -196,17 +196,17 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
                   onSelectSample(preset.handle, preset.platform);
                 }
               }}
-              className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 hover:border-slate-700 hover:bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors group cursor-pointer shadow-xs"
+              className="flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white hover:border-[#D1D5DB] hover:bg-[#F9FAFB] px-3 py-1.5 text-xs font-medium text-[#4B5563] transition-colors group cursor-pointer shadow-xs"
             >
               <div
-                className="h-5 w-5 rounded-full bg-slate-800 text-slate-300 group-hover:text-white flex items-center justify-center text-[10px] font-semibold"
+                className="h-5 w-5 rounded-full bg-[#F3F4F6] border border-[#E5E7EB] text-[#4B5563] group-hover:text-[#111827] flex items-center justify-center text-[10px] font-semibold"
               >
                 {preset.initials}
               </div>
-              <span className="font-medium text-slate-200 group-hover:text-indigo-300 transition-colors">
+              <span className="font-medium text-[#111827] group-hover:text-[#5B5CE2] transition-colors">
                 {preset.name}
               </span>
-              <span className="text-[11px] text-slate-400 font-mono">
+              <span className="text-[11px] text-[#6B7280] font-mono">
                 {preset.subscribers}
               </span>
             </button>
@@ -216,38 +216,38 @@ export const EmptyLandingState: React.FC<EmptyLandingStateProps> = ({
 
       {/* Feature Capabilities Preview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto px-4">
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-xs transition hover:border-slate-750">
-          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
-            <TrendingUp className="h-4 w-4 text-indigo-400" />
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-xs transition hover:border-[#D1D5DB]">
+          <div className="h-8 w-8 rounded-lg bg-[#F3F4F6] border border-[#E5E7EB] text-[#5B5CE2] flex items-center justify-center mb-3">
+            <TrendingUp className="h-4 w-4" />
           </div>
-          <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-1.5">
+          <h2 className="text-xs font-semibold text-[#111827] uppercase tracking-wider mb-1.5">
             Live Channel Growth
           </h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-[#6B7280] leading-relaxed">
             Tracks live subscriber delta, view velocities, and video upload cadence verified directly from YouTube.
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-xs transition hover:border-slate-750">
-          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
-            <BarChart2 className="h-4 w-4 text-indigo-400" />
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-xs transition hover:border-[#D1D5DB]">
+          <div className="h-8 w-8 rounded-lg bg-[#F3F4F6] border border-[#E5E7EB] text-[#5B5CE2] flex items-center justify-center mb-3">
+            <BarChart2 className="h-4 w-4" />
           </div>
-          <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-1.5">
+          <h2 className="text-xs font-semibold text-[#111827] uppercase tracking-wider mb-1.5">
             Studio-Style Trajectory
           </h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-[#6B7280] leading-relaxed">
             Plots performance curves against typical channel baseline envelopes, mirroring YouTube Studio analytics.
           </p>
         </div>
 
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/50 p-5 backdrop-blur-xs transition hover:border-slate-750">
-          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center mb-3">
-            <BrainCircuit className="h-4 w-4 text-indigo-400" />
+        <div className="rounded-xl border border-[#E5E7EB] bg-white p-5 shadow-xs transition hover:border-[#D1D5DB]">
+          <div className="h-8 w-8 rounded-lg bg-[#F3F4F6] border border-[#E5E7EB] text-[#5B5CE2] flex items-center justify-center mb-3">
+            <BrainCircuit className="h-4 w-4" />
           </div>
-          <h2 className="text-xs font-semibold text-slate-200 uppercase tracking-wider mb-1.5">
+          <h2 className="text-xs font-semibold text-[#111827] uppercase tracking-wider mb-1.5">
             Demand &amp; Retention Telemetry
           </h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <p className="text-xs text-[#6B7280] leading-relaxed">
             Identifies high-demand topic opportunities, retention curve drop-offs, and audience search volume gaps.
           </p>
         </div>

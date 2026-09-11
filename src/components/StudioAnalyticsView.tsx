@@ -244,32 +244,31 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
       {/* 1. Perspective YouTube Channel Account Card */}
       <div
         id="channel-perspective-account-card"
-        className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 shadow-xl backdrop-blur-sm"
+        className="relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-xs"
       >
-        {/* Rule 3: Clean channel banner image or subtle neutral gradient placeholder (no jokes/cookie emoji) */}
-        <div className="h-28 sm:h-36 w-full relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border-b border-slate-800/80">
+        {/* Clean channel banner image without dark gradient overlays */}
+        <div className="h-28 sm:h-36 w-full relative overflow-hidden bg-[#F1F5F9] border-b border-[#E5E7EB]">
           {profile.bannerUrl ? (
             <img
               src={profile.bannerUrl}
               alt={`${profile.displayName} Banner`}
               referrerPolicy="no-referrer"
-              className="h-full w-full object-cover opacity-85"
+              className="h-full w-full object-cover"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = "none";
               }}
             />
           ) : (
-            <div className="h-full w-full bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900" />
+            <div className="h-full w-full bg-[#F1F5F9]" />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent" />
         </div>
 
         {/* Profile Info Row */}
         <div className="px-5 sm:px-6 pb-6 pt-0 relative">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-10 sm:-mt-12 mb-4">
             <div className="flex items-end gap-4">
-              {/* Avatar without duplicate live badges */}
-              <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border-4 border-slate-950 bg-slate-800 shadow-xl overflow-hidden shrink-0">
+              {/* Avatar */}
+              <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl border-4 border-white bg-[#F3F4F6] shadow-xs overflow-hidden shrink-0">
                 {profile.avatarUrl ? (
                   <img
                     src={profile.avatarUrl}
@@ -281,24 +280,26 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
                     }}
                   />
                 ) : (
-                  <div className={`h-full w-full flex items-center justify-center font-bold text-white text-2xl bg-gradient-to-br ${profile.avatarBg}`}>
+                  <div className="h-full w-full flex items-center justify-center font-bold text-white text-2xl bg-[#5B5CE2]">
                     {profile.initials}
                   </div>
                 )}
               </div>
 
-              {/* Names & Handle: Rule 4 max 1 pill (verified checkmark) */}
+              {/* Names & Handle */}
               <div className="mb-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-bold text-[#111827] tracking-tight">
                     {profile.displayName}
                   </h2>
                   {profile.verified && (
-                    <CheckCircle2 className="h-4 w-4 text-sky-400 shrink-0" title="Verified Creator" />
+                    <span title="Verified Channel" className="flex items-center text-[#2563EB]">
+                      <CheckCircle2 className="h-4 w-4 fill-[#2563EB]/15" />
+                    </span>
                   )}
                 </div>
-                <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                  <span className="font-mono text-slate-300">{profile.handle}</span>
+                <div className="flex items-center gap-2 text-xs text-[#6B7280] mt-0.5">
+                  <span className="font-mono text-[#4B5563]">{profile.handle}</span>
                   {profile.category && (
                     <>
                       <span>•</span>
@@ -309,86 +310,86 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
               </div>
             </div>
 
-            {/* Rule 4 & Rule 2: Right-aligned single neutral ghost/outline button */}
+            {/* Right-aligned outline button */}
             <div className="self-start sm:self-end">
               <a
                 href={channelPerspectiveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white px-3.5 py-1.5 text-xs font-medium transition"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-[#F9FAFB] hover:bg-[#F3F4F6] text-[#374151] hover:text-[#111827] px-3.5 py-1.5 text-xs font-medium transition shadow-xs cursor-pointer"
               >
                 <span>Open Channel</span>
-                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+                <ExternalLink className="h-3.5 w-3.5 text-[#6B7280]" />
               </a>
             </div>
           </div>
 
-          {/* Clean channel bio without joke/cookie text */}
+          {/* Clean channel bio */}
           {cleanBioText(profile.bio) && (
-            <p className="text-xs sm:text-sm text-slate-300 line-clamp-2 max-w-3xl mb-4 leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#4B5563] line-clamp-2 max-w-3xl mb-4 leading-relaxed">
               {cleanBioText(profile.bio)}
             </p>
           )}
 
-          {/* Rule 5 & 6: Consistent 4 Stat Cards - same label style, prominent numbers, same padding, icons */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-800/80">
+          {/* Consistent 4 Stat Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-[#E5E7EB]">
             {/* Card 1: Subscribers */}
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-[#6B7280] mb-2">
                 <span>Subscribers</span>
-                <Users className="h-4 w-4 text-slate-400" />
+                <Users className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827] font-mono">
                 {stats.followersFormatted}
               </div>
-              <div className="mt-2 text-[11px] text-slate-400 font-medium">
+              <div className="mt-2 text-[11px] text-[#6B7280] font-medium">
                 {stats.followersDelta} vs last 30d
               </div>
             </div>
 
             {/* Card 2: Total Uploads */}
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-[#6B7280] mb-2">
                 <span>Total Uploads</span>
-                <Video className="h-4 w-4 text-slate-400" />
+                <Video className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827] font-mono">
                 {stats.postsCountFormatted}
               </div>
-              <div className="mt-2 text-[11px] text-slate-400 font-medium">
+              <div className="mt-2 text-[11px] text-[#6B7280] font-medium">
                 {stats.postsDelta} published
               </div>
             </div>
 
             {/* Card 3: Channel Views */}
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-[#6B7280] mb-2">
                 <span>Channel Views</span>
-                <Eye className="h-4 w-4 text-slate-400" />
+                <Eye className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827] font-mono">
                 {stats.totalViewsFormatted}
               </div>
-              <div className="mt-2 text-[11px] text-slate-400 font-medium">
+              <div className="mt-2 text-[11px] text-[#6B7280] font-medium">
                 {stats.viewsDelta} vs last 30d
               </div>
             </div>
 
             {/* Card 4: Channel Handle */}
-            <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-4.5 flex flex-col justify-between">
-              <div className="flex items-center justify-between text-xs font-medium text-slate-400 mb-2">
+            <div className="rounded-xl border border-[#E5E7EB] bg-[#F9FAFB] p-4 sm:p-4.5 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs font-medium text-[#6B7280] mb-2">
                 <span>Channel Handle</span>
-                <Link2 className="h-4 w-4 text-slate-400" />
+                <Link2 className="h-4 w-4 text-[#6B7280]" />
               </div>
               <a
                 href={channelPerspectiveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xl sm:text-2xl font-bold tracking-tight text-slate-200 hover:text-white font-mono truncate block"
+                className="text-xl sm:text-2xl font-bold tracking-tight text-[#111827] hover:text-[#5B5CE2] font-mono truncate block"
               >
                 @{profile.handle.replace(/^@/, "")}
               </a>
-              <div className="mt-2 text-[11px] text-slate-400 font-medium truncate">
+              <div className="mt-2 text-[11px] text-[#6B7280] font-medium truncate">
                 youtube.com/{profile.handle.replace(/^@/, "")}
               </div>
             </div>
@@ -397,17 +398,17 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
       </div>
 
       {/* 2. Channel Analytics Sub-Navigation Bar & Dynamic Timeframe */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-2 shadow-lg backdrop-blur-md">
+      <div className="rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-2 py-1">
           {/* Tabs */}
           <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
             <button
               id="studio-tab-overview"
               onClick={() => setActiveTab("overview")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
                 activeTab === "overview"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-[#5B5CE2] text-white shadow-xs"
+                  : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
               }`}
             >
               <Activity className="h-3.5 w-3.5" />
@@ -417,10 +418,10 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             <button
               id="studio-tab-reach"
               onClick={() => setActiveTab("reach")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
                 activeTab === "reach"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-[#5B5CE2] text-white shadow-xs"
+                  : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
               }`}
             >
               <Compass className="h-3.5 w-3.5" />
@@ -430,10 +431,10 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             <button
               id="studio-tab-engagement"
               onClick={() => setActiveTab("engagement")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
                 activeTab === "engagement"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-[#5B5CE2] text-white shadow-xs"
+                  : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
               }`}
             >
               <HeartHandshake className="h-3.5 w-3.5" />
@@ -443,10 +444,10 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             <button
               id="studio-tab-audience"
               onClick={() => setActiveTab("audience")}
-              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap ${
+              className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-semibold transition whitespace-nowrap cursor-pointer ${
                 activeTab === "audience"
-                  ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/20"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                  ? "bg-[#5B5CE2] text-white shadow-xs"
+                  : "text-[#6B7280] hover:text-[#111827] hover:bg-[#F3F4F6]"
               }`}
             >
               <Users className="h-3.5 w-3.5" />
@@ -459,22 +460,22 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             {/* Dynamic Date Range Display */}
             <div
               id="active-timeframe-daterange"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-indigo-300 font-semibold shadow-inner"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EEF2FF] border border-[#E0E7FF] rounded-xl text-xs text-[#5B5CE2] font-semibold"
               title="Active timeframe date interval"
             >
-              <Calendar className="h-3.5 w-3.5 text-indigo-400 shrink-0" />
+              <Calendar className="h-3.5 w-3.5 text-[#5B5CE2] shrink-0" />
               <span className="whitespace-nowrap">{dateRangeString}</span>
             </div>
 
-            <div className="flex items-center gap-1 bg-slate-950/60 rounded-xl p-1 border border-slate-800">
+            <div className="flex items-center gap-1 bg-[#F3F4F6] rounded-xl p-1 border border-[#E5E7EB]">
               {(["7d", "28d", "90d"] as const).map((period) => (
                 <button
                   key={period}
                   onClick={() => setStudioPeriod(period)}
-                  className={`px-3 py-1 text-xs font-medium rounded-lg transition ${
+                  className={`px-3 py-1 text-xs font-medium rounded-lg transition cursor-pointer ${
                     studioPeriod === period
-                      ? "bg-slate-800 text-white shadow-sm"
-                      : "text-slate-400 hover:text-slate-200"
+                      ? "bg-white text-[#111827] font-semibold shadow-xs"
+                      : "text-[#6B7280] hover:text-[#111827]"
                   }`}
                 >
                   Last {period === "7d" ? "7 Days" : period === "28d" ? "28 Days" : "90 Days"}
@@ -493,31 +494,31 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
           {/* Top KPI Cards in Studio Style - Clean, Consistent, No Redundant Badges */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* 1. Views */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-[#6B7280] mb-2 font-medium">
                 <span>Period Views</span>
-                <Eye className="h-4 w-4 text-slate-400" />
+                <Eye className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+              <div className="text-2xl sm:text-3xl font-bold text-[#111827] tracking-tight font-mono">
                 {periodViewsFormatted}
               </div>
-              <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-                <Calendar className="h-3.5 w-3.5 text-slate-400" />
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-[#6B7280] font-medium">
+                <Calendar className="h-3.5 w-3.5 text-[#9CA3AF]" />
                 <span>{dateRangeString}</span>
               </div>
             </div>
 
             {/* 2. Watch Time */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-[#6B7280] mb-2 font-medium">
                 <span>Watch Time (hours)</span>
-                <Clock className="h-4 w-4 text-slate-400" />
+                <Clock className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+              <div className="text-2xl sm:text-3xl font-bold text-[#111827] tracking-tight font-mono">
                 {periodWatchTimeFormatted}
               </div>
               <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
-                stats.viewsDeltaPositive ? "text-emerald-400" : "text-rose-400"
+                stats.viewsDeltaPositive ? "text-[#059669]" : "text-[#DC2626]"
               }`}>
                 {stats.viewsDeltaPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                 <span>{stats.viewsDeltaPositive ? studioData.engagement.watchTimeDelta : `-${studioData.engagement.watchTimeDelta.replace("+", "")}`} vs benchmark</span>
@@ -525,16 +526,16 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             </div>
 
             {/* 3. Subscribers */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-[#6B7280] mb-2 font-medium">
                 <span>Subscribers</span>
-                <Users className="h-4 w-4 text-slate-400" />
+                <Users className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+              <div className="text-2xl sm:text-3xl font-bold text-[#111827] tracking-tight font-mono">
                 {stats.followersFormatted}
               </div>
               <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
-                stats.followersDeltaPositive ? "text-emerald-400" : "text-rose-400"
+                stats.followersDeltaPositive ? "text-[#059669]" : "text-[#DC2626]"
               }`}>
                 <UserPlus className="h-3.5 w-3.5" />
                 <span>{stats.followersDelta} net growth</span>
@@ -542,16 +543,16 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             </div>
 
             {/* 4. Estimated Engagement Rate */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg relative overflow-hidden">
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-2 font-medium">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs relative overflow-hidden">
+              <div className="flex items-center justify-between text-xs text-[#6B7280] mb-2 font-medium">
                 <span>Engagement Rate</span>
-                <TrendingUp className="h-4 w-4 text-slate-400" />
+                <TrendingUp className="h-4 w-4 text-[#6B7280]" />
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white tracking-tight font-mono">
+              <div className="text-2xl sm:text-3xl font-bold text-[#111827] tracking-tight font-mono">
                 {stats.engagementRate}%
               </div>
               <div className={`mt-2 flex items-center gap-1.5 text-xs font-medium ${
-                stats.engagementDeltaPositive ? "text-emerald-400" : "text-rose-400"
+                stats.engagementDeltaPositive ? "text-[#059669]" : "text-[#DC2626]"
               }`}>
                 {stats.engagementDeltaPositive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
                 <span>{stats.engagementDelta} vs benchmark</span>
@@ -562,20 +563,20 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
           {/* Real-Time Pulse & Main Growth Chart */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Main Interactive Studio Chart */}
-            <div className="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/90 p-5 shadow-xl backdrop-blur-md">
+            <div className="lg:col-span-2 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+                  <h3 className="text-sm font-bold text-[#111827] tracking-tight flex items-center gap-2">
                     <span>Performance Dynamics</span>
-                    <span className="text-[11px] font-normal text-indigo-400">({dateRangeString})</span>
+                    <span className="text-[11px] font-normal text-[#5B5CE2]">({dateRangeString})</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-[#6B7280] mt-0.5">
                     Daily view velocity and engagement aligned with audience surges
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 text-[11px] text-slate-300 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/60">
-                    <span className="h-2 w-2 rounded-full bg-indigo-500" />
+                  <span className="inline-flex items-center gap-1 text-[11px] text-[#4B5563] bg-[#F3F4F6] px-2.5 py-1 rounded-lg border border-[#E5E7EB]">
+                    <span className="h-2 w-2 rounded-full bg-[#5B5CE2]" />
                     Daily Views
                   </span>
                 </div>
@@ -586,24 +587,26 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                     <defs>
                       <linearGradient id="studioViewsGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0.0} />
+                        <stop offset="5%" stopColor="#5B5CE2" stopOpacity={0.25} />
+                        <stop offset="95%" stopColor="#5B5CE2" stopOpacity={0.0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                    <XAxis dataKey="date" stroke="#64748b" fontSize={11} tickLine={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="date" stroke="#9CA3AF" fontSize={11} tickLine={false} />
                     <YAxis
-                      stroke="#64748b"
+                      stroke="#9CA3AF"
                       fontSize={11}
                       tickLine={false}
                       tickFormatter={(v) => (v >= 1e9 ? `${(v / 1e9).toFixed(1)}B` : v >= 1e6 ? `${(v / 1e6).toFixed(0)}M` : `${(v / 1e3).toFixed(0)}K`)}
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#0f172a",
-                        border: "1px solid #334155",
+                        backgroundColor: "#FFFFFF",
+                        border: "1px solid #E5E7EB",
                         borderRadius: "0.75rem",
                         fontSize: "0.75rem",
+                        boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.05)",
+                        color: "#111827",
                       }}
                       formatter={(val: any) => [Number(val).toLocaleString(), "Views"]}
                       labelFormatter={(lbl, payload) => payload?.[0]?.payload?.fullDate || lbl}
@@ -611,7 +614,7 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
                     <Area
                       type="monotone"
                       dataKey="views"
-                      stroke="#6366f1"
+                      stroke="#5B5CE2"
                       strokeWidth={2.5}
                       fillOpacity={1}
                       fill="url(#studioViewsGrad)"
@@ -622,28 +625,28 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
             </div>
 
             {/* Realtime 48h / 60m Activity Panel */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-xl backdrop-blur-md flex flex-col justify-between">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB]">
                   <div className="flex items-center gap-2">
-                    <Activity className="h-4 w-4 text-slate-400" />
-                    <h3 className="text-sm font-bold text-white tracking-tight">Realtime Activity</h3>
+                    <Activity className="h-4 w-4 text-[#5B5CE2]" />
+                    <h3 className="text-sm font-bold text-[#111827] tracking-tight">Realtime Activity</h3>
                   </div>
-                  <span className="text-[11px] text-slate-400 font-medium">
+                  <span className="text-[11px] text-[#6B7280] font-medium">
                     Continuous
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 my-4">
-                  <div className="rounded-xl bg-slate-950/60 p-3.5 border border-slate-800/80">
-                    <div className="text-[11px] text-slate-400 font-medium">Views • Last 48 hrs</div>
-                    <div className="text-xl sm:text-2xl font-bold text-white font-mono mt-1">
+                  <div className="rounded-xl bg-[#F9FAFB] p-3.5 border border-[#E5E7EB]">
+                    <div className="text-[11px] text-[#6B7280] font-medium">Views • Last 48 hrs</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[#111827] font-mono mt-1">
                       {studioData.realtime.viewsLast48hFormatted}
                     </div>
                   </div>
-                  <div className="rounded-xl bg-slate-950/60 p-3.5 border border-slate-800/80">
-                    <div className="text-[11px] text-slate-400 font-medium">Views • Last 60 min</div>
-                    <div className="text-xl sm:text-2xl font-bold text-white font-mono mt-1">
+                  <div className="rounded-xl bg-[#F9FAFB] p-3.5 border border-[#E5E7EB]">
+                    <div className="text-[11px] text-[#6B7280] font-medium">Views • Last 60 min</div>
+                    <div className="text-xl sm:text-2xl font-bold text-[#111827] font-mono mt-1">
                       {studioData.realtime.viewsLast60mFormatted}
                     </div>
                   </div>
@@ -651,11 +654,11 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
 
                 {/* 48-Hour Bar Chart Histogram */}
                 <div className="mt-3">
-                  <div className="flex items-center justify-between text-[11px] text-slate-400 mb-2">
+                  <div className="flex items-center justify-between text-[11px] text-[#6B7280] mb-2">
                     <span>Hourly Velocity (Past 48 Hours)</span>
-                    <span className="text-slate-500">Bars = 1h</span>
+                    <span className="text-[#9CA3AF]">Bars = 1h</span>
                   </div>
-                  <div className="h-24 flex items-end gap-0.5 sm:gap-1 bg-slate-950/40 p-2 rounded-xl border border-slate-800/60">
+                  <div className="h-24 flex items-end gap-0.5 sm:gap-1 bg-[#F9FAFB] p-2 rounded-xl border border-[#E5E7EB]">
                     {studioData.realtime.hourlyActivity.map((val, i) => {
                       const max = Math.max(...studioData.realtime.hourlyActivity, 1);
                       const heightPercent = Math.max(12, Math.round((val / max) * 100));
@@ -665,24 +668,24 @@ export const StudioAnalyticsView: React.FC<StudioAnalyticsViewProps> = ({ datase
                           key={i}
                           title={`Hour ${48 - i} ago: ${val.toLocaleString()} views`}
                           style={{ height: `${heightPercent}%` }}
-                          className={`flex-1 rounded-t-sm transition-all hover:bg-red-400 ${
-                            isRecent ? "bg-red-500" : "bg-red-900/60"
+                          className={`flex-1 rounded-t-xs transition-all hover:opacity-80 ${
+                            isRecent ? "bg-[#5B5CE2]" : "bg-[#C7D2FE]"
                           }`}
                         />
                       );
                     })}
                   </div>
-                  <div className="flex justify-between text-[10px] text-slate-500 mt-1.5">
+                  <div className="flex justify-between text-[10px] text-[#9CA3AF] mt-1.5">
                     <span>-48h</span>
                     <span>-24h</span>
-                    <span className="text-emerald-400 font-medium">Now</span>
+                    <span className="text-[#059669] font-medium">Now</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex items-center justify-between">
-                <span>Subscribers: <strong className="text-white">{stats.followersFormatted}</strong></span>
-                <span className="text-slate-500">See live count</span>
+              <div className="mt-4 pt-3 border-t border-[#E5E7EB] text-[11px] text-[#6B7280] flex items-center justify-between">
+                <span>Subscribers: <strong className="text-[#111827]">{stats.followersFormatted}</strong></span>
+                <span className="text-[#9CA3AF]">See live count</span>
               </div>
             </div>
           </div>

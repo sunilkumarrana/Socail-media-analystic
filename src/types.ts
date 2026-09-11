@@ -318,3 +318,92 @@ export interface HighDemandContentResponse {
   modelName: string;
   timestamp: string;
 }
+
+export interface CampusTermCycle {
+  termName: string; // e.g., "Fall Midterms Crunch", "Spring Finals Sprint", "Welcome Week"
+  viewershipVelocityMultiplier: number; // e.g. 1.35x
+  studyContentAppetite: "Peak" | "High" | "Moderate" | "Low";
+  lifestyleContentAppetite: "Peak" | "High" | "Moderate" | "Low";
+  recommendedPostingCadence: string;
+  keyInsight: string;
+}
+
+export interface StudentCohortBreakdown {
+  standing: "Freshmen" | "Sophomores" | "Juniors" | "Seniors" | "Graduate / Postgrad";
+  percentage: number;
+  primaryInterests: string[];
+  retentionIndex: number; // e.g. 112 (vs 100 benchmark)
+}
+
+export interface CampusMajorDistribution {
+  field: string; // e.g. "Computer Science & Engineering", "Business & Finance", "Pre-Med & Healthcare"
+  percentage: number;
+  avgEngagementRate: number;
+}
+
+export interface CampusFormatPerformance {
+  formatName: string;
+  avgRetentionPercent: number;
+  engagementRate: number;
+  bestPostingWindow: string;
+  collegiateViralityScore: number; // 0-100
+  brandSponsorSuitability: "High" | "Medium" | "Elite";
+  sampleTitle: string;
+  recommendationNote: string;
+}
+
+export interface CampusBrandOpportunity {
+  brandName: string;
+  category: "Energy & Beverage" | "Student Productivity" | "Apparel & Gear" | "EdTech & Study" | "Snacks & Dorm";
+  typicalCompensationTier: string; // e.g., "$350 - $750 / reel + Free Product"
+  avgStudentConversionRate: string; // e.g. "4.8% affiliate click-through"
+  idealContentAngle: string;
+}
+
+export interface CampusTrendTopic {
+  id: string;
+  topic: string;
+  hashtag: string;
+  viralityVelocity: "+145%" | "+88%" | "+210%" | "+64%";
+  category: "Academics & Study" | "Campus Life & Dorm" | "Career & Recruiting" | "Greek Life & Social" | "Budget & Food";
+  suggestedAngle: string;
+  bestPlatform: "YouTube Shorts / Reels" | "Long-form Vlog" | "Carousel Infographic";
+}
+
+export interface StudentCreatorData {
+  university: string;
+  campusEnrollment: string;
+  campusReachScore: number; // 0-100
+  peerTrustIndex: string; // e.g. "94.2% Peer Affinity"
+  academicCycle: CampusTermCycle;
+  cohortBreakdown: StudentCohortBreakdown[];
+  majorsDistribution: CampusMajorDistribution[];
+  housingBreakdown: Array<{ type: string; percentage: number }>;
+  campusPeakHours: Array<{ timeSlot: string; activityLevel: number; note: string }>;
+  topCampusFormats: CampusFormatPerformance[];
+  brandPartnerships: CampusBrandOpportunity[];
+  risingCampusTrends: CampusTrendTopic[];
+  aiCampusStrategicBriefing: string;
+}
+
+export interface StudentCreatorResponse {
+  data: StudentCreatorData;
+  source: string;
+  modelName: string;
+  timestamp: string;
+}
+
+export interface QuickDesignPayload {
+  headline: string;
+  subtitle?: string;
+  badgeText?: string;
+  category: "youtube-thumbnail" | "instagram-story" | "instagram-post" | "campus-flyer" | "stat-card";
+  dimensions: { width: number; height: number; label: string };
+  theme: "varsity-blue" | "campus-crimson" | "cyber-neon" | "academic-minimal" | "sunset-glow" | "dark-studio";
+  insightContext?: string;
+  creatorHandle?: string;
+  fireflyPrompt?: string;
+  tags?: string[];
+  suggestedTemplates?: string[];
+}
+

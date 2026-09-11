@@ -16,18 +16,43 @@ import { ReachTab } from "./components/ReachTab";
 import { EngagementTab } from "./components/EngagementTab";
 import { AudienceTab } from "./components/AudienceTab";
 import { VideoAndChannelAnalytics } from "./components/VideoAndChannelAnalytics";
-import { Platform, DashboardDataset, TopContentItem, VideoAnalyticsData } from "./types";
+import { HighDemandContentSection } from "./components/HighDemandContentSection";
+import { StudentCreatorView } from "./components/StudentCreatorView";
+import { QuickDesignModal } from "./components/QuickDesignModal";
+import { Platform, DashboardDataset, TopContentItem, VideoAnalyticsData, QuickDesignPayload } from "./types";
 import { generateMockStats, nudgeStats, formatNumber } from "./utils/mockGenerator";
-import { RotateCcw, LayoutDashboard, Compass, HeartHandshake, Users, Tv, Radio } from "lucide-react";
+import { RotateCcw, LayoutDashboard, Compass, HeartHandshake, Users, Tv, Radio, Sparkles } from "lucide-react";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"dashboard" | "studio" | "compare">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "studio" | "compare" | "student-creator">("dashboard");
   const [hasSearched, setHasSearched] = useState<boolean>(false); // Start empty on overview page: user inputs URL/name first!
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [currentInput, setCurrentInput] = useState<string>("");
   const [currentPlatform, setCurrentPlatform] = useState<Platform>("youtube");
   const [dataset, setDataset] = useState<DashboardDataset | null>(null);
+
+  // Quick Design with Adobe Express Modal State
+  const [isQuickDesignOpen, setIsQuickDesignOpen] = useState<boolean>(false);
+  const [quickDesignPayload, setQuickDesignPayload] = useState<Partial<QuickDesignPayload>>({});
+
+  const handleTriggerQuickDesign = (payload?: Partial<QuickDesignPayload>) => {
+    if (payload) {
+      setQuickDesignPayload(payload);
+    } else {
+      setQuickDesignPayload({
+        headline: dataset?.profile.displayName
+          ? `${dataset.profile.displayName.toUpperCase()} PERFORMANCE INSIGHT`
+          : "CAMPUS CREATOR PERFORMANCE INSIGHT",
+        subtitle: aiInsight ? aiInsight.slice(0, 110) + "..." : "High Retention Content Blueprint",
+        badgeText: "3.4X RETENTION • VERIFIED METRIC",
+        category: "youtube-thumbnail",
+        theme: "varsity-blue",
+        creatorHandle: dataset?.profile.handle || "@creator",
+      });
+    }
+    setIsQuickDesignOpen(true);
+  };
 
   // AI Insight State
   const [aiInsight, setAiInsight] = useState<string>("");
@@ -44,7 +69,7 @@ export default function App() {
   const [isConnectModalOpen, setIsConnectModalOpen] = useState<boolean>(false);
 
   // Dashboard Subtab & Period State
-  const [dashboardTab, setDashboardTab] = useState<"overview" | "video-analytics" | "reach" | "engagement" | "audience">("overview");
+  const [dashboardTab, setDashboardTab] = useState<"overview" | "video-analytics" | "reach" | "engagement" | "audience" | "demand">("overview");
   const [dashboardPeriod, setDashboardPeriod] = useState<"7d" | "28d" | "90d">("28d");
 
   // Fetch AI insight from server-side Gemini endpoint
@@ -355,12 +380,13 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#111827] flex flex-col font-sans">
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenConnectModal={() => setIsConnectModalOpen(true)}
+        onOpenQuickDesign={() => handleTriggerQuickDesign()}
         lastUpdated={dataset?.lastUpdated || "Just now"}
         isAutoRefreshEnabled={isAutoRefreshEnabled}
         setIsAutoRefreshEnabled={setIsAutoRefreshEnabled}
@@ -376,6 +402,13 @@ export default function App() {
           <CompareView
             initialHandleA={dataset?.profile.rawInput || currentInput || "youtube.com/@mkbhd"}
             initialPlatformA={dataset?.profile.platform || currentPlatform}
+          />
+        ) : activeTab === "student-creator" ? (
+          /* Campus & Student Creator Analytics Module */
+          <StudentCreatorView
+            currentHandle={dataset?.profile.handle || currentInput || "@creator"}
+            currentPlatform={dataset?.profile.platform || currentPlatform}
+            onTriggerQuickDesign={handleTriggerQuickDesign}
           />
         ) : activeTab === "studio" ? (
           /* Channel Analytics & Creator Telemetry View */
@@ -393,7 +426,7 @@ export default function App() {
                 <button
                   onClick={handleResetToLanding}
                   title="Return to empty search invitation"
-                  className="absolute -top-6 right-0 text-[11px] text-slate-500 hover:text-slate-300 flex items-center gap-1 transition"
+                  className="absolute -top-6 right-0 text-[11px] text-[#6B7280] hover:text-[#111827] flex items-center gap-1 transition cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Analyze Another Channel</span>
@@ -431,7 +464,7 @@ export default function App() {
                 <button
                   onClick={handleResetToLanding}
                   title="Return to empty search invitation"
-                  className="absolute -top-6 right-0 text-[11px] text-slate-500 hover:text-slate-300 flex items-center gap-1 transition"
+                  className="absolute -top-6 right-0 text-[11px] text-[#6B7280] hover:text-[#111827] flex items-center gap-1 transition cursor-pointer"
                 >
                   <RotateCcw className="h-3 w-3" />
                   <span>Analyze Another Channel</span>
@@ -459,16 +492,16 @@ export default function App() {
                 />
 
                 {/* Dashboard Subtabs Navigation */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                  <div className="flex items-center gap-1.5 overflow-x-auto p-1 bg-slate-900/80 rounded-xl border border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E7EB] pb-3">
+                  <div className="flex items-center gap-1.5 overflow-x-auto p-1 bg-[#F3F4F6] rounded-xl border border-[#E5E7EB]">
                     {dataset.videoAnalytics && (
                       <button
                         id="dashboard-subtab-video"
                         onClick={() => setDashboardTab("video-analytics")}
-                        className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg transition whitespace-nowrap ${
+                        className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg transition whitespace-nowrap cursor-pointer ${
                           dashboardTab === "video-analytics"
-                            ? "bg-indigo-600 text-white shadow-sm"
-                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                            ? "bg-white text-[#5B5CE2] font-semibold shadow-xs border border-[#E5E7EB]"
+                            : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                         }`}
                       >
                         <Tv className="h-3.5 w-3.5" />
@@ -479,10 +512,10 @@ export default function App() {
                     <button
                       id="dashboard-subtab-overview"
                       onClick={() => setDashboardTab("overview")}
-                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg transition whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg transition whitespace-nowrap cursor-pointer ${
                         dashboardTab === "overview"
-                          ? "bg-indigo-600 text-white shadow-sm"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                          ? "bg-white text-[#5B5CE2] font-semibold shadow-xs border border-[#E5E7EB]"
+                          : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                       }`}
                     >
                       <LayoutDashboard className="h-3.5 w-3.5" />
@@ -492,15 +525,15 @@ export default function App() {
                     <button
                       id="dashboard-subtab-reach"
                       onClick={() => setDashboardTab("reach")}
-                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
                         dashboardTab === "reach"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                          ? "bg-white text-[#5B5CE2] font-semibold shadow-xs border border-[#E5E7EB]"
+                          : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                       }`}
                     >
                       <Compass className="h-3.5 w-3.5" />
                       <span>Reach</span>
-                      <span className="hidden md:inline-block text-[10px] bg-slate-800/80 text-slate-300 px-1.5 py-0.5 rounded font-normal">
+                      <span className="hidden md:inline-block text-[10px] bg-white text-[#6B7280] px-1.5 py-0.5 rounded font-normal border border-[#E5E7EB]">
                         Traffic Sources
                       </span>
                     </button>
@@ -508,15 +541,15 @@ export default function App() {
                     <button
                       id="dashboard-subtab-engagement"
                       onClick={() => setDashboardTab("engagement")}
-                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
                         dashboardTab === "engagement"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                          ? "bg-white text-[#5B5CE2] font-semibold shadow-xs border border-[#E5E7EB]"
+                          : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                       }`}
                     >
                       <HeartHandshake className="h-3.5 w-3.5" />
                       <span>Engagement</span>
-                      <span className="hidden md:inline-block text-[10px] bg-slate-800/80 text-slate-300 px-1.5 py-0.5 rounded font-normal">
+                      <span className="hidden md:inline-block text-[10px] bg-white text-[#6B7280] px-1.5 py-0.5 rounded font-normal border border-[#E5E7EB]">
                         AVD &amp; Rates
                       </span>
                     </button>
@@ -524,49 +557,65 @@ export default function App() {
                     <button
                       id="dashboard-subtab-audience"
                       onClick={() => setDashboardTab("audience")}
-                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
                         dashboardTab === "audience"
-                          ? "bg-indigo-600 text-white shadow-md shadow-indigo-600/30"
-                          : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                          ? "bg-white text-[#5B5CE2] font-semibold shadow-xs border border-[#E5E7EB]"
+                          : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
                       }`}
                     >
                       <Users className="h-3.5 w-3.5" />
                       <span>Audience</span>
-                      <span className="hidden md:inline-block text-[10px] bg-slate-800/80 text-slate-300 px-1.5 py-0.5 rounded font-normal">
+                      <span className="hidden md:inline-block text-[10px] bg-white text-[#6B7280] px-1.5 py-0.5 rounded font-normal border border-[#E5E7EB]">
                         Demographics
+                      </span>
+                    </button>
+
+                    <button
+                      id="dashboard-subtab-demand"
+                      onClick={() => setDashboardTab("demand")}
+                      className={`flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer ${
+                        dashboardTab === "demand"
+                          ? "bg-white text-[#5B5CE2] font-semibold shadow-xs border border-[#E5E7EB]"
+                          : "text-[#6B7280] hover:text-[#111827] hover:bg-white/60"
+                      }`}
+                    >
+                      <Sparkles className="h-3.5 w-3.5 text-[#5B5CE2]" />
+                      <span>High-Demand Topics</span>
+                      <span className="hidden md:inline-block text-[10px] bg-[#EEF2FF] text-[#5B5CE2] px-1.5 py-0.5 rounded font-normal border border-[#E0E7FF]">
+                        AI
                       </span>
                     </button>
                   </div>
 
                   {/* Time Period Selector (for Reach, Engagement, Audience) */}
                   <div className="flex items-center gap-2 self-end sm:self-auto">
-                    <div className="flex items-center gap-1 bg-slate-900/80 rounded-xl p-1 border border-slate-800 text-xs">
+                    <div className="flex items-center gap-1 bg-[#F3F4F6] rounded-xl p-1 border border-[#E5E7EB] text-xs">
                       <button
                         onClick={() => setDashboardPeriod("7d")}
-                        className={`px-2.5 py-1 font-medium rounded-lg transition ${
+                        className={`px-2.5 py-1 font-medium rounded-lg transition cursor-pointer ${
                           dashboardPeriod === "7d"
-                            ? "bg-indigo-600 text-white"
-                            : "text-slate-400 hover:text-slate-200"
+                            ? "bg-white text-[#111827] font-semibold shadow-xs border border-[#E5E7EB]"
+                            : "text-[#6B7280] hover:text-[#111827]"
                         }`}
                       >
                         7 Days
                       </button>
                       <button
                         onClick={() => setDashboardPeriod("28d")}
-                        className={`px-2.5 py-1 font-medium rounded-lg transition ${
+                        className={`px-2.5 py-1 font-medium rounded-lg transition cursor-pointer ${
                           dashboardPeriod === "28d"
-                            ? "bg-indigo-600 text-white"
-                            : "text-slate-400 hover:text-slate-200"
+                            ? "bg-white text-[#111827] font-semibold shadow-xs border border-[#E5E7EB]"
+                            : "text-[#6B7280] hover:text-[#111827]"
                         }`}
                       >
                         28 Days
                       </button>
                       <button
                         onClick={() => setDashboardPeriod("90d")}
-                        className={`px-2.5 py-1 font-medium rounded-lg transition ${
+                        className={`px-2.5 py-1 font-medium rounded-lg transition cursor-pointer ${
                           dashboardPeriod === "90d"
-                            ? "bg-indigo-600 text-white"
-                            : "text-slate-400 hover:text-slate-200"
+                            ? "bg-white text-[#111827] font-semibold shadow-xs border border-[#E5E7EB]"
+                            : "text-[#6B7280] hover:text-[#111827]"
                         }`}
                       >
                         90 Days
@@ -588,29 +637,29 @@ export default function App() {
                   <div className="space-y-6">
                     {/* Video Analysis Active Banner */}
                     {dataset.videoAnalytics && (
-                      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm">
+                      <div className="rounded-xl border border-[#E5E7EB] bg-white p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
                         <div className="flex items-center gap-3">
-                          <div className="h-8 w-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center shrink-0">
-                            <Tv className="h-4 w-4 text-indigo-400" />
+                          <div className="h-8 w-8 rounded-lg bg-[#F3F4F6] text-[#5B5CE2] border border-[#E5E7EB] flex items-center justify-center shrink-0">
+                            <Tv className="h-4 w-4" />
                           </div>
                           <div>
-                            <div className="text-xs font-medium text-white flex items-center gap-1.5">
+                            <div className="text-xs font-medium text-[#111827] flex items-center gap-1.5">
                               <span>Video Diagnostics:</span>
-                              <span className="text-slate-300 font-normal truncate max-w-[280px] sm:max-w-md">
+                              <span className="text-[#4B5563] font-normal truncate max-w-[280px] sm:max-w-md">
                                 {dataset.videoAnalytics.title}
                               </span>
                             </div>
-                            <p className="text-[11px] text-slate-400">
+                            <p className="text-[11px] text-[#6B7280]">
                               {dataset.videoAnalytics.viewsFormatted} views • {dataset.videoAnalytics.viewsPerHourFormatted} • {dataset.videoAnalytics.likeRatio}% positive
                             </p>
                           </div>
                         </div>
                         <button
                           onClick={() => setDashboardTab("video-analytics")}
-                          className="shrink-0 text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
+                          className="shrink-0 text-xs font-medium text-[#374151] hover:text-[#111827] bg-[#F9FAFB] hover:bg-[#F3F4F6] px-3 py-1.5 rounded-lg border border-[#E5E7EB] transition flex items-center gap-1.5 cursor-pointer shadow-xs"
                         >
                           <span>Open Side-by-Side View</span>
-                          <Tv className="h-3.5 w-3.5 text-slate-400" />
+                          <Tv className="h-3.5 w-3.5 text-[#6B7280]" />
                         </button>
                       </div>
                     )}
@@ -627,6 +676,7 @@ export default function App() {
                       onRegenerate={() => requestAiInsight(dataset)}
                       handle={dataset.profile.handle}
                       platform={dataset.profile.platform}
+                      onTriggerQuickDesign={handleTriggerQuickDesign}
                     />
 
                     {/* 4 & 5. YouTube Studio Growth Trend Chart & Engagement Breakdown */}
@@ -655,24 +705,37 @@ export default function App() {
                       onAnalyzeVideo={handleAnalyzeVideo}
                     />
 
+                    {/* 7. High-Demand Content Opportunities */}
+                    <HighDemandContentSection
+                      dataset={dataset}
+                      onTriggerQuickDesign={handleTriggerQuickDesign}
+                    />
+
                     {/* Bottom Callout for OAuth Connection */}
-                    <div className="rounded-2xl border border-slate-800/80 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
                       <div>
-                        <h3 className="text-sm font-bold text-white">
+                        <h3 className="text-sm font-bold text-[#111827]">
                           Unlock Private Creator Telemetry
                         </h3>
-                        <p className="text-xs text-slate-400 mt-0.5">
+                        <p className="text-xs text-[#6B7280] mt-0.5">
                           Need retention curves, second-by-second drop-off graphs, or audience demographics?
                         </p>
                       </div>
                       <button
                         onClick={() => setIsConnectModalOpen(true)}
-                        className="shrink-0 rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 transition"
+                        className="shrink-0 rounded-xl bg-[#5B5CE2] hover:bg-[#4D4ECF] px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition cursor-pointer"
                       >
                         Connect Your Account
                       </button>
                     </div>
                   </div>
+                )}
+
+                {dashboardTab === "demand" && (
+                  <HighDemandContentSection
+                    dataset={dataset}
+                    onTriggerQuickDesign={handleTriggerQuickDesign}
+                  />
                 )}
 
                 {dashboardTab === "reach" && dataset.studio && (
@@ -708,12 +771,12 @@ export default function App() {
       </main>
 
       {/* Footer */}
-      <footer className="w-full border-t border-slate-800/80 bg-slate-950 py-5 text-center text-xs text-slate-400">
+      <footer className="w-full border-t border-[#E5E7EB] bg-white py-5 text-center text-xs text-[#6B7280]">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p>
             SocialPulse Prototype — Demonstrating social analytics UI/UX with deterministic simulation.
           </p>
-          <p className="text-slate-400">
+          <p className="text-[#6B7280]">
             Powered by Google AI Studio & Gemini 3.8 Flash
           </p>
         </div>
@@ -723,6 +786,14 @@ export default function App() {
       <ConnectModal
         isOpen={isConnectModalOpen}
         onClose={() => setIsConnectModalOpen(false)}
+      />
+
+      {/* Quick Design with Adobe Express Modal */}
+      <QuickDesignModal
+        isOpen={isQuickDesignOpen}
+        onClose={() => setIsQuickDesignOpen(false)}
+        initialPayload={quickDesignPayload}
+        defaultCreatorHandle={dataset?.profile.handle || currentInput || "@creator"}
       />
     </div>
   );

@@ -65,28 +65,28 @@ export const StatCards: React.FC<StatCardsProps> = ({ stats, platform }) => {
           <div
             key={card.id}
             id={card.id}
-            className="relative overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-sm backdrop-blur-sm transition hover:border-slate-700/80"
+            className="relative overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-xs transition hover:border-[#D1D5DB]"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">
+              <span className="text-xs font-medium text-[#6B7280]">
                 {card.label}
               </span>
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-800/80 text-slate-400">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#F3F4F6] text-[#6B7280]">
                 <IconComponent className="h-3.5 w-3.5" />
               </div>
             </div>
 
             <div className="mt-3 flex items-baseline justify-between">
-              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-white font-mono">
+              <div className="text-2xl sm:text-3xl font-bold tracking-tight text-[#111827] font-mono">
                 {card.value}
               </div>
 
               {/* Delta Badge */}
               <div
-                className={`flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium ${
+                className={`flex items-center gap-0.5 rounded-md px-1.5 py-0.5 text-xs font-medium border ${
                   card.isPositive
-                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                    ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
+                    : "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]"
                 }`}
               >
                 {card.isPositive ? (
@@ -98,7 +98,7 @@ export const StatCards: React.FC<StatCardsProps> = ({ stats, platform }) => {
               </div>
             </div>
 
-            <div className="mt-2 text-[11px] text-slate-400 font-medium">
+            <div className="mt-2 text-[11px] text-[#9CA3AF] font-medium">
               <span>{card.period}</span>
             </div>
           </div>

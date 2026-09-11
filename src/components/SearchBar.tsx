@@ -58,8 +58,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
     <div className="w-full max-w-4xl mx-auto mb-8">
       {/* Search Form */}
       <form onSubmit={handleSubmit} className="relative">
-        <div className="relative flex items-center rounded-xl border border-slate-750 bg-slate-900/90 shadow-sm backdrop-blur-sm transition-all focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
-          <div className="pl-3.5 text-slate-500">
+        <div className="relative flex items-center rounded-xl border border-[#D1D5DB] bg-white shadow-xs transition-all focus-within:border-[#5B5CE2] focus-within:ring-1 focus-within:ring-[#5B5CE2]">
+          <div className="pl-3.5 text-[#9CA3AF]">
             <Search className="h-4 w-4" />
           </div>
 
@@ -69,7 +69,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Paste channel URL or handle (e.g. youtube.com/@mkbhd, @mrbeast)..."
-            className="w-full bg-transparent px-3 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+            className="w-full bg-transparent px-3 py-3 text-sm text-[#111827] placeholder-[#9CA3AF] focus:outline-none"
             autoComplete="off"
             spellCheck={false}
           />
@@ -78,7 +78,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             <button
               type="button"
               onClick={() => setInputValue("")}
-              className="mr-2 rounded-full p-1 text-slate-500 hover:bg-slate-800 hover:text-slate-300 transition cursor-pointer"
+              className="mr-2 rounded-full p-1 text-[#9CA3AF] hover:bg-[#F3F4F6] hover:text-[#111827] transition cursor-pointer"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -86,15 +86,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
           {/* Auto-detected Platform Badge (if detected from URL) */}
           {detectedPlatform && (
-            <div className="hidden sm:flex items-center gap-1.5 mr-2 rounded-md border border-slate-800 bg-slate-850 px-2 py-0.5 text-[11px] font-medium text-slate-300">
+            <div className="hidden sm:flex items-center gap-1.5 mr-2 rounded-md border border-[#E5E7EB] bg-[#F3F4F6] px-2 py-0.5 text-[11px] font-medium text-[#4B5563]">
               {detectedPlatform === "youtube" && (
-                <Youtube className="h-3 w-3 text-red-500" />
+                <Youtube className="h-3 w-3 text-[#DC2626]" />
               )}
               {detectedPlatform === "instagram" && (
-                <Instagram className="h-3 w-3 text-pink-500" />
+                <Instagram className="h-3 w-3 text-[#DB2777]" />
               )}
               {detectedPlatform === "x" && (
-                <Twitter className="h-3 w-3 text-slate-300" />
+                <Twitter className="h-3 w-3 text-[#4B5563]" />
               )}
               <span>{PLATFORM_CONFIGS[detectedPlatform].name}</span>
             </div>
@@ -106,7 +106,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
               id="search-submit-btn"
               type="submit"
               disabled={isLoading || !inputValue.trim()}
-              className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-medium text-white shadow-xs transition hover:bg-indigo-500 focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg bg-[#5B5CE2] px-3.5 py-1.5 text-xs font-medium text-white shadow-xs transition hover:bg-[#4D4ECF] focus:outline-none disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             >
               {isLoading ? (
                 <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -123,7 +123,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         {/* Ambiguous Handle: Manual Platform Selection Picker */}
         {isAmbiguous && (
           <div className="mt-2.5 flex items-center gap-2 px-1">
-            <span className="text-xs text-slate-400">Select platform:</span>
+            <span className="text-xs text-[#6B7280]">Select platform:</span>
             <div className="flex items-center gap-1.5">
               {(["youtube", "instagram", "x"] as Platform[]).map((p) => {
                 const isSelected = manualPlatform === p;
@@ -132,15 +132,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({
                     key={p}
                     type="button"
                     onClick={() => setManualPlatform(p)}
-                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition ${
+                    className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium transition cursor-pointer ${
                       isSelected
-                        ? "bg-indigo-500/20 border border-indigo-500/50 text-indigo-300"
-                        : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200"
+                        ? "bg-[#5B5CE2]/10 border border-[#5B5CE2]/30 text-[#5B5CE2]"
+                        : "bg-white border border-[#E5E7EB] text-[#4B5563] hover:text-[#111827] hover:bg-[#F9FAFB]"
                     }`}
                   >
-                    {p === "youtube" && <Youtube className="h-3 w-3 text-red-400" />}
-                    {p === "instagram" && <Instagram className="h-3 w-3 text-pink-400" />}
-                    {p === "x" && <Twitter className="h-3 w-3 text-slate-300" />}
+                    {p === "youtube" && <Youtube className="h-3 w-3 text-[#DC2626]" />}
+                    {p === "instagram" && <Instagram className="h-3 w-3 text-[#DB2777]" />}
+                    {p === "x" && <Twitter className="h-3 w-3 text-[#4B5563]" />}
                     <span>{PLATFORM_CONFIGS[p].name}</span>
                   </button>
                 );
@@ -152,8 +152,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 
       {/* Quick Sample Profiles */}
       <div className="mt-3 flex flex-wrap items-center gap-1.5 px-1">
-        <span className="text-[11px] font-medium text-slate-400 flex items-center gap-1 mr-1">
-          <Sparkles className="h-3 w-3 text-indigo-400" />
+        <span className="text-[11px] font-medium text-[#6B7280] flex items-center gap-1 mr-1">
+          <Sparkles className="h-3 w-3 text-[#6B7280]" />
           Try sample:
         </span>
         {SAMPLE_PROFILES.map((sample) => (
@@ -161,18 +161,18 @@ export const SearchBar: React.FC<SearchBarProps> = ({
             key={sample.handle}
             type="button"
             onClick={() => handleSampleClick(sample)}
-            className="group flex items-center gap-1 rounded-full border border-slate-800 bg-slate-900/60 px-2.5 py-1 text-[11px] text-slate-300 transition hover:border-slate-700 hover:bg-slate-800"
+            className="group flex items-center gap-1.5 rounded-full border border-[#E5E7EB] bg-[#F3F4F6] px-2.5 py-1 text-[11px] text-[#374151] transition hover:border-[#D1D5DB] hover:bg-[#E5E7EB]/70 cursor-pointer shadow-2xs"
           >
             {sample.platform === "youtube" && (
-              <span className="h-1.5 w-1.5 rounded-full bg-red-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#DC2626]" />
             )}
             {sample.platform === "instagram" && (
-              <span className="h-1.5 w-1.5 rounded-full bg-pink-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#DB2777]" />
             )}
             {sample.platform === "x" && (
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#6B7280]" />
             )}
-            <span className="group-hover:text-white">{sample.label}</span>
+            <span className="group-hover:text-[#111827]">{sample.label}</span>
           </button>
         ))}
       </div>

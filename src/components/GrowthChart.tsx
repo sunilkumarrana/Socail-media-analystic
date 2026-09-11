@@ -334,193 +334,195 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
   }, [daysSlice, periodViews, isGoodPerformance, activeMetric, topContent, effectiveDeltaPercent]);
 
   // Line Colors depending on performance state
-  const lineColor = isGoodPerformance ? "#10b981" : "#f43f5e"; // Emerald for Good / Growing Up, Rose for Bad / Decreasing Down
+  const lineColor = isGoodPerformance ? "#059669" : "#DC2626"; // Emerald for Good / Growing Up, Red for Bad / Decreasing Down
   const gradientId = isGoodPerformance ? "growthUpGrad" : "growthDownGrad";
 
   return (
     <div
       id="youtube-studio-growth-chart-card"
-      className="rounded-2xl border border-slate-800 bg-slate-900/90 p-5 sm:p-6 shadow-xl backdrop-blur-md"
+      className="rounded-2xl border border-[#E5E7EB] bg-white p-5 sm:p-6 shadow-xs"
     >
       {/* 1. Header: YouTube Studio Analytics Title & Performance Controls */}
-      <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4 pb-5 border-b border-slate-800">
-        <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              <span>Channel Performance Trajectory</span>
-              <span className="text-xs font-normal text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-md px-2 py-0.5">
-                YouTube Studio Engine
-              </span>
+      <div className="flex flex-col gap-4 pb-5 border-b border-[#E5E7EB]">
+        {/* Top Row: Title, Engine Badge, and Interactive Simulation/Timeframe Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-lg font-bold text-[#111827] tracking-tight whitespace-nowrap">
+              Channel Performance Trajectory
             </h2>
-
-            {/* Dynamic Performance Status Badge */}
-            <span
-              id="performance-status-pill"
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border transition-all ${
-                isGoodPerformance
-                  ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-300"
-                  : "bg-rose-500/15 border-rose-500/30 text-rose-300"
-              }`}
-            >
-              {isGoodPerformance ? (
-                <>
-                  <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
-                  <span>Growing Up: +{absPerfDelta}% Above Typical</span>
-                </>
-              ) : (
-                <>
-                  <TrendingDown className="h-3.5 w-3.5 text-rose-400" />
-                  <span>Decreasing Down: -{absPerfDelta}% Below Typical</span>
-                </>
-              )}
+            <span className="text-xs font-medium text-[#5B5CE2] bg-[#EEF2FF] border border-[#E0E7FF] rounded-md px-2 py-0.5 whitespace-nowrap">
+              YouTube Studio Engine
             </span>
           </div>
+
+          {/* Interactive Controls: Mode Switcher + Timeframe Selector */}
+          <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {/* Performance Simulation Selector */}
+            <div className="flex items-center bg-[#F3F4F6] rounded-xl p-1 border border-[#E5E7EB] text-xs">
+              <button
+                id="btn-perf-good"
+                onClick={() => setPerformanceMode("good")}
+                title="Demonstrate Good Performance (Growing Up)"
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
+                  performanceMode === "good"
+                    ? "bg-[#059669] text-white shadow-xs"
+                    : "text-[#4B5563] hover:text-[#059669] hover:bg-[#E5E7EB]"
+                }`}
+              >
+                <TrendingUp className="h-3 w-3" />
+                <span>Good (Growing ↗)</span>
+              </button>
+
+              <button
+                id="btn-perf-bad"
+                onClick={() => setPerformanceMode("bad")}
+                title="Demonstrate Bad Performance (Decreasing Down)"
+                className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
+                  performanceMode === "bad"
+                    ? "bg-[#DC2626] text-white shadow-xs"
+                    : "text-[#4B5563] hover:text-[#DC2626] hover:bg-[#E5E7EB]"
+                }`}
+              >
+                <TrendingDown className="h-3 w-3" />
+                <span>Bad (Down ↘)</span>
+              </button>
+
+              <button
+                id="btn-perf-auto"
+                onClick={() => setPerformanceMode("auto")}
+                title="Auto-detect based on channel's live metrics"
+                className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition flex items-center gap-1.5 cursor-pointer ${
+                  performanceMode === "auto"
+                    ? "bg-white text-[#111827] font-semibold border border-[#E5E7EB] shadow-xs"
+                    : "text-[#6B7280] hover:text-[#111827]"
+                }`}
+              >
+                <span>Auto</span>
+                <span
+                  className={`text-[9px] px-1 py-0.2 rounded font-semibold ${
+                    isNaturallyPositive ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#FEF2F2] text-[#DC2626]"
+                  }`}
+                >
+                  {isNaturallyPositive ? `+${Math.abs(naturalDelta).toFixed(0)}%` : `-${Math.abs(naturalDelta).toFixed(0)}%`}
+                </span>
+              </button>
+            </div>
+
+            {/* Timeframe Selector */}
+            <div className="flex items-center bg-[#F3F4F6] rounded-xl p-1 border border-[#E5E7EB] text-xs">
+              <Calendar className="h-3.5 w-3.5 text-[#6B7280] ml-2 mr-1" />
+              {(["7d", "28d", "90d"] as TimeframeOption[]).map((tf) => (
+                <button
+                  key={tf}
+                  id={`btn-timeframe-${tf}`}
+                  onClick={() => setTimeframe(tf)}
+                  className={`px-2.5 py-1.5 rounded-lg font-medium transition cursor-pointer ${
+                    timeframe === tf
+                      ? "bg-white text-[#111827] font-semibold border border-[#E5E7EB] shadow-xs"
+                      : "text-[#4B5563] hover:text-[#111827]"
+                  }`}
+                >
+                  {tf.toUpperCase()}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Second Row: Horizontal Trajectory Metrics Strip */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
+          {/* Dynamic Performance Status Badge */}
+          <span
+            id="performance-status-pill"
+            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-semibold border transition-all shrink-0 whitespace-nowrap ${
+              isGoodPerformance
+                ? "bg-[#ECFDF5] border-[#A7F3D0] text-[#059669]"
+                : "bg-[#FEF2F2] border-[#FECACA] text-[#DC2626]"
+            }`}
+          >
+            {isGoodPerformance ? (
+              <>
+                <TrendingUp className="h-3.5 w-3.5 text-[#059669]" />
+                <span>Growing Up: +{absPerfDelta}% Above Typical</span>
+              </>
+            ) : (
+              <>
+                <TrendingDown className="h-3.5 w-3.5 text-[#DC2626]" />
+                <span>Decreasing Down: -{absPerfDelta}% Below Typical</span>
+              </>
+            )}
+          </span>
 
           {/* Dynamic Real-time Metric Breakdown Chips */}
-          <div className="flex items-center gap-2 flex-wrap mt-2.5">
-            <span
-              id="metric-chip-views"
-              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border transition ${
-                effectiveViewsDelta >= 0
-                  ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/30"
-                  : "bg-rose-950/40 text-rose-300 border-rose-500/30"
-              }`}
-            >
-              <Eye className="h-3 w-3" />
-              <span>Views:</span>
-              <span className="font-bold">{effectiveViewsDelta >= 0 ? "+" : ""}{effectiveViewsDelta.toFixed(1)}%</span>
-              <span className={`text-[10px] px-1 py-0.5 rounded font-semibold ${
-                effectiveViewsDelta >= 0 ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
-              }`}>
-                {effectiveViewsDelta >= 0 ? "Above Avg" : "Below Avg"}
-              </span>
+          <span
+            id="metric-chip-views"
+            className={`inline-flex items-center gap-1.5 font-medium px-2.5 py-1 rounded-lg border transition shrink-0 whitespace-nowrap ${
+              effectiveViewsDelta >= 0
+                ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
+                : "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]"
+            }`}
+          >
+            <Eye className="h-3 w-3" />
+            <span>Views:</span>
+            <span className="font-bold">{effectiveViewsDelta >= 0 ? "+" : ""}{effectiveViewsDelta.toFixed(1)}%</span>
+            <span className={`text-[10px] px-1 py-0.5 rounded font-semibold ${
+              effectiveViewsDelta >= 0 ? "bg-[#D1FAE5] text-[#059669]" : "bg-[#FEE2E2] text-[#DC2626]"
+            }`}>
+              {effectiveViewsDelta >= 0 ? "Above Avg" : "Below Avg"}
             </span>
+          </span>
 
-            <span
-              id="metric-chip-likes"
-              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border transition ${
-                effectiveLikesDelta >= 0
-                  ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/30"
-                  : "bg-rose-950/40 text-rose-300 border-rose-500/30"
-              }`}
-            >
-              <ThumbsUp className="h-3 w-3" />
-              <span>Like Ratio:</span>
-              <span className="font-bold">{recentUploadMetrics.likeRate}%</span>
-              <span className={`text-[10px] px-1 py-0.5 rounded font-semibold ${
-                effectiveLikesDelta >= 0 ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
-              }`}>
-                {effectiveLikesDelta >= 0 ? "+" : ""}{effectiveLikesDelta.toFixed(1)}%
-              </span>
+          <span
+            id="metric-chip-likes"
+            className={`inline-flex items-center gap-1.5 font-medium px-2.5 py-1 rounded-lg border transition shrink-0 whitespace-nowrap ${
+              effectiveLikesDelta >= 0
+                ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
+                : "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]"
+            }`}
+          >
+            <ThumbsUp className="h-3 w-3" />
+            <span>Like Ratio:</span>
+            <span className="font-bold">{recentUploadMetrics.likeRate}%</span>
+            <span className={`text-[10px] px-1 py-0.5 rounded font-semibold ${
+              effectiveLikesDelta >= 0 ? "bg-[#D1FAE5] text-[#059669]" : "bg-[#FEE2E2] text-[#DC2626]"
+            }`}>
+              {effectiveLikesDelta >= 0 ? "+" : ""}{effectiveLikesDelta.toFixed(1)}%
             </span>
+          </span>
 
-            <span
-              id="metric-chip-engagement"
-              className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border transition ${
-                recentUploadMetrics.avgEngagement >= 2.5
-                  ? "bg-emerald-950/40 text-emerald-300 border-emerald-500/30"
-                  : "bg-rose-950/40 text-rose-300 border-rose-500/30"
-              }`}
-            >
-              <Percent className="h-3 w-3" />
-              <span>Engagement:</span>
-              <span className="font-bold">{recentUploadMetrics.avgEngagement}%</span>
-              <span className={`text-[10px] px-1 py-0.5 rounded font-semibold ${
-                recentUploadMetrics.avgEngagement >= 2.5 ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
-              }`}>
-                {recentUploadMetrics.avgEngagement >= 2.5 ? "Healthy" : "Low"}
-              </span>
+          <span
+            id="metric-chip-engagement"
+            className={`inline-flex items-center gap-1.5 font-medium px-2.5 py-1 rounded-lg border transition shrink-0 whitespace-nowrap ${
+              recentUploadMetrics.avgEngagement >= 2.5
+                ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]"
+                : "bg-[#FEF2F2] text-[#DC2626] border-[#FECACA]"
+            }`}
+          >
+            <Percent className="h-3 w-3" />
+            <span>Engagement:</span>
+            <span className="font-bold">{recentUploadMetrics.avgEngagement}%</span>
+            <span className={`text-[10px] px-1 py-0.5 rounded font-semibold ${
+              recentUploadMetrics.avgEngagement >= 2.5 ? "bg-[#D1FAE5] text-[#059669]" : "bg-[#FEE2E2] text-[#DC2626]"
+            }`}>
+              {recentUploadMetrics.avgEngagement >= 2.5 ? "Healthy" : "Low"}
             </span>
-          </div>
-
-          {/* Dynamic Explanatory Text */}
-          <p className="text-xs text-slate-400 mt-2.5 max-w-2xl leading-relaxed">
-            {isGoodPerformance ? (
-              <span>
-                <strong className="text-emerald-400">Great job!</strong> Your channel performance is{" "}
-                <strong className="text-white">growing up (+{absPerfDelta}%)</strong> and outperforming the typical benchmark range. Views on recent uploads (~{formatNumber(recentUploadMetrics.avgViews)}) and like-to-view ratios ({recentUploadMetrics.likeRate}%) are driving strong organic browse traffic.
-              </span>
-            ) : (
-              <span>
-                <strong className="text-rose-400">Attention:</strong> Performance is{" "}
-                <strong className="text-white">decreasing down (-{absPerfDelta}%)</strong> and tracking below the typical benchmark range. Reduced views on recent uploads (~{formatNumber(recentUploadMetrics.avgViews)} vs ~{formatNumber(channelAvgViews)} channel baseline) and a lower like-to-view ratio ({recentUploadMetrics.likeRate}% vs 3.5% typical) have slowed momentum.
-              </span>
-            )}
-          </p>
+          </span>
         </div>
 
-        {/* Interactive Controls: Mode Switcher + Timeframe Selector */}
-        <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto shrink-0">
-          {/* Performance Simulation Selector */}
-          <div className="flex items-center bg-slate-950/90 rounded-xl p-1 border border-slate-800 text-xs">
-            <button
-              id="btn-perf-good"
-              onClick={() => setPerformanceMode("good")}
-              title="Demonstrate Good Performance (Growing Up)"
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold transition ${
-                performanceMode === "good"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/30"
-                  : "text-slate-400 hover:text-emerald-300 hover:bg-slate-800"
-              }`}
-            >
-              <TrendingUp className="h-3 w-3 text-emerald-300" />
-              <span>Good (Growing ↗)</span>
-            </button>
-
-            <button
-              id="btn-perf-bad"
-              onClick={() => setPerformanceMode("bad")}
-              title="Demonstrate Bad Performance (Decreasing Down)"
-              className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg font-semibold transition ${
-                performanceMode === "bad"
-                  ? "bg-rose-600 text-white shadow-md shadow-rose-600/30"
-                  : "text-slate-400 hover:text-rose-300 hover:bg-slate-800"
-              }`}
-            >
-              <TrendingDown className="h-3 w-3 text-rose-300" />
-              <span>Bad (Down ↘)</span>
-            </button>
-
-            <button
-              id="btn-perf-auto"
-              onClick={() => setPerformanceMode("auto")}
-              title="Auto-detect based on channel's live metrics"
-              className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition flex items-center gap-1.5 ${
-                performanceMode === "auto"
-                  ? "bg-slate-800 text-slate-100 font-semibold border border-slate-700"
-                  : "text-slate-500 hover:text-slate-300"
-              }`}
-            >
-              <span>Auto</span>
-              <span
-                className={`text-[9px] px-1 py-0.2 rounded font-semibold ${
-                  isNaturallyPositive ? "bg-emerald-500/20 text-emerald-300" : "bg-rose-500/20 text-rose-300"
-                }`}
-              >
-                {isNaturallyPositive ? `+${Math.abs(naturalDelta).toFixed(0)}%` : `-${Math.abs(naturalDelta).toFixed(0)}%`}
-              </span>
-            </button>
-          </div>
-
-          {/* Timeframe Selector */}
-          <div className="flex items-center bg-slate-950/80 rounded-xl p-1 border border-slate-800 text-xs">
-            <Calendar className="h-3.5 w-3.5 text-slate-500 ml-2 mr-1" />
-            {(["7d", "28d", "90d"] as TimeframeOption[]).map((tf) => (
-              <button
-                key={tf}
-                id={`btn-timeframe-${tf}`}
-                onClick={() => setTimeframe(tf)}
-                className={`px-2.5 py-1.5 rounded-lg font-medium transition ${
-                  timeframe === tf
-                    ? "bg-slate-800 text-white shadow-sm"
-                    : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                {tf.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Dynamic Explanatory Text */}
+        <p className="text-xs text-[#4B5563] leading-relaxed max-w-3xl">
+          {isGoodPerformance ? (
+            <span>
+              <strong className="text-[#059669]">Great job!</strong> Your channel performance is{" "}
+              <strong className="text-[#111827]">growing up (+{absPerfDelta}%)</strong> and outperforming the typical benchmark range. Views on recent uploads (~{formatNumber(recentUploadMetrics.avgViews)}) and like-to-view ratios ({recentUploadMetrics.likeRate}%) are driving strong organic browse traffic.
+            </span>
+          ) : (
+            <span>
+              <strong className="text-[#DC2626]">Attention:</strong> Performance is{" "}
+              <strong className="text-[#111827]">decreasing down (-{absPerfDelta}%)</strong> and tracking below the typical benchmark range. Reduced views on recent uploads (~{formatNumber(recentUploadMetrics.avgViews)} vs ~{formatNumber(channelAvgViews)} channel baseline) and a lower like-to-view ratio ({recentUploadMetrics.likeRate}% vs 3.5% typical) have slowed momentum.
+            </span>
+          )}
+        </p>
       </div>
 
       {/* 2. YouTube Studio Metric Cards Strip (Clickable Tabs) */}
@@ -532,30 +534,30 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveMetric(tab.id)}
-              className={`flex flex-col text-left p-3.5 rounded-xl border transition group ${
+              className={`flex flex-col text-left p-3.5 rounded-xl border transition group cursor-pointer ${
                 isActive
                   ? isGoodPerformance
-                    ? "bg-emerald-950/30 border-emerald-500/50 shadow-md shadow-emerald-950/30"
-                    : "bg-rose-950/30 border-rose-500/50 shadow-md shadow-rose-950/30"
-                  : "bg-slate-950/60 border-slate-800/80 hover:bg-slate-800/50 hover:border-slate-700"
+                    ? "bg-[#ECFDF5] border-[#A7F3D0] shadow-xs"
+                    : "bg-[#FEF2F2] border-[#FECACA] shadow-xs"
+                  : "bg-[#F8FAFC] border-[#E5E7EB] hover:bg-[#F1F5F9] hover:border-[#D1D5DB]"
               }`}
             >
-              <div className="flex items-center justify-between text-xs text-slate-400 mb-1">
-                <span className="font-medium group-hover:text-slate-300 transition">
+              <div className="flex items-center justify-between text-xs text-[#6B7280] mb-1">
+                <span className="font-medium group-hover:text-[#111827] transition">
                   {tab.label}
                 </span>
-                <Icon className={`h-4 w-4 ${isActive ? (isGoodPerformance ? "text-emerald-400" : "text-rose-400") : "text-slate-500"}`} />
+                <Icon className={`h-4 w-4 ${isActive ? (isGoodPerformance ? "text-[#059669]" : "text-[#DC2626]") : "text-[#9CA3AF]"}`} />
               </div>
-              <div className="text-xl sm:text-2xl font-bold text-white tracking-tight font-mono my-0.5">
+              <div className="text-xl sm:text-2xl font-bold text-[#111827] tracking-tight font-mono my-0.5">
                 {tab.value}
               </div>
               <div
                 className={`text-xs font-semibold flex items-center gap-1 ${
-                  isGoodPerformance ? "text-emerald-400" : "text-rose-400"
+                  isGoodPerformance ? "text-[#059669]" : "text-[#DC2626]"
                 }`}
               >
                 <span>{tab.delta}</span>
-                <span className="text-[11px] text-slate-400 font-normal">
+                <span className="text-[11px] text-[#6B7280] font-normal">
                   {tab.subtext}
                 </span>
               </div>
@@ -567,13 +569,13 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
       {/* 3. The Recharts Canvas with Typical Corridor and Growing Up / Decreasing Down Curve */}
       <div className="relative h-[320px] w-full">
         {/* Date range subtitle */}
-        <div className="absolute top-2 right-4 z-10 flex items-center gap-3 text-xs text-slate-400">
-          <span className="hidden sm:inline font-mono text-indigo-300 bg-slate-950/90 border border-slate-800 px-2 py-0.5 rounded">
+        <div className="absolute top-2 right-4 z-10 flex items-center gap-3 text-xs text-[#6B7280]">
+          <span className="hidden sm:inline font-mono text-[#5B5CE2] bg-[#EEF2FF] border border-[#E0E7FF] px-2 py-0.5 rounded">
             {dateRangeString}
           </span>
           <div className="flex items-center gap-2 text-[11px]">
-            <span className="flex items-center gap-1 text-slate-400">
-              <span className="h-1.5 w-4 border-b border-dashed border-slate-500 inline-block" />
+            <span className="flex items-center gap-1 text-[#6B7280]">
+              <span className="h-1.5 w-4 border-b border-dashed border-[#9CA3AF] inline-block" />
               <span>Typical Range</span>
             </span>
             <span className="flex items-center gap-1 font-semibold" style={{ color: lineColor }}>
@@ -587,28 +589,28 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
           <AreaChart data={chartData} margin={{ top: 25, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="growthUpGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#10b981" stopOpacity={0.45} />
-                <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="#059669" stopOpacity={0.12} />
+                <stop offset="95%" stopColor="#059669" stopOpacity={0.0} />
               </linearGradient>
               <linearGradient id="growthDownGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.45} />
-                <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.0} />
+                <stop offset="5%" stopColor="#DC2626" stopOpacity={0.12} />
+                <stop offset="95%" stopColor="#DC2626" stopOpacity={0.0} />
               </linearGradient>
             </defs>
 
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
 
             <XAxis
               dataKey="date"
-              stroke="#64748b"
+              stroke="#6B7280"
               fontSize={11}
               tickLine={false}
-              axisLine={{ stroke: "#1e293b" }}
+              axisLine={{ stroke: "#E5E7EB" }}
               tickMargin={8}
             />
 
             <YAxis
-              stroke="#64748b"
+              stroke="#6B7280"
               fontSize={11}
               tickLine={false}
               axisLine={false}
@@ -622,7 +624,7 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
               type="monotone"
               dataKey="typicalHigh"
               name="Typical High"
-              stroke="#64748b"
+              stroke="#9CA3AF"
               strokeDasharray="4 4"
               strokeWidth={1.2}
               dot={false}
@@ -631,7 +633,7 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
               type="monotone"
               dataKey="typicalLow"
               name="Typical Low"
-              stroke="#475569"
+              stroke="#CBD5E1"
               strokeDasharray="4 4"
               strokeWidth={1.2}
               dot={false}
@@ -643,32 +645,32 @@ export const GrowthChart: React.FC<GrowthChartProps> = ({
               dataKey="value"
               name={activeMetric.charAt(0).toUpperCase() + activeMetric.slice(1)}
               stroke={lineColor}
-              strokeWidth={3}
+              strokeWidth={2.5}
               fillOpacity={1}
               fill={`url(#${gradientId})`}
               dot={false}
-              activeDot={{ r: 6, fill: lineColor, stroke: "#020617", strokeWidth: 3 }}
+              activeDot={{ r: 5, fill: lineColor, stroke: "#FFFFFF", strokeWidth: 2 }}
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
 
       {/* 4. Chart Footer Legend & Explanation */}
-      <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-slate-800/80 pt-3 text-xs text-slate-400">
+      <div className="mt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-t border-[#E5E7EB] pt-3 text-xs text-[#6B7280]">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full" style={{ backgroundColor: lineColor }} />
-            <span className="font-semibold text-slate-200">
+            <span className="font-semibold text-[#111827]">
               {isGoodPerformance ? "Growing Up Trajectory" : "Decreasing Down Trajectory"}
             </span>
           </div>
-          <div className="flex items-center gap-1.5 text-slate-400">
-            <span className="h-0.5 w-3 border-b border-dashed border-slate-500 inline-block" />
+          <div className="flex items-center gap-1.5 text-[#6B7280]">
+            <span className="h-0.5 w-3 border-b border-dashed border-[#9CA3AF] inline-block" />
             <span>Gray Corridor: Typical channel baseline ({daysSlice} day window)</span>
           </div>
         </div>
 
-        <div className="text-[11px] text-slate-400">
+        <div className="text-[11px] text-[#9CA3AF]">
           Updated live with YouTube Studio telemetry
         </div>
       </div>
@@ -700,59 +702,59 @@ const YouTubeStudioCustomTooltip: React.FC<TooltipProps> = ({
     const isBelow = point.isBelowTypical;
 
     return (
-      <div className="rounded-xl border border-slate-800 bg-slate-900/95 p-3.5 shadow-2xl backdrop-blur-md min-w-[220px]">
-        <div className="text-xs font-semibold text-slate-300 mb-2 border-b border-slate-800 pb-1.5">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white p-3.5 shadow-lg min-w-[220px]">
+        <div className="text-xs font-semibold text-[#111827] mb-2 border-b border-[#E5E7EB] pb-1.5">
           {point.fullDate}
         </div>
 
         <div className="space-y-1.5 text-xs">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-slate-400 flex items-center gap-1.5">
+            <span className="text-[#6B7280] flex items-center gap-1.5">
               <span
                 className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: isGood ? "#10b981" : "#f43f5e" }}
+                style={{ backgroundColor: isGood ? "#059669" : "#DC2626" }}
               />
               <span>Actual:</span>
             </span>
-            <span className="font-mono font-bold text-white text-sm">
+            <span className="font-mono font-bold text-[#111827] text-sm">
               {actualVal.toLocaleString()}
             </span>
           </div>
 
           <div className="flex items-center justify-between gap-3 text-[11px]">
-            <span className="text-slate-400">Typical Range:</span>
-            <span className="font-mono text-slate-300">
+            <span className="text-[#6B7280]">Typical Range:</span>
+            <span className="font-mono text-[#4B5563]">
               {typLow.toLocaleString()} – {typHigh.toLocaleString()}
             </span>
           </div>
 
           {/* Performance verdict badge */}
-          <div className="pt-1.5 border-t border-slate-800 flex items-center justify-between gap-2">
-            <span className="text-[11px] text-slate-400">Status:</span>
+          <div className="pt-1.5 border-t border-[#E5E7EB] flex items-center justify-between gap-2">
+            <span className="text-[11px] text-[#6B7280]">Status:</span>
             {isAbove ? (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#059669] bg-[#ECFDF5] px-2 py-0.5 rounded border border-[#A7F3D0]">
                 <TrendingUp className="h-3 w-3" />
                 <span>Above typical (+38%)</span>
               </span>
             ) : isBelow ? (
-              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#DC2626] bg-[#FEF2F2] px-2 py-0.5 rounded border border-[#FECACA]">
                 <TrendingDown className="h-3 w-3" />
                 <span>Below typical (-25%)</span>
               </span>
             ) : (
-              <span className="text-[11px] text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+              <span className="text-[11px] text-[#6B7280] bg-[#F3F4F6] px-2 py-0.5 rounded">
                 Within typical range
               </span>
             )}
           </div>
 
           {point.videoUpload && (
-            <div className="mt-2 rounded-lg bg-indigo-950/50 border border-indigo-500/30 p-2 text-[11px] text-indigo-200">
-              <div className="flex items-center gap-1 font-semibold text-indigo-300">
+            <div className="mt-2 rounded-lg bg-[#F8FAFC] border border-[#E5E7EB] p-2 text-[11px] text-[#4B5563]">
+              <div className="flex items-center gap-1 font-semibold text-[#5B5CE2]">
                 <Video className="h-3 w-3" />
                 <span>Video Published</span>
               </div>
-              <div className="truncate text-slate-300 mt-0.5">{point.videoUpload}</div>
+              <div className="truncate text-[#111827] mt-0.5">{point.videoUpload}</div>
             </div>
           )}
         </div>

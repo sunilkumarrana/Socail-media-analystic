@@ -1,6 +1,6 @@
 {
   "name": "SocialPulse",
-  "description": "Social media analytics dashboard prototype for YouTube, Instagram, and X with simulated performance data, growth trends, top content metrics, and AI-powered analyst insights.",
+  "description": "Social media analytics dashboard featuring dedicated Student Creator & campus influencer metrics, AI insights, and Quick Design integration with Adobe Express.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
